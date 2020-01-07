@@ -1,0 +1,72 @@
+{
+	"name": "ETL_pl_AzureSQLDB_Scaling",
+	"properties": {
+		"activities": [
+			{
+				"name": "ADF_Scale_Azure_SQLDB",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@concat('https://management.azure.com/subscriptions/', pipeline().parameters.SubscriptionID, '/resourceGroups/', pipeline().parameters.ResourceGroupName, '/providers/Microsoft.Sql/servers/',pipeline().parameters.AzureSQLServerName,'/databases/',pipeline().parameters.AzureSQLDatabaseName,'?api-version=2017-10-01-preview')",
+						"type": "Expression"
+					},
+					"method": "PUT",
+					"headers": {
+						"Content-Type": "application/json"
+					},
+					"body": {
+						"value": "@json(concat('{\"sku\":{\"name\":\"', pipeline().parameters.ComputeSize, '\",\"tier\":\"', pipeline().parameters.ServiceTier, '\"}, \"location\": \"', pipeline().parameters.AzureRegionName, ' \"}' ) )",
+						"type": "Expression"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://management.azure.com/"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"ServiceTier": {
+				"type": "String",
+				"defaultValue": "GeneralPurpose"
+			},
+			"ComputeSize": {
+				"type": "String",
+				"defaultValue": "GP_Gen5_16"
+			},
+			"AzureSQLServerName": {
+				"type": "String",
+				"defaultValue": "dataanalyticsqa-sql21"
+			},
+			"AzureSQLDatabaseName": {
+				"type": "String",
+				"defaultValue": "HavertysDW_QA"
+			},
+			"SubscriptionID": {
+				"type": "String",
+				"defaultValue": "e2f53281-fd58-437e-82e1-088d1b79fcbc"
+			},
+			"ResourceGroupName": {
+				"type": "String",
+				"defaultValue": "DataAnalytics_QA_RG"
+			},
+			"AzureRegionName": {
+				"type": "String",
+				"defaultValue": "East US"
+			}
+		},
+		"folder": {
+			"name": "MasterPipeline"
+		},
+		"annotations": []
+	}
+}

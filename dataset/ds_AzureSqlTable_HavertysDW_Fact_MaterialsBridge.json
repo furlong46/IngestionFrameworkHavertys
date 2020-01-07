@@ -1,0 +1,63 @@
+{
+	"name": "ds_AzureSqlTable_HavertysDW_Fact_MaterialsBridge",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Materials_Bridge_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Count",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SKU_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Materials_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SKU_Unformatted_nk",
+				"type": "varchar"
+			},
+			{
+				"name": "Material_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "SourceSystem_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Insert",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Update",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "DW",
+			"table": "Fact_MaterialsBridge"
+		}
+	}
+}

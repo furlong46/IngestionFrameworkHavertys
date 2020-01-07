@@ -1,0 +1,19 @@
+{
+	"name": "DB2StoredProcedureHTTPJson",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_HTTP_REST_dwstoredprocedure11",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DB2REST"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation"
+			}
+		}
+	}
+}

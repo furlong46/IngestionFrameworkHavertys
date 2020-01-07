@@ -1,0 +1,84 @@
+{
+	"name": "ds_ADLSG2parquet_staging_masterdata_tbpromo",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DataLake"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "staging/master data/other/DB203002/pcrundata_tbpromo",
+				"fileSystem": "datalake"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "PROMO",
+				"type": "UTF8"
+			},
+			{
+				"name": "CMPKEY",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "CSTDESC",
+				"type": "UTF8"
+			},
+			{
+				"name": "MINSALEAMT",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "CITIDPPCT",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "PLANNAME",
+				"type": "UTF8"
+			},
+			{
+				"name": "PLANDESC",
+				"type": "UTF8"
+			},
+			{
+				"name": "DURATION",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "PROMOAPR",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "PURCHAPR",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "OFPLANG",
+				"type": "UTF8"
+			},
+			{
+				"name": "GENTERMS",
+				"type": "UTF8"
+			}
+		]
+	}
+}

@@ -1,0 +1,98 @@
+{
+	"name": "ds_ADLSG2parquet_staging_masterdata_customer_tbcid",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DataLake"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "staging/master data/customer/DB203002/pcrundata_tbcid",
+				"fileSystem": "datalake"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "CIDNUM",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "CREATED",
+				"type": "INT96"
+			},
+			{
+				"name": "SOURCE",
+				"type": "UTF8"
+			},
+			{
+				"name": "UPDATED",
+				"type": "INT96"
+			},
+			{
+				"name": "STATUS",
+				"type": "UTF8"
+			},
+			{
+				"name": "SYNCHED",
+				"type": "INT96"
+			},
+			{
+				"name": "PREFNAM",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "PREFPHN",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "PREFADR",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "SENDNEWS",
+				"type": "UTF8"
+			},
+			{
+				"name": "SENDADV",
+				"type": "UTF8"
+			},
+			{
+				"name": "SENDCAT",
+				"type": "UTF8"
+			},
+			{
+				"name": "PREFEML",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "SENDPMAIL",
+				"type": "UTF8"
+			},
+			{
+				"name": "NOEMAIL",
+				"type": "UTF8"
+			},
+			{
+				"name": "ROOMPLAN",
+				"type": "UTF8"
+			}
+		]
+	}
+}

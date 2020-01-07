@@ -1,0 +1,33 @@
+{
+	"name": "Fact_SalesTeamBridge",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_ADLS_to_Fact_SalesTeamBridge",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_ADLS_to_Fact_SalesTeamBridge",
+						"type": "DataFlowReference",
+						"parameters": {
+							"MasterProcessNumber": "'1'"
+						}
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "Facts/Unit Testing"
+		},
+		"annotations": []
+	}
+}

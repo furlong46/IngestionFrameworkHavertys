@@ -1,0 +1,308 @@
+{
+	"name": "ds_ADLSG2parquet_staging_masterdata_product_tbgroup",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DataLake"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "staging/master data/product/DB203002/pcrundata_tbgroup",
+				"fileSystem": "datalake"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "GROUPID",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "VENDOR",
+				"type": "UTF8"
+			},
+			{
+				"name": "GROUP",
+				"type": "UTF8"
+			},
+			{
+				"name": "CRTDATE",
+				"type": "INT96"
+			},
+			{
+				"name": "UPDATED",
+				"type": "INT96"
+			},
+			{
+				"name": "SYNCHED",
+				"type": "INT96"
+			},
+			{
+				"name": "DESC",
+				"type": "UTF8"
+			},
+			{
+				"name": "RPTCLASS",
+				"type": "UTF8"
+			},
+			{
+				"name": "CATMDS",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "WEBDESC",
+				"type": "UTF8"
+			},
+			{
+				"name": "COLLID",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "GRPSORT",
+				"type": "UTF8"
+			},
+			{
+				"name": "WEBSHOW",
+				"type": "UTF8"
+			},
+			{
+				"name": "SHOWPRICE",
+				"type": "UTF8"
+			},
+			{
+				"name": "PRODFEAT",
+				"type": "UTF8"
+			},
+			{
+				"name": "STYLE",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "PRICEPT",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "TABDESC",
+				"type": "UTF8"
+			},
+			{
+				"name": "FACNAME",
+				"type": "UTF8"
+			},
+			{
+				"name": "CATWEB",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "SRCPCNT",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "ORIGVND",
+				"type": "UTF8"
+			},
+			{
+				"name": "ORIGINID",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "UPDATEDBY",
+				"type": "UTF8"
+			},
+			{
+				"name": "ANALYSTID",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "SPLORDPROD",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "ACTIVESTR",
+				"type": "INT96"
+			},
+			{
+				"name": "ACTIVEEND",
+				"type": "INT96"
+			},
+			{
+				"name": "PRCTAGDESC",
+				"type": "UTF8"
+			},
+			{
+				"name": "COMMENT",
+				"type": "UTF8"
+			},
+			{
+				"name": "VENDORLEAD",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "PTAGDESCUP",
+				"type": "INT96"
+			},
+			{
+				"name": "MIORIGIN",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "IMAGELOC",
+				"type": "UTF8"
+			},
+			{
+				"name": "WEBSTATUS",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "MDSSIGNOFF",
+				"type": "UTF8"
+			},
+			{
+				"name": "ADVSIGNOFF",
+				"type": "UTF8"
+			},
+			{
+				"name": "INCOMCAT",
+				"type": "UTF8"
+			},
+			{
+				"name": "MDSUSER",
+				"type": "UTF8"
+			},
+			{
+				"name": "MDSDATE",
+				"type": "INT96"
+			},
+			{
+				"name": "ADVUSER",
+				"type": "UTF8"
+			},
+			{
+				"name": "ADVDATE",
+				"type": "INT96"
+			},
+			{
+				"name": "STARRATING",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "RATINGCNT",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "DSPNAME",
+				"type": "UTF8"
+			},
+			{
+				"name": "CARRYPARTS",
+				"type": "UTF8"
+			},
+			{
+				"name": "PARTSDEFND",
+				"type": "UTF8"
+			},
+			{
+				"name": "WATCH",
+				"type": "INT96"
+			},
+			{
+				"name": "CLOSEOUT",
+				"type": "INT96"
+			},
+			{
+				"name": "FACTORYID",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "DIRECTIMP",
+				"type": "UTF8"
+			},
+			{
+				"name": "QUALITYLVL",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "SPECORDAVL",
+				"type": "UTF8"
+			},
+			{
+				"name": "ORDBYSALE",
+				"type": "UTF8"
+			},
+			{
+				"name": "CSLEADFM",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "CSLEADTO",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "SOLEADFM",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "SOLEADTO",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "OMITLCLA",
+				"type": "UTF8"
+			},
+			{
+				"name": "QCNUM",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			}
+		]
+	}
+}

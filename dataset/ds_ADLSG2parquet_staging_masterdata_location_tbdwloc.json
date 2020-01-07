@@ -1,0 +1,176 @@
+{
+	"name": "ds_ADLSG2parquet_staging_masterdata_location_tbdwloc",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DataLake"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "staging/master data/location/DB203002/ipcorpdta_tbdwloc",
+				"fileSystem": "datalake"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "PROCESS_NUMBER",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "DIVISION",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "REGIONID",
+				"type": "UTF8"
+			},
+			{
+				"name": "REGIONNAME",
+				"type": "UTF8"
+			},
+			{
+				"name": "CENTER",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "CENTERNAME",
+				"type": "UTF8"
+			},
+			{
+				"name": "BRANCHID",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "BRANCHNAME",
+				"type": "UTF8"
+			},
+			{
+				"name": "LABEL",
+				"type": "UTF8"
+			},
+			{
+				"name": "BRANCHTYPE",
+				"type": "UTF8"
+			},
+			{
+				"name": "PHONE",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "ADDRESS1",
+				"type": "UTF8"
+			},
+			{
+				"name": "ADDRESS2",
+				"type": "UTF8"
+			},
+			{
+				"name": "CITY",
+				"type": "UTF8"
+			},
+			{
+				"name": "STATE",
+				"type": "UTF8"
+			},
+			{
+				"name": "ZIPCODE",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "LONGITUDE",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "LATITUDE",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "OPENDATE",
+				"type": "INT96"
+			},
+			{
+				"name": "CLOSEDATE",
+				"type": "INT96"
+			},
+			{
+				"name": "SALESSQFT",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "CONDCCSQFT",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "OFCUTLSQFT",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "WHSESQFT",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "TOTRTLSQFT",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "GROSSSQFT",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "LOCTYPE",
+				"type": "UTF8"
+			},
+			{
+				"name": "BRANCHSIZE",
+				"type": "UTF8"
+			},
+			{
+				"name": "TIMEZONE",
+				"type": "UTF8"
+			},
+			{
+				"name": "MARKETMGR",
+				"type": "UTF8"
+			},
+			{
+				"name": "BRANCHMGR",
+				"type": "UTF8"
+			}
+		]
+	}
+}

@@ -1,0 +1,16 @@
+{
+	"name": "MDFIntegrationRuntime",
+	"properties": {
+		"type": "Managed",
+		"typeProperties": {
+			"computeProperties": {
+				"location": "AutoResolve",
+				"dataFlowProperties": {
+					"computeType": "MemoryOptimized",
+					"coreCount": 36,
+					"timeToLive": 0
+				}
+			}
+		}
+	}
+}

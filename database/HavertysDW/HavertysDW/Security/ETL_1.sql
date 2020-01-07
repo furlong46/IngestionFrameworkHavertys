@@ -1,0 +1,8 @@
+﻿CREATE USER [ETL] FOR LOGIN [ETL];
+
+
+
+
+
+
+

@@ -1,0 +1,280 @@
+{
+	"name": "ETL_pl_AAS_Processing_AzureAutoHook",
+	"properties": {
+		"activities": [
+			{
+				"name": "SP_MasterJobEnd_Success",
+				"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after successful execution of previous steps.",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Full or Incremental AAS Processing",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 1,
+					"retryIntervalInSeconds": 60,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_MasterJobEnd_Success]",
+					"storedProcedureParameters": {
+						"MasterProcessNumber": {
+							"value": {
+								"value": "@pipeline().parameters.MasterProcessNumber",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "SP_MasterJobEnd_Failure_Pipeline",
+				"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after failed execution of previous steps.",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Full or Incremental AAS Processing",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_MasterJobEnd_Failure]",
+					"storedProcedureParameters": {
+						"MasterProcessNumber": {
+							"value": {
+								"value": "@pipeline().parameters.MasterProcessNumber",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Full or Incremental AAS Processing",
+				"type": "IfCondition",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(pipeline().parameters.RunType, 'N')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Web_AzureAutomation_Webhook_Full",
+							"type": "WebHook",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@pipeline().parameters.WebHookFull",
+									"type": "Expression"
+								},
+								"method": "POST",
+								"headers": {
+									"Content-Type": "application/json"
+								},
+								"body": {
+									"value": "@json(concat('{\"AnalysisServicesDatabaseName\":\"Havertys Semantic Layer\",\"AnalysisServicesServer\":\"', pipeline().parameters.AnalysisServicesServer,'\"}'))",
+									"type": "Expression"
+								},
+								"timeout": "00:40:00"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Web_AzureAutomation_Webhook_Incremental",
+							"type": "WebHook",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@pipeline().parameters.WebHookIncremental",
+									"type": "Expression"
+								},
+								"method": "POST",
+								"headers": {
+									"Content-Type": "application/json"
+								},
+								"body": {
+									"value": "@json(concat('{\"AnalysisServicesDatabaseName\":\"Havertys Semantic Layer\",\"AnalysisServicesServer\":\"', pipeline().parameters.AnalysisServicesServer,'\"}'))",
+									"type": "Expression"
+								},
+								"timeout": "00:45:00"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "900or1000_Temp1000",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Full or Incremental AAS Processing",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(pipeline().parameters.RunType, 'N')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "DB2_RESTCall_1000",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "POST",
+										"requestBody": {
+											"value": "@{concat('{', '\"status\": ', '1000', ', ', '\"processNumber\": ', string(pipeline().parameters.MasterProcessNumber), ', ', '\"runType\": ', pipeline().parameters.RunType, '}')}",
+											"type": "Expression"
+										},
+										"requestTimeout": ""
+									}
+								},
+								"dataset": {
+									"referenceName": "DB2StoredProcedureHTTPJson",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "Execute_pl_ScaleDBDown",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "DB2_RESTCall_1000",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "ETL_pl_AzureSQLDB_Scaling",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"ServiceTier": "GeneralPurpose",
+									"ComputeSize": "GP_Gen5_2",
+									"AzureSQLServerName": "dataanalyticsqa-sql21",
+									"AzureSQLDatabaseName": "HavertysDW_QA",
+									"SubscriptionID": "e2f53281-fd58-437e-82e1-088d1b79fcbc",
+									"ResourceGroupName": "DataAnalytics_QA_RG",
+									"AzureRegionName": "East US"
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "DB2_RESTCall_900",
+							"description": "@{concat('{', '\"status\": ', '900', ', ', '\"processNumber\": ', string(pipeline().parameters.MasterProcessNumber), ', ', '\"runType\": ', pipeline().parameters.RunType, '}')}",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "POST",
+										"requestBody": {
+											"value": "@{concat('{', '\"status\": ', '1000', ', ', '\"processNumber\": ', string(pipeline().parameters.MasterProcessNumber), ', ', '\"runType\": ', 'O', '}')}",
+											"type": "Expression"
+										},
+										"requestTimeout": ""
+									}
+								},
+								"dataset": {
+									"referenceName": "DB2StoredProcedureHTTPJson",
+									"type": "DatasetReference"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"MasterProcessNumber": {
+				"type": "int",
+				"defaultValue": 1
+			},
+			"RunType": {
+				"type": "string",
+				"defaultValue": "N"
+			},
+			"WebHookFull": {
+				"type": "string",
+				"defaultValue": "https://s16events.azure-automation.net/webhooks?token=F2xAYLKuX%2fs1VY%2byw7QFUIL0cQal1QKrBmrISNEKBBU%3d"
+			},
+			"WebHookIncremental": {
+				"type": "string",
+				"defaultValue": "https://s16events.azure-automation.net/webhooks?token=t7GUWw%2bHL81EfJlHJhqaFSfrB6dkjELv0yWdTjTx7TI%3d"
+			},
+			"AnalysisServicesServer": {
+				"type": "string",
+				"defaultValue": "asazure://eastus.asazure.windows.net/dataanalyticsqaaas21"
+			}
+		},
+		"folder": {
+			"name": "AAS Processing"
+		},
+		"annotations": []
+	}
+}

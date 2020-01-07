@@ -1,0 +1,20 @@
+{
+	"name": "PC03002",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"description": "PC03002 connection",
+		"annotations": [],
+		"type": "Db2",
+		"typeProperties": {
+			"server": "pc03002:446",
+			"database": "pc03002",
+			"authenticationType": "Basic",
+			"username": "userazure",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI2MGMzNjkxZC02NTA5LTRkNmMtYTMwYi01MmQ0YTU3NTY3MjMiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "Gateway01IR",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

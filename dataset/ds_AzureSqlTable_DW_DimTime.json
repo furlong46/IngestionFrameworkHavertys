@@ -1,0 +1,106 @@
+{
+	"name": "ds_AzureSqlTable_DW_DimTime",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Time_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Time24_code",
+				"type": "time",
+				"scale": 0
+			},
+			{
+				"name": "Time24_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Hour_code",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Hour_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Hour24_code",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Hour24_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Minute_code",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Minute_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Minute24_code",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "Minute24_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Second_code",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Second_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Second24_code",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Second24_name",
+				"type": "varchar"
+			},
+			{
+				"name": "AmPm",
+				"type": "varchar"
+			},
+			{
+				"name": "StandardTime",
+				"type": "varchar"
+			},
+			{
+				"name": "ETLBatchID_Insert",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Update",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "DW",
+			"table": "Dim_Time"
+		}
+	}
+}

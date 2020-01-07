@@ -1,0 +1,70 @@
+{
+	"name": "ds_AzureSQLTable_HavertysDW_Fact_SalesTeamBridge",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Sales_Team_Bridge_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Count",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Sales_Team_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Sales_Associate_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TeamMember1_ID_nk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TeamMember2_ID_nk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Employee_ID_nk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SourceSystem_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Insert",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Update",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "DW",
+			"table": "Fact_SalesTeamBridge"
+		}
+	}
+}

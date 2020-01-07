@@ -1,0 +1,74 @@
+{
+	"name": "ds_AzureSqlTable_ETL_DB2MetadataIngestionList",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "DB2TableID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SchemaTable",
+				"type": "varchar"
+			},
+			{
+				"name": "PKColumnList",
+				"type": "varchar"
+			},
+			{
+				"name": "ControlTable",
+				"type": "varchar"
+			},
+			{
+				"name": "ControlFilterColumn",
+				"type": "varchar"
+			},
+			{
+				"name": "ControlStartDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ControlEndDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ControlFilterValue",
+				"type": "varchar"
+			},
+			{
+				"name": "ControlFilterType",
+				"type": "varchar"
+			},
+			{
+				"name": "ControlProcessNumber",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SelectQuery",
+				"type": "varchar"
+			},
+			{
+				"name": "DataLakeStagingFolder",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "ETL",
+			"table": "DB2MetadataIngestionList"
+		}
+	}
+}

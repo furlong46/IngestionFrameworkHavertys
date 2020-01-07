@@ -1,0 +1,258 @@
+{
+	"name": "ds_AzureSqlTable_HavertysDW_DimCustomer",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Customer_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Customer_Sequence_nk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Customer_ID_nk",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "Sequence_Status",
+				"type": "varchar"
+			},
+			{
+				"name": "Bill_First_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Bill_Last_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Bill_Name_Status",
+				"type": "varchar"
+			},
+			{
+				"name": "Bill_Address",
+				"type": "varchar"
+			},
+			{
+				"name": "Bill_City",
+				"type": "varchar"
+			},
+			{
+				"name": "Bill_State",
+				"type": "varchar"
+			},
+			{
+				"name": "Bill_ZIP",
+				"type": "varchar"
+			},
+			{
+				"name": "Bill_ZIP4",
+				"type": "varchar"
+			},
+			{
+				"name": "Bill_Latitude",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 6
+			},
+			{
+				"name": "Bill_Longitude",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 6
+			},
+			{
+				"name": "Bill_Address_Status",
+				"type": "varchar"
+			},
+			{
+				"name": "Delivery_First_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Delivery_Last_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Delivery_Name_Status",
+				"type": "varchar"
+			},
+			{
+				"name": "Delivery_Address",
+				"type": "varchar"
+			},
+			{
+				"name": "Delivery_City",
+				"type": "varchar"
+			},
+			{
+				"name": "Delivery_State",
+				"type": "varchar"
+			},
+			{
+				"name": "Delivery_ZIP",
+				"type": "varchar"
+			},
+			{
+				"name": "Delivery_ZIP4",
+				"type": "varchar"
+			},
+			{
+				"name": "Delivery_Latitude",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 6
+			},
+			{
+				"name": "Delivery_Longitude",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 6
+			},
+			{
+				"name": "Delivery_Address_Status",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_Profile_Created_Date",
+				"type": "date"
+			},
+			{
+				"name": "Customer_First_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_Last_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_Name_Status",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_Address",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_City",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_State",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_ZIP",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_ZIP4",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_Latitude",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 6
+			},
+			{
+				"name": "Customer_Longitude",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 6
+			},
+			{
+				"name": "Customer_Phone_Type",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_Phone",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_Phone_Extension",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_Phone_Status",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_Email",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_Email_Status",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_Created_Date",
+				"type": "date"
+			},
+			{
+				"name": "Customer_Status",
+				"type": "varchar"
+			},
+			{
+				"name": "No_Email",
+				"type": "varchar"
+			},
+			{
+				"name": "Room_Plan",
+				"type": "varchar"
+			},
+			{
+				"name": "Send_Advertising",
+				"type": "varchar"
+			},
+			{
+				"name": "Send_Catalog",
+				"type": "varchar"
+			},
+			{
+				"name": "Send_News",
+				"type": "varchar"
+			},
+			{
+				"name": "Send_P_Mail",
+				"type": "varchar"
+			},
+			{
+				"name": "HashKey",
+				"type": "char"
+			},
+			{
+				"name": "SourceSystem_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Insert",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Update",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "DW",
+			"table": "Dim_Customer"
+		}
+	}
+}

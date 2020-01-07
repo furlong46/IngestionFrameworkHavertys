@@ -1,0 +1,33 @@
+{
+	"name": "Dim_Factory",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_ADLS_to_Dim_Factory",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_ADLS_to_Dim_Factory",
+						"type": "DataFlowReference",
+						"parameters": {
+							"MasterProcessNumber": "'4'"
+						}
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "Dimensions/Unit Testing"
+		},
+		"annotations": []
+	}
+}

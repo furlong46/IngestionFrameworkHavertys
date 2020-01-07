@@ -1,0 +1,113 @@
+{
+	"name": "ds_AzureSqlTable_HavertysDW_DimVendor",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Vendor_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Vendor_ID_nk",
+				"type": "varchar"
+			},
+			{
+				"name": "Vendor_Number",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Vendor_Long_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Vendor_Short_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Vendor_Type_Code",
+				"type": "varchar"
+			},
+			{
+				"name": "Vendor_Type_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Address_1",
+				"type": "varchar"
+			},
+			{
+				"name": "Address_2",
+				"type": "varchar"
+			},
+			{
+				"name": "City",
+				"type": "varchar"
+			},
+			{
+				"name": "State",
+				"type": "varchar"
+			},
+			{
+				"name": "Zip",
+				"type": "varchar"
+			},
+			{
+				"name": "Country",
+				"type": "varchar"
+			},
+			{
+				"name": "Active",
+				"type": "bit"
+			},
+			{
+				"name": "IndirectDirect",
+				"type": "varchar"
+			},
+			{
+				"name": "Status_ID",
+				"type": "varchar"
+			},
+			{
+				"name": "Status",
+				"type": "varchar"
+			},
+			{
+				"name": "RTV_Credit_Allowed",
+				"type": "varchar"
+			},
+			{
+				"name": "HashKey",
+				"type": "char"
+			},
+			{
+				"name": "SourceSystem_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Insert",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Update",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "DW",
+			"table": "Dim_Vendor"
+		}
+	}
+}

@@ -1,0 +1,74 @@
+{
+	"name": "ds_ADLSG2parquet_staging_masterdata_tbsp",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DataLake"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "staging/master data/other/DB203002/pcrundata_tbsp",
+				"fileSystem": "datalake"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "PROKEY",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "PROCODE",
+				"type": "UTF8"
+			},
+			{
+				"name": "DESC",
+				"type": "UTF8"
+			},
+			{
+				"name": "PROTYPE",
+				"type": "UTF8"
+			},
+			{
+				"name": "SECURITY",
+				"type": "UTF8"
+			},
+			{
+				"name": "CIDUSEMAX",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "CREATED",
+				"type": "INT96"
+			},
+			{
+				"name": "UPDATED",
+				"type": "INT96"
+			},
+			{
+				"name": "SYNCHED",
+				"type": "INT96"
+			},
+			{
+				"name": "INTERNDESC",
+				"type": "UTF8"
+			},
+			{
+				"name": "SEGMENT",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			}
+		]
+	}
+}

@@ -1,0 +1,102 @@
+{
+	"name": "ds_AzureSqlTable_HavertysDW_DimFactory",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Factory_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Factory_Code_nk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Factory_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Address_1",
+				"type": "varchar"
+			},
+			{
+				"name": "Address_2",
+				"type": "varchar"
+			},
+			{
+				"name": "City",
+				"type": "varchar"
+			},
+			{
+				"name": "State",
+				"type": "varchar"
+			},
+			{
+				"name": "Zip",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Country",
+				"type": "varchar"
+			},
+			{
+				"name": "Active",
+				"type": "varchar"
+			},
+			{
+				"name": "HashKey",
+				"type": "char"
+			},
+			{
+				"name": "SourceSystem_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Insert",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Update",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Latitude",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 6
+			},
+			{
+				"name": "Longitude",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 6
+			},
+			{
+				"name": "Country_Code",
+				"type": "char"
+			},
+			{
+				"name": "Created_Date",
+				"type": "date"
+			}
+		],
+		"typeProperties": {
+			"schema": "DW",
+			"table": "Dim_Factory"
+		}
+	}
+}
