@@ -15,16 +15,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Dim_CommonFinish",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -44,16 +34,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Dim_CreditPromotion",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -73,16 +53,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Dim_Location",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -102,16 +72,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Dim_Materials",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -131,16 +91,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Dim_MerchandisingPromo",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -160,16 +110,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Dim_SpecialOrderAttributesKey",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -196,16 +136,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Dim_SpecialOrdersAttributes",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -225,16 +155,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "ds_ADLS_to_Dim_CommonColor",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -261,10 +181,6 @@
 							"type": "Expression"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -287,10 +203,6 @@
 							"type": "Expression"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -306,16 +218,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Dim_Factory",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -335,16 +237,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Dim_Vendor",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -364,16 +256,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Dim_Override_Reason",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -519,10 +401,6 @@
 							"type": "Int32"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -545,10 +423,6 @@
 							"type": "Expression"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -571,10 +445,6 @@
 							"type": "Expression"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
-					"type": "LinkedServiceReference"
 				}
 			}
 		],

@@ -15,16 +15,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Fact_MaterialsBridge",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -51,20 +41,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Fact_WrittenSales",
-						"type": "DataFlowReference",
-						"parameters": {
-							"ControlStartDate": {
-								"value": "'@{substring(\nreplace(\nstring(activity('LookUp_DB2ControlDates_Written').output.firstrow.ControlStartDate), \n'-', ''),\n0,\n8\n)}'",
-								"type": "Expression"
-							},
-							"ControlEndDate": {
-								"value": "'@{substring(\nreplace(\nstring(activity('LookUp_DB2ControlDates_Written').output.firstrow.ControlEndDate), \n'-', ''),\n0,\n8\n)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -91,20 +67,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Fact_DeliveredSales",
-						"type": "DataFlowReference",
-						"parameters": {
-							"ControlStartDate": {
-								"value": "'@{substring(\nreplace(\nstring(activity('LookUp_DB2ControlDates_Delivered').output.firstrow.ControlStartDate), \n'-', ''),\n0,\n8\n)}'",
-								"type": "Expression"
-							},
-							"ControlEndDate": {
-								"value": "'@{substring(\nreplace(\nstring(activity('LookUp_DB2ControlDates_Delivered').output.firstrow.ControlEndDate), \n'-', ''),\n0,\n8\n)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -124,16 +86,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Fact_SKUCost",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -153,16 +105,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Fact_SpecialOrderAttributesKeyValuesBridge",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -182,16 +124,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Fact_CommonColorBridge",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -211,16 +143,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_ADLS_to_Fact_CommonFinishBridge",
-						"type": "DataFlowReference",
-						"parameters": {
-							"MasterProcessNumber": {
-								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
-								"type": "Expression"
-							}
-						}
-					},
 					"integrationRuntime": {
 						"referenceName": "MDFIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -318,10 +240,6 @@
 							"type": "String"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -361,10 +279,6 @@
 							"type": "String"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -488,10 +402,6 @@
 							"type": "Int32"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -514,10 +424,6 @@
 							"type": "Expression"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -540,10 +446,6 @@
 							"type": "Expression"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -566,10 +468,6 @@
 							"type": "Expression"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -592,10 +490,6 @@
 							"type": "Expression"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -629,10 +523,6 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"pipeline": {
-						"referenceName": "CuratedMaintenance",
-						"type": "PipelineReference"
-					},
 					"waitOnCompletion": true
 				}
 			}

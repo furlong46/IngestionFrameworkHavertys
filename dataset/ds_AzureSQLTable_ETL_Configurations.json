@@ -1,10 +1,6 @@
 {
 	"name": "ds_AzureSQLTable_ETL_Configurations",
 	"properties": {
-		"linkedServiceName": {
-			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
-			"type": "LinkedServiceReference"
-		},
 		"folder": {
 			"name": "HavertysDW"
 		},

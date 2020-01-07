@@ -1,10 +1,6 @@
 {
 	"name": "ds_AzureSqlTable_ETL_AzureMetadataIngestionList",
 	"properties": {
-		"linkedServiceName": {
-			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
-			"type": "LinkedServiceReference"
-		},
 		"folder": {
 			"name": "HavertysDW"
 		},

@@ -33,10 +33,6 @@
 							"type": "Int32"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -70,10 +66,6 @@
 							"type": "Int32"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
