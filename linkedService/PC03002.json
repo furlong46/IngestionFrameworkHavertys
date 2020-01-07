@@ -6,15 +6,11 @@
 		"annotations": [],
 		"type": "Db2",
 		"typeProperties": {
-			"server": "pc03002:446",
-			"database": "pc03002",
+			"server": "servername:446",
+			"database": "db2",
 			"authenticationType": "Basic",
-			"username": "userazure",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI2MGMzNjkxZC02NTA5LTRkNmMtYTMwYi01MmQ0YTU3NTY3MjMiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
-		},
-		"connectVia": {
-			"referenceName": "Gateway01IR",
-			"type": "IntegrationRuntimeReference"
+			"username": "user",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIklOR0VTVElPTkZSQU1FV09SS19lOTc1YTdhZi1lMmVmLTQxODktOTRlNC1kODc5ZDM1YjMzOTIiDQp9"
 		}
 	}
 }
