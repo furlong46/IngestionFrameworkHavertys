@@ -287,7 +287,20 @@
 						{
 							"name": "Execute_pl_DW_Dimensions",
 							"type": "ExecutePipeline",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "Execute_pl_AzureControledMetadata",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "Execute_pl_DB2ControledMetadata_via_RunType_Pipeline",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
