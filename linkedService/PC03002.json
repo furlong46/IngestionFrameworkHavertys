@@ -2,7 +2,7 @@
 	"name": "PC03002",
 	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
-		"description": "PC03002 connection",
+		"description": "db2",
 		"annotations": [],
 		"type": "Db2",
 		"typeProperties": {
