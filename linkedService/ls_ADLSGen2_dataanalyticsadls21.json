@@ -12,7 +12,7 @@
 					"referenceName": "ls_KV_KV21",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "dataanalyticsqaadls21"
+				"secretName": "ADLS"
 			}
 		}
 	}
