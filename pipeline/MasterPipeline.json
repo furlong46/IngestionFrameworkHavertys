@@ -97,10 +97,6 @@
 							},
 							"requestTimeout": ""
 						}
-					},
-					"dataset": {
-						"referenceName": "DB2StoredProcedureHTTPJson",
-						"type": "DatasetReference"
 					}
 				}
 			},
@@ -252,39 +248,6 @@
 							}
 						},
 						{
-							"name": "adbx_ADLS_CuratedCustomer",
-							"type": "DatabricksNotebook",
-							"dependsOn": [
-								{
-									"activity": "Execute_pl_AzureControledMetadata",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								},
-								{
-									"activity": "adbx_Start_Cluster",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "7.00:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"notebookPath": "/Dimension Loads/Load Curated Customer Tables"
-							},
-							"linkedServiceName": {
-								"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
-								"type": "LinkedServiceReference"
-							}
-						},
-						{
 							"name": "SP_MasterJobEnd_Failure_DB2",
 							"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after failed execution of previous steps.",
 							"type": "SqlServerStoredProcedure",
@@ -322,55 +285,9 @@
 							}
 						},
 						{
-							"name": "adbx_ADLS_CuratedTeam",
-							"type": "DatabricksNotebook",
-							"dependsOn": [
-								{
-									"activity": "Execute_pl_DB2ControledMetadata_via_RunType_Pipeline",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								},
-								{
-									"activity": "adbx_Start_Cluster",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "7.00:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"notebookPath": "/Dimension Loads/Load Curated Team Tables"
-							},
-							"linkedServiceName": {
-								"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
-								"type": "LinkedServiceReference"
-							}
-						},
-						{
 							"name": "Execute_pl_DW_Dimensions",
 							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "adbx_ADLS_CuratedCustomer",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								},
-								{
-									"activity": "adbx_ADLS_CuratedTeam",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
@@ -428,26 +345,6 @@
 							},
 							"linkedServiceName": {
 								"referenceName": "ls_AzureSqlDatabase_HavertysDW",
-								"type": "LinkedServiceReference"
-							}
-						},
-						{
-							"name": "adbx_Start_Cluster",
-							"type": "DatabricksNotebook",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "7.00:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"notebookPath": "/Dimension Loads/Count Curated Tables and Start Cluster"
-							},
-							"linkedServiceName": {
-								"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
 								"type": "LinkedServiceReference"
 							}
 						}
