@@ -55,7 +55,7 @@
 						"type": "Expression"
 					},
 					"isSequential": false,
-					"batchCount": 15,
+					"batchCount": 1,
 					"activities": [
 						{
 							"name": "Copy_ADLStaging_ADLRaw",
