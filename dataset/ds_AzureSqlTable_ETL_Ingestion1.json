@@ -1,5 +1,5 @@
 {
-	"name": "ds_AzureSqlTable_ETL_Ingestion",
+	"name": "ds_AzureSqlTable_ETL_Ingestion1",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_sourcesystem",
