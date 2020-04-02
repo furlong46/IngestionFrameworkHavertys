@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-mdp-demo"
+		},
+		"ls_ADLSGen2_dataanalyticsadls21_accountKey": {
+			"value": ""
+		},
+		"ls_AzureDatabricks_DataAnalyticsQA_ADBX_accessToken": {
+			"value": ""
+		},
+		"ls_AzureSqlDatabase_HavertysDW_connectionString": {
+			"value": ""
+		},
+		"ls_sourcesystem_connectionString": {
+			"value": ""
+		},
+		"ls_ADLSGen2_dataanalyticsadls21_properties_typeProperties_url": {
+			"value": "https://adlsmdpdemo.dfs.core.windows.net"
+		},
+		"ls_KV_KV21_properties_typeProperties_baseUrl": {
+			"value": "https://kv-mdp-demo.vault.azure.net/"
+		},
+		"Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration": {
+			"value": "OverrideLoad"
+		},
+		"Mornings at 8AM_properties_MasterPipeline_parameters_RunType": {
+			"value": "O"
+		}
+	}
+}

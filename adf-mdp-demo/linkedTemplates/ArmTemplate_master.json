@@ -1,0 +1,118 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-mdp-demo"
+		},
+		"ls_ADLSGen2_dataanalyticsadls21_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_ADLSGen2_dataanalyticsadls21'"
+		},
+		"ls_AzureDatabricks_DataAnalyticsQA_ADBX_accessToken": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accessToken' of 'ls_AzureDatabricks_DataAnalyticsQA_ADBX'"
+		},
+		"ls_AzureSqlDatabase_HavertysDW_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_AzureSqlDatabase_HavertysDW'"
+		},
+		"ls_sourcesystem_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_sourcesystem'"
+		},
+		"ls_ADLSGen2_dataanalyticsadls21_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adlsmdpdemo.dfs.core.windows.net"
+		},
+		"ls_KV_KV21_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://kv-mdp-demo.vault.azure.net/"
+		},
+		"Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration": {
+			"type": "string",
+			"defaultValue": "OverrideLoad"
+		},
+		"Mornings at 8AM_properties_MasterPipeline_parameters_RunType": {
+			"type": "string",
+			"defaultValue": "O"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"ls_ADLSGen2_dataanalyticsadls21_accountKey": {
+						"value": "[parameters('ls_ADLSGen2_dataanalyticsadls21_accountKey')]"
+					},
+					"ls_AzureDatabricks_DataAnalyticsQA_ADBX_accessToken": {
+						"value": "[parameters('ls_AzureDatabricks_DataAnalyticsQA_ADBX_accessToken')]"
+					},
+					"ls_AzureSqlDatabase_HavertysDW_connectionString": {
+						"value": "[parameters('ls_AzureSqlDatabase_HavertysDW_connectionString')]"
+					},
+					"ls_sourcesystem_connectionString": {
+						"value": "[parameters('ls_sourcesystem_connectionString')]"
+					},
+					"ls_ADLSGen2_dataanalyticsadls21_properties_typeProperties_url": {
+						"value": "[parameters('ls_ADLSGen2_dataanalyticsadls21_properties_typeProperties_url')]"
+					},
+					"ls_KV_KV21_properties_typeProperties_baseUrl": {
+						"value": "[parameters('ls_KV_KV21_properties_typeProperties_baseUrl')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration": {
+						"value": "[parameters('Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration')]"
+					},
+					"Mornings at 8AM_properties_MasterPipeline_parameters_RunType": {
+						"value": "[parameters('Mornings at 8AM_properties_MasterPipeline_parameters_RunType')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'ArmTemplate_0')]"
+			]
+		}
+	]
+}

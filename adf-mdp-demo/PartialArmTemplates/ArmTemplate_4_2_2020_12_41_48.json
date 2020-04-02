@@ -1,0 +1,2716 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-mdp-demo"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ETL_pl_AAS_Processing_AzureAutoHook')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SP_MasterJobEnd_Success",
+						"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after successful execution of previous steps.",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Full or Incremental AAS Processing",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 1,
+							"retryIntervalInSeconds": 60,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_MasterJobEnd_Success]",
+							"storedProcedureParameters": {
+								"MasterProcessNumber": {
+									"value": {
+										"value": "@pipeline().parameters.MasterProcessNumber",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "SP_MasterJobEnd_Failure_Pipeline",
+						"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after failed execution of previous steps.",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Full or Incremental AAS Processing",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_MasterJobEnd_Failure]",
+							"storedProcedureParameters": {
+								"MasterProcessNumber": {
+									"value": {
+										"value": "@pipeline().parameters.MasterProcessNumber",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Full or Incremental AAS Processing",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Lookup_KeyValueConfig",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@equals(pipeline().parameters.RunType, 'N')",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "Web_AzureAutomation_Webhook_Full",
+									"type": "WebHook",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"url": {
+											"value": "@activity('Lookup_KeyValueConfig').output.firstRow.WebHookFull",
+											"type": "Expression"
+										},
+										"method": "POST",
+										"headers": {
+											"Content-Type": "application/json"
+										},
+										"body": {
+											"value": "@json(concat('{\"AnalysisServicesDatabaseName\":\"Havertys Semantic Layer\",\"AnalysisServicesServer\":\"', activity('Lookup_KeyValueConfig').output.firstRow.AnalysisServicesServer,'\"}'))",
+											"type": "Expression"
+										},
+										"timeout": "01:00:00",
+										"reportStatusOnCallBack": true
+									}
+								},
+								{
+									"name": "Web_AzureAutomation_Webhook_Full_copy1",
+									"type": "WebHook",
+									"dependsOn": [
+										{
+											"activity": "Web_AzureAutomation_Webhook_Full",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"url": {
+											"value": "@activity('Lookup_KeyValueConfig').output.firstRow.WebHookFull",
+											"type": "Expression"
+										},
+										"method": "POST",
+										"headers": {
+											"Content-Type": "application/json"
+										},
+										"body": {
+											"value": "@json(concat('{\"AnalysisServicesDatabaseName\":\"Havertys Semantic Layer\",\"AnalysisServicesServer\":\"', activity('Lookup_KeyValueConfig').output.firstRow.AnalysisServicesServer,'\"}'))",
+											"type": "Expression"
+										},
+										"timeout": "01:00:00",
+										"reportStatusOnCallBack": true
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Web_AzureAutomation_Webhook_Incremental",
+									"type": "WebHook",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"url": {
+											"value": "@activity('Lookup_KeyValueConfig').output.firstRow.WebHookFull",
+											"type": "Expression"
+										},
+										"method": "POST",
+										"headers": {
+											"Content-Type": "application/json"
+										},
+										"body": {
+											"value": "@json(concat('{\"AnalysisServicesDatabaseName\":\"Havertys Semantic Layer\",\"AnalysisServicesServer\":\"', activity('Lookup_KeyValueConfig').output.firstRow.AnalysisServicesServer,'\"}'))",
+											"type": "Expression"
+										},
+										"timeout": "01:00:00",
+										"reportStatusOnCallBack": true
+									}
+								},
+								{
+									"name": "Web_AzureAutomation_Webhook_Incremental_copy1",
+									"type": "WebHook",
+									"dependsOn": [
+										{
+											"activity": "Web_AzureAutomation_Webhook_Incremental",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"url": {
+											"value": "@activity('Lookup_KeyValueConfig').output.firstRow.WebHookFull",
+											"type": "Expression"
+										},
+										"method": "POST",
+										"headers": {
+											"Content-Type": "application/json"
+										},
+										"body": {
+											"value": "@json(concat('{\"AnalysisServicesDatabaseName\":\"Havertys Semantic Layer\",\"AnalysisServicesServer\":\"', activity('Lookup_KeyValueConfig').output.firstRow.AnalysisServicesServer,'\"}'))",
+											"type": "Expression"
+										},
+										"timeout": "01:00:00",
+										"reportStatusOnCallBack": true
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Lookup_KeyValueConfig",
+						"description": "This LookUp calls a stored procedure which\npulls the key/value pairs ",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT dbo.udf_GetETLConfiguration('WebHookFull') AS WebHookFull,\n\t   dbo.udf_GetETLConfiguration('WebHookIncremental') AS WebHookIncremental,\n\t   dbo.udf_GetETLConfiguration('AnalysisServicesServer') AS AnalysisServicesServer,\n\t   dbo.udf_GetETLConfiguration('AzureSQLServerName') AS AzureSQLServerName,\n\t   dbo.udf_GetETLConfiguration('AzureSQLDatabaseName') AS AzureSQLDatabaseName,\n\t   dbo.udf_GetETLConfiguration('SubscriptionID') AS SubscriptionID,\n\t   dbo.udf_GetETLConfiguration('ResourceGroupName') AS ResourceGroupName,\n           dbo.udf_GetETLConfiguration('SQLComputeSizeHigh') AS SQLComputeSizeHigh,\n\t   dbo.udf_GetETLConfiguration('SQLComputeSizeLow') AS SQLComputeSizeLow",
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "ds_AzureSqlTable_ETL_Master",
+								"type": "DatasetReference"
+							}
+						}
+					}
+				],
+				"parameters": {
+					"MasterProcessNumber": {
+						"type": "int",
+						"defaultValue": 1
+					},
+					"RunType": {
+						"type": "string",
+						"defaultValue": "N"
+					}
+				},
+				"folder": {
+					"name": "AAS Processing"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_Master')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ETL_pl_AzureSQLDB_Scaling')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ADF_Scale_Azure_SQLDB",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Lookup_KeyValueConfig",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@concat('https://management.azure.com/subscriptions/', activity('Lookup_KeyValueConfig').output.firstRow.SubscriptionID,'/resourceGroups/',activity('Lookup_KeyValueConfig').output.firstRow.ResourceGroupName, '/providers/Microsoft.Sql/servers/',activity('Lookup_KeyValueConfig').output.firstRow.AzureSQLServerName,'/databases/',activity('Lookup_KeyValueConfig').output.firstRow.AzureSQLDatabaseName,'?api-version=2017-10-01-preview')",
+								"type": "Expression"
+							},
+							"method": "PUT",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"body": {
+								"value": "@json(concat('{\"sku\":{\"name\":\"', pipeline().parameters.ComputeSize, '\",\"tier\":\"', pipeline().parameters.ServiceTier, '\"}, \"location\": \"', pipeline().parameters.AzureRegionName, ' \"}' ) )",
+								"type": "Expression"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://management.azure.com/"
+							}
+						}
+					},
+					{
+						"name": "Lookup_KeyValueConfig",
+						"description": "This LookUp calls a stored procedure which\npulls the key/value pairs ",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT [dbo].[udf_GetETLConfiguration]('AzureSQLServerName') AS AzureSQLServerName,\n\t   [dbo].[udf_GetETLConfiguration]('AzureSQLDatabaseName') AS AzureSQLDatabaseName,\n\t   [dbo].[udf_GetETLConfiguration]('SubscriptionID') AS SubscriptionID,\n\t   [dbo].[udf_GetETLConfiguration]('ResourceGroupName') AS ResourceGroupName",
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "ds_AzureSqlTable_ETL_Master",
+								"type": "DatasetReference"
+							}
+						}
+					}
+				],
+				"parameters": {
+					"ServiceTier": {
+						"type": "String",
+						"defaultValue": "GeneralPurpose"
+					},
+					"AzureRegionName": {
+						"type": "String",
+						"defaultValue": "East US"
+					},
+					"ComputeSize": {
+						"type": "string",
+						"defaultValue": "GP_Gen5_2"
+					}
+				},
+				"folder": {
+					"name": "MasterPipeline"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_Master')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ETL_pl_AzureSQLDB_Scaling_ScaleDown')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ADF_Scale_Azure_SQLDB",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Lookup_KeyValueConfig",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@concat('https://management.azure.com/subscriptions/', activity('Lookup_KeyValueConfig').output.firstRow.SubscriptionID,'/resourceGroups/',activity('Lookup_KeyValueConfig').output.firstRow.ResourceGroupName, '/providers/Microsoft.Sql/servers/',activity('Lookup_KeyValueConfig').output.firstRow.AzureSQLServerName,'/databases/',activity('Lookup_KeyValueConfig').output.firstRow.AzureSQLDatabaseName,'?api-version=2017-10-01-preview')",
+								"type": "Expression"
+							},
+							"method": "PUT",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"body": {
+								"value": "@json(concat('{\"sku\":{\"name\":\"', activity('Lookup_KeyValueConfig').output.firstRow.SQLComputeSizeLow, '\",\"tier\":\"', pipeline().parameters.ServiceTier, '\"}, \"location\": \"', pipeline().parameters.AzureRegionName, ' \"}' ) )",
+								"type": "Expression"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://management.azure.com/"
+							}
+						}
+					},
+					{
+						"name": "Lookup_KeyValueConfig",
+						"description": "This LookUp calls a stored procedure which\npulls the key/value pairs ",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT [dbo].[udf_GetETLConfiguration]('AzureSQLServerName') AS AzureSQLServerName,\n\t   [dbo].[udf_GetETLConfiguration]('AzureSQLDatabaseName') AS AzureSQLDatabaseName,\n\t   [dbo].[udf_GetETLConfiguration]('SubscriptionID') AS SubscriptionID,\n\t   [dbo].[udf_GetETLConfiguration]('ResourceGroupName') AS ResourceGroupName,\n           dbo.udf_GetETLConfiguration('SQLComputeSizeHigh') AS SQLComputeSizeHigh,\n\t   dbo.udf_GetETLConfiguration('SQLComputeSizeLow') AS SQLComputeSizeLow",
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "ds_AzureSqlTable_ETL_Master",
+								"type": "DatasetReference"
+							}
+						}
+					}
+				],
+				"parameters": {
+					"ServiceTier": {
+						"type": "String",
+						"defaultValue": "GeneralPurpose"
+					},
+					"AzureRegionName": {
+						"type": "String",
+						"defaultValue": "East US"
+					}
+				},
+				"folder": {
+					"name": "MasterPipeline"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_Master')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ETL_pl_Ingestion_Subpipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "LookUp_JobConfigurationMetadataList",
+						"description": "This LookUp calls a stored procedure and returns the metadata for the DB2 tables that need to be copied to Azure Data Lake",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[dbo].[usp_JobConfigurationMetadataList]",
+								"storedProcedureParameters": {
+									"MasterProcessNumber": {
+										"type": "Int32",
+										"value": {
+											"value": "@pipeline().parameters.MasterProcessNumber",
+											"type": "Expression"
+										}
+									}
+								}
+							},
+							"dataset": {
+								"referenceName": "ds_AzureSqlTable_ETL_MetadataIngestionList",
+								"type": "DatasetReference"
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach_CopyStagingRaw",
+						"description": "This ForEach loops through the metadata list and copies data nto Staging and Raw in Azure Data Lake.",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "LookUp_JobConfigurationMetadataList",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('LookUp_JobConfigurationMetadataList').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 15,
+							"activities": [
+								{
+									"name": "Copy_ADLStaging_ADLRaw",
+									"description": "This activity copies data from the ADL Staging location into a Raw storage folder. File path and name are dynamically derived from the Metadata lookup.",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Delete_ExistingRaw",
+											"dependencyConditions": [
+												"Completed"
+											]
+										},
+										{
+											"activity": "Switch_ServerName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "ParquetSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"wildcardFileName": "*",
+												"enablePartitionDiscovery": false
+											}
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"parallelCopies": {
+											"value": "@pipeline().parameters.JobParallelism",
+											"type": "Expression"
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+											"type": "DatasetReference",
+											"parameters": {
+												"FolderPath": {
+													"value": "@concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_'))",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+											"type": "DatasetReference",
+											"parameters": {
+												"FolderPath": {
+													"value": "@concat(replace(concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_')), 'staging', 'raw'), '/TS=',string(item().StartTime))",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "LookUp_JobTableLogStart",
+									"description": "This LookUp calls a stored procedure which updates the status in the JobTableLog for each table being copied and returns JobTableLogID.",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderStoredProcedureName": "[[dbo].[usp_JobTableLogStart]",
+											"storedProcedureParameters": {
+												"JobConfiguration": {
+													"type": "String",
+													"value": {
+														"value": "@pipeline().parameters.JobConfiguration",
+														"type": "Expression"
+													}
+												},
+												"MasterProcessNumber": {
+													"type": "Int32",
+													"value": {
+														"value": "@pipeline().parameters.MasterProcessNumber",
+														"type": "Expression"
+													}
+												},
+												"SchemaTable": {
+													"type": "String",
+													"value": {
+														"value": "@item().DB2SchemaTable",
+														"type": "Expression"
+													}
+												},
+												"TableControlType": {
+													"type": "String",
+													"value": "DB2"
+												},
+												"TableID": {
+													"type": "Int32",
+													"value": {
+														"value": "@item().TableID",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										"dataset": {
+											"referenceName": "ds_AzureSqlTable_ETL_Master",
+											"type": "DatasetReference"
+										},
+										"firstRowOnly": false
+									}
+								},
+								{
+									"name": "SP_JobTableLogEnd_Success",
+									"description": "This stored procedure updates the JobTableLog status after successful execution of previous steps. ",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "SP_MetadataListUpdate",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_JobTableLogEnd_Success]",
+										"storedProcedureParameters": {
+											"JobTableLogID": {
+												"value": {
+													"value": "@{activity('LookUp_JobTableLogStart').output.value[0].JobTableLogID}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "SP_JobTableLogEnd_Failure3",
+									"description": "This stored procedures updates the status of the JobTableLog failed execution of previous steps.",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Copy_ADLStaging_ADLRaw",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_JobTableLogEnd_Failure]",
+										"storedProcedureParameters": {
+											"JobTableLogID": {
+												"value": {
+													"value": "@{activity('LookUp_JobTableLogStart').output.value[0].JobTableLogID}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "SP_JobTableLogEnd_Failure2",
+									"description": "This stored procedures updates the status of the JobTableLog failed execution of previous steps.",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Switch_ServerName",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_JobTableLogEnd_Failure]",
+										"storedProcedureParameters": {
+											"JobTableLogID": {
+												"value": {
+													"value": "@{activity('LookUp_JobTableLogStart').output.value[0].JobTableLogID}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Delete_ExistingStaging",
+									"description": "This activity deletes all existing files in the destination staging folder for each file being copied.",
+									"type": "Delete",
+									"dependsOn": [
+										{
+											"activity": "LookUp_DB2SelectSql",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+											"type": "DatasetReference",
+											"parameters": {
+												"FolderPath": {
+													"value": "@concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_'))",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableLogging": false,
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"recursive": true
+										}
+									}
+								},
+								{
+									"name": "Delete_ExistingRaw",
+									"description": "This activity deletes files that have the same start time as the current run (i.e. only when this is a rerun). Therefore, most of the time this activity will not delete any files and will fail. The pipeline will continue upon completion of this activity - not success.",
+									"type": "Delete",
+									"dependsOn": [
+										{
+											"activity": "Delete_ExistingStaging",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+											"type": "DatasetReference",
+											"parameters": {
+												"FolderPath": {
+													"value": "@concat(replace(concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_') ), 'staging', 'raw'), '/TS=',string(item().StartTime))",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableLogging": false,
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"recursive": true
+										}
+									}
+								},
+								{
+									"name": "Switch_ServerName",
+									"type": "Switch",
+									"dependsOn": [
+										{
+											"activity": "Delete_ExistingStaging",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"on": {
+											"value": "@toUpper(item().ServerName)",
+											"type": "Expression"
+										},
+										"cases": [
+											{
+												"value": "PC03002",
+												"activities": [
+													{
+														"name": "Copy_DB2_ADLStaging_3002",
+														"description": "A query returns applicable data for each from DB2 which is then copied into Azure Data Lake in a staging folder. File path and name are dynamically derived from the Metadata lookup.",
+														"type": "Copy",
+														"dependsOn": [],
+														"policy": {
+															"timeout": "7.00:00:00",
+															"retry": 0,
+															"retryIntervalInSeconds": 30,
+															"secureOutput": false,
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"source": {
+																"type": "AzureSqlSource",
+																"sqlReaderQuery": {
+																	"value": "@item().SelectQuery",
+																	"type": "Expression"
+																},
+																"queryTimeout": "02:00:00"
+															},
+															"sink": {
+																"type": "ParquetSink",
+																"storeSettings": {
+																	"type": "AzureBlobFSWriteSettings"
+																}
+															},
+															"enableStaging": false,
+															"parallelCopies": {
+																"value": "@pipeline().parameters.JobParallelism",
+																"type": "Expression"
+															}
+														},
+														"inputs": [
+															{
+																"referenceName": "ds_AzureSqlTable_ETL_Ingestion2",
+																"type": "DatasetReference"
+															}
+														],
+														"outputs": [
+															{
+																"referenceName": "ds_ADLSG2parquet_DataLakeIngestionNamedFile",
+																"type": "DatasetReference",
+																"parameters": {
+																	"FolderPath": {
+																		"value": "@concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_') )",
+																		"type": "Expression"
+																	},
+																	"FileName": {
+																		"value": "@concat(item().DataLakeSchemaTable,'_',string(pipeline().parameters.MasterProcessNumber),'.parquet')",
+																		"type": "Expression"
+																	}
+																}
+															}
+														]
+													},
+													{
+														"name": "SP_JobTableLogUpdate_3002",
+														"description": "This stored procedure updates the JobTableLog with the SQL statement used and the number of rows read after successful execution of the copy from DB2 to staging",
+														"type": "SqlServerStoredProcedure",
+														"dependsOn": [
+															{
+																"activity": "Copy_DB2_ADLStaging_3002",
+																"dependencyConditions": [
+																	"Succeeded"
+																]
+															}
+														],
+														"policy": {
+															"timeout": "7.00:00:00",
+															"retry": 0,
+															"retryIntervalInSeconds": 30,
+															"secureOutput": false,
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"storedProcedureName": "[[dbo].[usp_JobTableLogIngestionUpdate]",
+															"storedProcedureParameters": {
+																"JobTableLogID": {
+																	"value": {
+																		"value": "@{activity('LookUp_JobTableLogStart').output.value[0].JobTableLogID}",
+																		"type": "Expression"
+																	},
+																	"type": "Int32"
+																},
+																"RowsCopied": {
+																	"value": {
+																		"value": "@activity('Copy_DB2_ADLStaging_3002').output.rowsCopied",
+																		"type": "Expression"
+																	},
+																	"type": "Int32"
+																},
+																"SqlStatementUsed": {
+																	"value": {
+																		"value": "@activity('LookUp_DB2SelectSql').output.firstRow.Query",
+																		"type": "Expression"
+																	},
+																	"type": "String"
+																}
+															}
+														},
+														"linkedServiceName": {
+															"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+															"type": "LinkedServiceReference"
+														}
+													}
+												]
+											}
+										],
+										"defaultActivities": [
+											{
+												"name": "Copy_DB2_ADLStaging_Default",
+												"description": "A query returns applicable data for each from DB2 which is then copied into Azure Data Lake in a staging folder. File path and name are dynamically derived from the Metadata lookup.",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "7.00:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "AzureSqlSource",
+														"sqlReaderQuery": {
+															"value": "@item().SelectQuery",
+															"type": "Expression"
+														},
+														"queryTimeout": "02:00:00"
+													},
+													"sink": {
+														"type": "ParquetSink",
+														"storeSettings": {
+															"type": "AzureBlobFSWriteSettings"
+														}
+													},
+													"enableStaging": false,
+													"parallelCopies": {
+														"value": "@pipeline().parameters.JobParallelism",
+														"type": "Expression"
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "ds_AzureSqlTable_ETL_Ingestion1",
+														"type": "DatasetReference"
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "ds_ADLSG2parquet_DataLakeIngestionNamedFile",
+														"type": "DatasetReference",
+														"parameters": {
+															"FolderPath": {
+																"value": "@concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_'))",
+																"type": "Expression"
+															},
+															"FileName": {
+																"value": "@concat(item().DataLakeSchemaTable,'_',string(pipeline().parameters.MasterProcessNumber),'.parquet')",
+																"type": "Expression"
+															}
+														}
+													}
+												]
+											},
+											{
+												"name": "SP_JobTableLogUpdate_Default",
+												"description": "This stored procedure updates the JobTableLog with the SQL statement used and the number of rows read after successful execution of the copy from DB2 to staging",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "Copy_DB2_ADLStaging_Default",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "7.00:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[[dbo].[usp_JobTableLogIngestionUpdate]",
+													"storedProcedureParameters": {
+														"JobTableLogID": {
+															"value": {
+																"value": "@{activity('LookUp_JobTableLogStart').output.value[0].JobTableLogID}",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"RowsCopied": {
+															"value": {
+																"value": "@activity('Copy_DB2_ADLStaging_Default').output.rowsCopied",
+																"type": "Expression"
+															},
+															"type": "Int32"
+														},
+														"SqlStatementUsed": {
+															"value": {
+																"value": "@activity('LookUp_DB2SelectSql').output.firstRow.Query",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+													"type": "LinkedServiceReference"
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "LookUp_DB2SelectSql",
+									"description": "Using a stored procedure, outputs correct SQL to use to select rows from DB2 ",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "LookUp_JobTableLogStart",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderStoredProcedureName": "[[dbo].[usp_MetadataListDB2Sql]",
+											"storedProcedureParameters": {
+												"DB2SchemaTable": {
+													"type": "String",
+													"value": {
+														"value": "@item().DB2SchemaTable",
+														"type": "Expression"
+													}
+												},
+												"EndDate": {
+													"type": "String",
+													"value": {
+														"value": "@replace(coalesce(item().ControlEndDate, ''), 'T', ' ')",
+														"type": "Expression"
+													}
+												},
+												"FilterColumn": {
+													"type": "String",
+													"value": {
+														"value": "@item().FilterColumn",
+														"type": "Expression"
+													}
+												},
+												"FilterColumnDataType": {
+													"type": "String",
+													"value": {
+														"value": "@item().FilterColumnDataType",
+														"type": "Expression"
+													}
+												},
+												"FilterColumnValue": {
+													"type": "String",
+													"value": {
+														"value": "@item().FilterColumnValue",
+														"type": "Expression"
+													}
+												},
+												"SelectQuery": {
+													"type": "String",
+													"value": {
+														"value": "@item().SelectQuery",
+														"type": "Expression"
+													}
+												},
+												"SqlOverrideQuery": {
+													"type": "String",
+													"value": {
+														"value": "@item().SqlOverrideQuery",
+														"type": "Expression"
+													}
+												},
+												"StartDate": {
+													"type": "String",
+													"value": {
+														"value": "@replace(coalesce(item().ControlStartDate, ''), 'T', ' ')",
+														"type": "Expression"
+													}
+												}
+											},
+											"queryTimeout": "02:00:00"
+										},
+										"dataset": {
+											"referenceName": "ds_AzureSqlTable_ETL_MetadataIngestionList",
+											"type": "DatasetReference"
+										}
+									}
+								},
+								{
+									"name": "SP_MetadataListUpdate",
+									"description": "This stored procedure updates the JobTableLog status after successful execution of previous steps. ",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "If_LoadCurated",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_MetadataListUpdate]",
+										"storedProcedureParameters": {
+											"EndDate": {
+												"value": {
+													"value": "@item().ControlEndDate",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"JobTableLogID": {
+												"value": {
+													"value": "@{activity('LookUp_JobTableLogStart').output.value[0].JobTableLogID}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"ProcessNumber": {
+												"value": {
+													"value": "@item().ControlProcessNumber",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"StartDate": {
+												"value": {
+													"value": "@item().ControlStartDate",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "SP_JobTableLogEnd_Failure5",
+									"description": "This stored procedures updates the status of the JobTableLog failed execution of previous steps.",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "SP_MetadataListUpdate",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_JobTableLogEnd_Failure]",
+										"storedProcedureParameters": {
+											"JobTableLogID": {
+												"value": {
+													"value": "@{activity('LookUp_JobTableLogStart').output.value[0].JobTableLogID}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "If_LoadCurated",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "Copy_ADLStaging_ADLRaw",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@item().LoadCurated",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "adbx_LoadCuratedTables",
+												"type": "DatabricksNotebook",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "7.00:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"notebookPath": "/Data Lake Schema/Load Curated Tables",
+													"baseParameters": {
+														"SchemaTable": {
+															"value": "@string(item().DataLakeSchemaTable)",
+															"type": "Expression"
+														},
+														"PKColumnList": {
+															"value": "@string(item().PKColumnList)",
+															"type": "Expression"
+														},
+														"DataLakeStagingFolder": {
+															"value": "@string(item().DataLakeStagingFolder)",
+															"type": "Expression"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
+													"type": "LinkedServiceReference"
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "SP_JobTableLogEnd_Failure4",
+									"description": "This stored procedures updates the status of the JobTableLog failed execution of previous steps.",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "If_LoadCurated",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_JobTableLogEnd_Failure]",
+										"storedProcedureParameters": {
+											"JobTableLogID": {
+												"value": {
+													"value": "@{activity('LookUp_JobTableLogStart').output.value[0].JobTableLogID}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "SP_MasterJobEnd_Failure",
+						"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after failed execution of previous steps.",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ForEach_CopyStagingRaw",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_MasterJobEnd_Failure]",
+							"storedProcedureParameters": {
+								"MasterProcessNumber": {
+									"value": {
+										"value": "@pipeline().parameters.MasterProcessNumber",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"JobConfiguration": {
+						"type": "string",
+						"defaultValue": "OverrideLoad"
+					},
+					"MasterProcessNumber": {
+						"type": "int",
+						"defaultValue": 395
+					},
+					"JobParallelism": {
+						"type": "int",
+						"defaultValue": 10
+					},
+					"RunType": {
+						"type": "string",
+						"defaultValue": "O"
+					}
+				},
+				"folder": {
+					"name": "MasterPipeline"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_MetadataIngestionList')]",
+				"[concat(variables('factoryId'), '/datasets/ds_ADLSG2parquet_DataLakeIngestionDir')]",
+				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_Master')]",
+				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_Ingestion1')]",
+				"[concat(variables('factoryId'), '/datasets/ds_ADLSG2parquet_DataLakeIngestionNamedFile')]",
+				"[concat(variables('factoryId'), '/linkedServices/ls_AzureDatabricks_DataAnalyticsQA_ADBX')]",
+				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_Ingestion2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MasterPipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "This pipeline is used to copy data from DB2 to Azure Data Lake for both Staging and Raw storage. Several stored procedures are called to update logging and return metadata for the data that needs to be copied.",
+				"activities": [
+					{
+						"name": "LookUp_MasterJobStart",
+						"description": "This LookUp calls a stored procedure which creates the ETL.JobMaster status row and returns the MasterProcessNumber ",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Execute_pl_ScaleDBUp",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[dbo].[usp_MasterJobStart]",
+								"storedProcedureParameters": {
+									"JobConfiguration": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.JobConfiguration",
+											"type": "Expression"
+										}
+									}
+								}
+							},
+							"dataset": {
+								"referenceName": "ds_AzureSqlTable_ETL_Master",
+								"type": "DatasetReference"
+							},
+							"firstRowOnly": true
+						}
+					},
+					{
+						"name": "Execute_pl_ScaleDBUp",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Lookup_KeyValueConfig",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ETL_pl_AzureSQLDB_Scaling",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"ServiceTier": "GeneralPurpose",
+								"ComputeSize": {
+									"value": "@activity('Lookup_KeyValueConfig').output.firstRow.SQLComputeSizeHigh",
+									"type": "Expression"
+								},
+								"AzureRegionName": "East US"
+							}
+						}
+					},
+					{
+						"name": "RunCheck",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "LookUp_MasterJobStart",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(equals(string(activity('LookUp_MasterJobStart').output.firstRow.MasterProcessNumber), '0'))",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "SP_MasterJobEnd_Failure_Pipeline_BadRestCall",
+									"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after failed execution of previous steps.",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_MasterJobEnd_Failure]",
+										"storedProcedureParameters": {
+											"MasterProcessNumber": {
+												"value": {
+													"value": "@activity('LookUp_MasterJobStart').output.firstRow.MasterProcessNumber",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Execute ETL_pl_ScaleDown",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "SP_MasterJobEnd_Failure_Pipeline_BadRestCall",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "ETL_pl_AzureSQLDB_Scaling_ScaleDown",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": false,
+										"parameters": {
+											"ServiceTier": "GeneralPurpose",
+											"AzureRegionName": "East US"
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "SP_MasterJobEnd_Failure_Pipeline",
+									"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after failed execution of previous steps.",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Execute_pl_DB2MetadataIngestion",
+											"dependencyConditions": [
+												"Failed"
+											]
+										},
+										{
+											"activity": "adbx_Start_Cluster",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_MasterJobEnd_Failure]",
+										"storedProcedureParameters": {
+											"MasterProcessNumber": {
+												"value": {
+													"value": "@activity('LookUp_MasterJobStart').output.firstRow.MasterProcessNumber",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "adbx_Start_Cluster",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Dimension Loads/Count Curated Tables and Start Cluster"
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Execute_pl_DB2MetadataIngestion",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "ETL_pl_Ingestion_Subpipeline",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"JobConfiguration": {
+												"value": "@pipeline().parameters.JobConfiguration",
+												"type": "Expression"
+											},
+											"MasterProcessNumber": {
+												"value": "@activity('LookUp_MasterJobStart').output.firstRow.MasterProcessNumber",
+												"type": "Expression"
+											},
+											"RunType": {
+												"value": "@pipeline().parameters.RunType",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "SP_MasterJobEnd_Failure_Pipeline_copy",
+						"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after failed execution of previous steps.",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RunCheck",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_MasterJobEnd_Failure]",
+							"storedProcedureParameters": {
+								"MasterProcessNumber": {
+									"value": {
+										"value": "@activity('LookUp_MasterJobStart').output.firstRow.MasterProcessNumber",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Lookup_KeyValueConfig",
+						"description": "This LookUp calls a stored procedure which\npulls the key/value pairs ",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT dbo.udf_GetETLConfiguration('SQLComputeSizeHigh') AS SQLComputeSizeHigh",
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "ds_AzureSqlTable_ETL_Master",
+								"type": "DatasetReference"
+							}
+						}
+					}
+				],
+				"parameters": {
+					"JobConfiguration": {
+						"type": "string",
+						"defaultValue": "NightlyLoad"
+					},
+					"RunType": {
+						"type": "string",
+						"defaultValue": "N"
+					}
+				},
+				"folder": {
+					"name": "MasterPipeline"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_Master')]",
+				"[concat(variables('factoryId'), '/pipelines/ETL_pl_AzureSQLDB_Scaling')]",
+				"[concat(variables('factoryId'), '/pipelines/ETL_pl_AzureSQLDB_Scaling_ScaleDown')]",
+				"[concat(variables('factoryId'), '/linkedServices/ls_AzureDatabricks_DataAnalyticsQA_ADBX')]",
+				"[concat(variables('factoryId'), '/pipelines/ETL_pl_Ingestion_Subpipeline')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ADLSG2parquet_DataLakeIngestionDir')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"FolderPath": {
+						"type": "string",
+						"defaultValue": "datalake/staging/master data/product/DB203002"
+					}
+				},
+				"folder": {
+					"name": "DataLake"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@substring(dataset().FolderPath, indexof(dataset().FolderPath, '/'), sub(length(dataset().FolderPath), indexof(dataset().FolderPath, '/')) )",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@substring(dataset().FolderPath, 0, indexof(dataset().FolderPath, '/') )",
+							"type": "Expression"
+						}
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_ADLSGen2_dataanalyticsadls21')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ADLSG2parquet_DataLakeIngestionNamedFile')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"FolderPath": {
+						"type": "string",
+						"defaultValue": "datalake/staging/master data/product/DB203002"
+					},
+					"FileName": {
+						"type": "string",
+						"defaultValue": "Testing.parquet"
+					}
+				},
+				"folder": {
+					"name": "DataLake"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().FileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@substring(dataset().FolderPath, indexof(dataset().FolderPath, '/'), sub(length(dataset().FolderPath), indexof(dataset().FolderPath, '/')) )",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@substring(dataset().FolderPath, 0, indexof(dataset().FolderPath, '/') )",
+							"type": "Expression"
+						}
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_ADLSGen2_dataanalyticsadls21')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_AzureSQLTable_ETL_Configurations')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "HavertysDW"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ConfigKey",
+						"type": "varchar"
+					},
+					{
+						"name": "ConfigValue",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "ETL",
+					"table": "Configurations"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_AzureSqlTable_DW_DimDate')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "HavertysDW"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Date_sk",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Isworkday_Store",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Isworkday_Delivery",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Calendar_date",
+						"type": "date"
+					},
+					{
+						"name": "Calendar_name_sht",
+						"type": "varchar"
+					},
+					{
+						"name": "Calendar_name_lng",
+						"type": "varchar"
+					},
+					{
+						"name": "Calendar_year_day_number",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "Calendar_year_day_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Calendar_quarter_day_number",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Calendar_quarter_day_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Calendar_month_day_number",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Calendar_month_day_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Calendar_weekday_number",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Calendar_weekday_code",
+						"type": "char"
+					},
+					{
+						"name": "Calendar_weekday_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Calendar_week_of_month_number",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Calendar_week_of_month_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Calendar_week_of_year_number",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "Calendar_week_of_year_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Calendar_month_number",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Calendar_month_code",
+						"type": "char"
+					},
+					{
+						"name": "Calendar_month_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Calendar_quarter_number",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Calendar_quarter_code",
+						"type": "char"
+					},
+					{
+						"name": "Calendar_quarter_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Calendar_month_week_year_number",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Calendar_month_week_year_code",
+						"type": "varchar"
+					},
+					{
+						"name": "Calendar_month_year_number",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Calendar_month_year_code",
+						"type": "varchar"
+					},
+					{
+						"name": "Calendar_quarter_year_number",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Calendar_quarter_year_code",
+						"type": "varchar"
+					},
+					{
+						"name": "Calendar_quarter_year_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Calendar_year_number",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Calendar_year_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Reporting_week_number",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Reporting_weekending_date",
+						"type": "date"
+					},
+					{
+						"name": "Reporting_weekending_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Reporting_weekday_number",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Reporting_month_number",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Reporting_month_code",
+						"type": "char"
+					},
+					{
+						"name": "Reporting_month_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Reporting_quarter_number",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Reporting_quarter_code",
+						"type": "char"
+					},
+					{
+						"name": "Reporting_quarter_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Reporting_month_year_number",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Reporting_month_year_code",
+						"type": "varchar"
+					},
+					{
+						"name": "Reporting_quarter_year_number",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Reporting_quarter_year_code",
+						"type": "varchar"
+					},
+					{
+						"name": "Reporting_quarter_year_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Reporting_year_number",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Reporting_year_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Holiday_name",
+						"type": "varchar"
+					},
+					{
+						"name": "ETLBatchID_Insert",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ETLBatchID_Update",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "DW",
+					"table": "Dim_Date"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_AzureSqlTable_DW_DimTime')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "HavertysDW"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Time_sk",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Time24_code",
+						"type": "time",
+						"scale": 0
+					},
+					{
+						"name": "Time24_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Hour_code",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Hour_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Hour24_code",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Hour24_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Minute_code",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Minute_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Minute24_code",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "Minute24_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Second_code",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Second_name",
+						"type": "varchar"
+					},
+					{
+						"name": "Second24_code",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Second24_name",
+						"type": "varchar"
+					},
+					{
+						"name": "AmPm",
+						"type": "varchar"
+					},
+					{
+						"name": "StandardTime",
+						"type": "varchar"
+					},
+					{
+						"name": "ETLBatchID_Insert",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ETLBatchID_Update",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "DW",
+					"table": "Dim_Time"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_AzureSqlTable_ETL_Ingestion1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sourcesystem",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Framework"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "TableID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DB2SchemaTable",
+						"type": "varchar"
+					},
+					{
+						"name": "DataLakeSchemaTable",
+						"type": "varchar"
+					},
+					{
+						"name": "PKColumnList",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlTable",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlFilterColumn",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlFilterColumn2",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlStartDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ControlEndDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ControlFilterValue",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlFilterType",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlProcessNumber",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SelectQuery",
+						"type": "varchar"
+					},
+					{
+						"name": "DataLakeStagingFolder",
+						"type": "varchar"
+					},
+					{
+						"name": "ServerName",
+						"type": "varchar"
+					},
+					{
+						"name": "SqlOverrideQuery",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "ETL",
+					"table": "MetadataIngestionList"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_AzureSqlTable_ETL_Ingestion2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sourcesystem",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Framework"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "TableID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DB2SchemaTable",
+						"type": "varchar"
+					},
+					{
+						"name": "DataLakeSchemaTable",
+						"type": "varchar"
+					},
+					{
+						"name": "PKColumnList",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlTable",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlFilterColumn",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlFilterColumn2",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlStartDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ControlEndDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ControlFilterValue",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlFilterType",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlProcessNumber",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SelectQuery",
+						"type": "varchar"
+					},
+					{
+						"name": "DataLakeStagingFolder",
+						"type": "varchar"
+					},
+					{
+						"name": "ServerName",
+						"type": "varchar"
+					},
+					{
+						"name": "SqlOverrideQuery",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "ETL",
+					"table": "MetadataIngestionList"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_AzureSqlTable_ETL_Master')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "HavertysDW"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AzureTableID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SchemaTable",
+						"type": "varchar"
+					},
+					{
+						"name": "PKColumnList",
+						"type": "varchar"
+					},
+					{
+						"name": "FilterColumn",
+						"type": "varchar"
+					},
+					{
+						"name": "FilterColumnValue",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "SelectQuery",
+						"type": "varchar"
+					},
+					{
+						"name": "DataLakeStagingFolder",
+						"type": "varchar"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_AzureSqlTable_ETL_MetadataIngestionControlDateRanges')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "HavertysDW"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "DB2TableID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DB2SchemaTable",
+						"type": "varchar"
+					},
+					{
+						"name": "DB2ControlTable",
+						"type": "varchar"
+					},
+					{
+						"name": "DB2ControlTableStartDateColumn",
+						"type": "varchar"
+					},
+					{
+						"name": "DB2ControlTableEndDateColumn",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlProcessNumber",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ControlStartDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ControlEndDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "ETL",
+					"table": "MetadataIngestionControlDateRanges"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_AzureSqlTable_ETL_MetadataIngestionList')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "HavertysDW"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "TableID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DB2SchemaTable",
+						"type": "varchar"
+					},
+					{
+						"name": "DataLakeSchemaTable",
+						"type": "varchar"
+					},
+					{
+						"name": "PKColumnList",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlTable",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlFilterColumn",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlFilterColumn2",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlStartDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ControlEndDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ControlFilterValue",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlFilterType",
+						"type": "varchar"
+					},
+					{
+						"name": "ControlProcessNumber",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SelectQuery",
+						"type": "varchar"
+					},
+					{
+						"name": "DataLakeStagingFolder",
+						"type": "varchar"
+					},
+					{
+						"name": "ServerName",
+						"type": "varchar"
+					},
+					{
+						"name": "SqlOverrideQuery",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "ETL",
+					"table": "MetadataIngestionList"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_ADLSGen2_dataanalyticsadls21')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "connect to ADLS Gen 2 via key vault using storage key secret",
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "https://adlsmdpdemo.dfs.core.windows.net",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "**********"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_AzureDatabricks_DataAnalyticsQA_ADBX')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://eastus2.azuredatabricks.net",
+					"accessToken": {
+						"type": "SecureString",
+						"value": "**********"
+					},
+					"existingClusterId": "0402-152549-adder831"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_KV_KV21')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "This is a linked service to our Key Vault service",
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "https://kv-mdp-demo.vault.azure.net/"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Mornings at 8AM')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "MasterPipeline",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"JobConfiguration": "OverrideLoad",
+							"RunType": "O"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2019-10-31T13:00:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/MasterPipeline')]"
+			]
+		}
+	]
+}
