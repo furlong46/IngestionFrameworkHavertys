@@ -735,7 +735,7 @@
 								"storedProcedureParameters": {
 									"EndDate": {
 										"value": {
-											"value": "@if(equals(pipeline().parameters.RunType, 'N'),\nactivity('LookUp_DB2ControlTable').output.firstRow.End_Date,\nitem().ControlEndDate\n)",
+											"value": "@item().ControlEndDate",
 											"type": "Expression"
 										},
 										"type": "DateTime"
@@ -749,14 +749,14 @@
 									},
 									"ProcessNumber": {
 										"value": {
-											"value": "@if(equals(pipeline().parameters.RunType, 'N'),\nactivity('LookUp_DB2ControlTable').output.firstRow.Next_Process_Number,\nitem().ControlProcessNumber\n)",
+											"value": "@item().ControlProcessNumber",
 											"type": "Expression"
 										},
 										"type": "Int32"
 									},
 									"StartDate": {
 										"value": {
-											"value": "@if(equals(pipeline().parameters.RunType, 'N'),\nactivity('LookUp_DB2ControlTable').output.firstRow.Start_Date,\nitem().ControlStartDate\n)",
+											"value": "@item().ControlStartDate",
 											"type": "Expression"
 										},
 										"type": "DateTime"
