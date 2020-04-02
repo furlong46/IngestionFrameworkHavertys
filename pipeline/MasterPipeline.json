@@ -235,43 +235,6 @@
 									}
 								}
 							}
-						},
-						{
-							"name": "SP_MasterJobEnd_Failure_DB2Ingestion",
-							"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after failed execution of previous steps.",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [
-								{
-									"activity": "Execute_pl_DB2MetadataIngestion",
-									"dependencyConditions": [
-										"Failed"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "7.00:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"storedProcedureName": "[dbo].[usp_MasterJobEnd_Failure]",
-								"storedProcedureParameters": {
-									"MasterProcessNumber": {
-										"value": {
-											"value": "@activity('LookUp_MasterJobStart').output.firstRow.MasterProcessNumber",
-											"type": "Expression"
-										},
-										"type": "Int32"
-									}
-								}
-							},
-							"linkedServiceName": {
-								"referenceName": "ls_AzureSqlDatabase_HavertysDW",
-								"type": "LinkedServiceReference"
-							}
 						}
 					]
 				}
