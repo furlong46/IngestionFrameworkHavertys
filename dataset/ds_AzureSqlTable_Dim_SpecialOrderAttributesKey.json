@@ -1,0 +1,58 @@
+{
+	"name": "ds_AzureSqlTable_Dim_SpecialOrderAttributesKey",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Special_Order_Attributes_Key_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Attribute_Type_ID_nk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Attribute",
+				"type": "varchar"
+			},
+			{
+				"name": "Attribute_Group",
+				"type": "varchar"
+			},
+			{
+				"name": "HashKey",
+				"type": "char"
+			},
+			{
+				"name": "SourceSystem_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Insert",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Update",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "DW",
+			"table": "Dim_SKU_SpecialOrderAttributesKey"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
