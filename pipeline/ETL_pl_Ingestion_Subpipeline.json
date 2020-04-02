@@ -949,10 +949,6 @@
 			"JobParallelism": {
 				"type": "int",
 				"defaultValue": 10
-			},
-			"RunType": {
-				"type": "string",
-				"defaultValue": "O"
 			}
 		},
 		"folder": {
