@@ -737,7 +737,7 @@
 										"EndDate": {
 											"type": "String",
 											"value": {
-												"value": "@if(equals(pipeline().parameters.RunType, 'N'), replace(coalesce(activity('LookUp_DB2ControlTable').output.firstrow.End_Date, ''), 'T', ' '), replace(coalesce(item().ControlEndDate, ''), 'T', ' '))",
+												"value": "@replace(coalesce(item().ControlEndDate, ''), 'T', ' ')",
 												"type": "Expression"
 											}
 										},
@@ -779,7 +779,7 @@
 										"StartDate": {
 											"type": "String",
 											"value": {
-												"value": "@if(equals(pipeline().parameters.RunType, 'N'), replace(coalesce(activity('LookUp_DB2ControlTable').output.firstrow.Start_Date, ''), 'T', ' '), replace(coalesce(item().ControlStartDate, ''), 'T', ' '))",
+												"value": "@replace(coalesce(item().ControlStartDate, ''), 'T', ' ')",
 												"type": "Expression"
 											}
 										}
