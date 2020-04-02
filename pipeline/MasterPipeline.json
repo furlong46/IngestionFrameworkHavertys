@@ -156,12 +156,6 @@
 									"dependencyConditions": [
 										"Failed"
 									]
-								},
-								{
-									"activity": "adbx_Start_Cluster",
-									"dependencyConditions": [
-										"Failed"
-									]
 								}
 							],
 							"policy": {
@@ -186,26 +180,6 @@
 							},
 							"linkedServiceName": {
 								"referenceName": "ls_AzureSqlDatabase_HavertysDW",
-								"type": "LinkedServiceReference"
-							}
-						},
-						{
-							"name": "adbx_Start_Cluster",
-							"type": "DatabricksNotebook",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "7.00:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"notebookPath": "/Dimension Loads/Count Curated Tables and Start Cluster"
-							},
-							"linkedServiceName": {
-								"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
 								"type": "LinkedServiceReference"
 							}
 						},
