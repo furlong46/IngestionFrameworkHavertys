@@ -1,0 +1,87 @@
+{
+	"name": "ds_AzureSqlTable_Dim_MerchandisingPromotion",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Merchandising_Promotion_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Merchandising_Promotion_Key_nk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Merchandising_Promotion_Code_nk",
+				"type": "varchar"
+			},
+			{
+				"name": "Merchandising_Promotion_Description",
+				"type": "varchar"
+			},
+			{
+				"name": "Type_Code",
+				"type": "varchar"
+			},
+			{
+				"name": "Type",
+				"type": "varchar"
+			},
+			{
+				"name": "Start_Date",
+				"type": "date"
+			},
+			{
+				"name": "End_Date",
+				"type": "date"
+			},
+			{
+				"name": "Segment_Code",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Segment",
+				"type": "varchar"
+			},
+			{
+				"name": "Available_on_Internet",
+				"type": "varchar"
+			},
+			{
+				"name": "HashKey",
+				"type": "char"
+			},
+			{
+				"name": "SourceSystem_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Insert",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Update",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "DW",
+			"table": "Dim_MerchandisingPromotion"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
