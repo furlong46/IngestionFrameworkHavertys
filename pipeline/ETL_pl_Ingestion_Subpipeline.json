@@ -603,15 +603,12 @@
 										"userProperties": [],
 										"typeProperties": {
 											"source": {
-												"type": "Db2Source",
-												"query": {
-													"value": "@activity('LookUp_DB2SelectSql').output.firstRow.Query",
-													"type": "Expression"
-												},
+												"type": "AzureSqlSource",
 												"sqlReaderQuery": {
 													"value": "@item().SelectQuery",
 													"type": "Expression"
-												}
+												},
+												"queryTimeout": "02:00:00"
 											},
 											"sink": {
 												"type": "ParquetSink",
@@ -627,7 +624,7 @@
 										},
 										"inputs": [
 											{
-												"referenceName": "ds_DB2_ingestion",
+												"referenceName": "ds_AzureSqlTable_ETL_Ingestion1",
 												"type": "DatasetReference"
 											}
 										],
