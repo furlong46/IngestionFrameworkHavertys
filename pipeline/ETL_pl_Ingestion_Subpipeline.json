@@ -413,7 +413,7 @@
 													"source": {
 														"type": "AzureSqlSource",
 														"sqlReaderQuery": {
-															"value": "@item().SelectQuery",
+															"value": "@activity('LookUp_DB2SelectSql').output.firstRow.Query",
 															"type": "Expression"
 														},
 														"queryTimeout": "02:00:00"
@@ -525,7 +525,7 @@
 											"source": {
 												"type": "AzureSqlSource",
 												"sqlReaderQuery": {
-													"value": "@item().SelectQuery",
+													"value": "@activity('LookUp_DB2SelectSql').output.firstRow.Query",
 													"type": "Expression"
 												},
 												"queryTimeout": "02:00:00"
