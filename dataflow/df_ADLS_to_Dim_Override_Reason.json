@@ -1,0 +1,91 @@
+{
+	"name": "df_ADLS_to_Dim_Override_Reason",
+	"properties": {
+		"folder": {
+			"name": "Dim_DataFlows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2parquet_staging_sales_tbdwwrt",
+						"type": "DatasetReference"
+					},
+					"name": "SourceTbdwwrt"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2parquet_staging_sales_tbdwbld",
+						"type": "DatasetReference"
+					},
+					"name": "SourceTbdwbld"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_dim_OverrideReason",
+						"type": "DatasetReference"
+					},
+					"name": "SourceOverrideReasonDim"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_dim_OverrideReason",
+						"type": "DatasetReference"
+					},
+					"name": "SinkOverrideReasonDim"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectTbdwbld"
+				},
+				{
+					"name": "SelectTbdwwrt"
+				},
+				{
+					"name": "AggDistinct"
+				},
+				{
+					"name": "DvClHashKeyETL"
+				},
+				{
+					"name": "LookupExistingDim"
+				},
+				{
+					"name": "UnionFactTables"
+				},
+				{
+					"name": "SelectRename"
+				},
+				{
+					"name": "SelectOverrideDim"
+				},
+				{
+					"name": "AlterRowUpdates"
+				},
+				{
+					"name": "FilterInsertsOnly"
+				},
+				{
+					"name": "FilterNullsWritten"
+				},
+				{
+					"name": "FilterNullsDelivered"
+				},
+				{
+					"name": "DeriveTrim"
+				},
+				{
+					"name": "WindowRemoveDuplicates"
+				},
+				{
+					"name": "FilterRemoveDuplicates"
+				}
+			],
+			"script": "\nparameters{\n\tMasterProcessNumber as string ('1')\n}\nsource(output(\n\t\tPROCESS_NUMBER as decimal(38,18),\n\t\tDIVISION as decimal(38,18),\n\t\tMARKET as decimal(38,18),\n\t\tBRANCH as decimal(38,18),\n\t\tSALENUM as decimal(38,18),\n\t\tLINE as decimal(38,18),\n\t\tTYPE as string,\n\t\tTRANTYPE as string,\n\t\tTRANSEQUENCE as decimal(38,18),\n\t\tORGSALENUM as decimal(38,18),\n\t\tWRITTENDATE as timestamp,\n\t\tWRITTENTIME as decimal(38,18),\n\t\tITEM as string,\n\t\tGROUPSKU as string,\n\t\tQUANTITY as decimal(38,18),\n\t\tGROSSSLS as decimal(38,18),\n\t\tGRPSKUDSCT as decimal(38,18),\n\t\tRTLREDUCTION as decimal(38,18),\n\t\tOVRDISCOUNT as decimal(38,18),\n\t\tPROMODISCOUNT as decimal(38,18),\n\t\tUNCLASSDSCT as decimal(38,18),\n\t\tRETAIL as decimal(38,18),\n\t\tTAXAMT1 as decimal(38,18),\n\t\tTAXAMT2 as decimal(38,18),\n\t\tCIDNUM as decimal(38,18),\n\t\tCIDPRFSEQ as decimal(38,18),\n\t\tSALEASC as decimal(38,18),\n\t\tCOSALEASC as decimal(38,18),\n\t\tDESIGNER as decimal(38,18),\n\t\tCODESIGNER as decimal(38,18),\n\t\tOVRRSNID as decimal(38,18),\n\t\tOVRRSNDESC as string,\n\t\tOVRRSNCMT as string,\n\t\tOVRUSRFNAM as string,\n\t\tOVRUSRLNAM as string,\n\t\tSALEPROMO as string,\n\t\tCREDITPROMO as string,\n\t\tDELIVERYDC as decimal(38,18),\n\t\tCHARGETYPE as string,\n\t\tINTERNETSALE as string,\n\t\tEXCHANGETYPE as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> SourceTbdwwrt\nsource(output(\n\t\tPROCESS_NUMBER as decimal(38,18),\n\t\tDIVISION as decimal(38,18),\n\t\tMARKET as decimal(38,18),\n\t\tBRANCH as decimal(38,18),\n\t\tSALENUM as decimal(38,18),\n\t\tLINE as decimal(38,18),\n\t\tTYPE as string,\n\t\tTRANTYPE as string,\n\t\tTRANSEQUENCE as decimal(38,18),\n\t\tORGSALENUM as decimal(38,18),\n\t\tBILLEDDATE as timestamp,\n\t\tWRITTENDATE as timestamp,\n\t\tITEM as string,\n\t\tGROUPSKU as string,\n\t\tQUANTITY as decimal(38,18),\n\t\tGROSSSLS as decimal(38,18),\n\t\tGRPSKUDSCT as decimal(38,18),\n\t\tRTLREDUCTION as decimal(38,18),\n\t\tOVRDISCOUNT as decimal(38,18),\n\t\tPROMODISCOUNT as decimal(38,18),\n\t\tUNCLASSDSCT as decimal(38,18),\n\t\tUNDLVALLOW as decimal(38,18),\n\t\tRETAIL as decimal(38,18),\n\t\tTAXAMT1 as decimal(38,18),\n\t\tTAXAMT2 as decimal(38,18),\n\t\tCIDNUM as decimal(38,18),\n\t\tCIDPRFSEQ as decimal(38,18),\n\t\tSALEASC as decimal(38,18),\n\t\tCOSALEASC as decimal(38,18),\n\t\tDESIGNER as decimal(38,18),\n\t\tCODESIGNER as decimal(38,18),\n\t\tOVRRSNID as decimal(38,18),\n\t\tOVRRSNDESC as string,\n\t\tOVRRSNCMT as string,\n\t\tOVRUSRFNAM as string,\n\t\tOVRUSRLNAM as string,\n\t\tSALEPROMO as string,\n\t\tCREDITPROMO as string,\n\t\tDELIVERYDC as decimal(38,18),\n\t\tLANDEDCOST as decimal(38,18),\n\t\tCHARGETYPE as string,\n\t\tINTERNETSALE as string,\n\t\tEXCHANGETYPE as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> SourceTbdwbld\nsource(output(\n\t\tOverride_Reason_sk as integer,\n\t\tOverride_Reason_ID as integer,\n\t\tOverride_Reason as string,\n\t\tOverride_Reason_Text as string,\n\t\tOverride_Approve_First_Name as string,\n\t\tOverride_Approve_Last_Name as string,\n\t\tHashKey as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SourceOverrideReasonDim\nSourceTbdwbld select(mapColumn(\n\t\tOVRRSNID,\n\t\tOVRRSNDESC,\n\t\tOVRRSNCMT,\n\t\tOVRUSRFNAM,\n\t\tOVRUSRLNAM\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectTbdwbld\nSourceTbdwwrt select(mapColumn(\n\t\tOVRRSNID,\n\t\tOVRRSNDESC,\n\t\tOVRRSNCMT,\n\t\tOVRUSRFNAM,\n\t\tOVRUSRLNAM\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectTbdwwrt\nDeriveTrim aggregate(groupBy(OVRRSNDESC = OVRRSNDESC,\n\t\tOVRRSNCMT = OVRRSNCMT,\n\t\tOVRUSRFNAM = OVRUSRFNAM,\n\t\tOVRUSRLNAM = OVRUSRLNAM,\n\t\tOVRRSNID = OVRRSNID),\n\tCount = count(OVRRSNCMT)) ~> AggDistinct\nSelectOverrideDim derive(ETLBatchID_Insert = iif(isNull(ETLBatchID_InsertDim),toInteger($MasterProcessNumber),ETLBatchID_InsertDim),\n\t\tETLBatchID_Update = $MasterProcessNumber,\n\t\tHashKeyStage = sha1(Override_Reason,\r\nOverride_Reason_Text,\r\nOverride_Approve_First_Name,\r\nOverride_Approve_Last_Name,\r\nOverride_Reason_ID),\n\t\tSourceSystem_fk = 0) ~> DvClHashKeyETL\nSelectRename, SourceOverrideReasonDim lookup(SelectRename@Override_Reason == SourceOverrideReasonDim@Override_Reason\n\t&& SelectRename@Override_Reason_Text == SourceOverrideReasonDim@Override_Reason_Text\n\t&& SelectRename@Override_Approve_First_Name == SourceOverrideReasonDim@Override_Approve_First_Name\n\t&& SelectRename@Override_Approve_Last_Name == SourceOverrideReasonDim@Override_Approve_Last_Name\n\t&& SelectRename@Override_Reason_ID == SourceOverrideReasonDim@Override_Reason_ID,\n\tbroadcast: 'none')~> LookupExistingDim\nFilterNullsWritten, FilterNullsDelivered union(byName: true)~> UnionFactTables\nAggDistinct select(mapColumn(\n\t\tOverride_Reason = OVRRSNDESC,\n\t\tOverride_Reason_Text = OVRRSNCMT,\n\t\tOverride_Approve_First_Name = OVRUSRFNAM,\n\t\tOverride_Approve_Last_Name = OVRUSRLNAM,\n\t\tOverride_Reason_ID = OVRRSNID\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectRename\nLookupExistingDim select(mapColumn(\n\t\tOverride_Reason = {SelectRename@Override_Reason},\n\t\tOverride_Reason_Text = {SelectRename@Override_Reason_Text},\n\t\tOverride_Approve_First_Name = {SelectRename@Override_Approve_First_Name},\n\t\tOverride_Approve_Last_Name = {SelectRename@Override_Approve_Last_Name},\n\t\tOverride_Reason_ID = {SelectRename@Override_Reason_ID},\n\t\tOverride_Reason_skDim = Override_Reason_sk,\n\t\tHashKeyDim = HashKey,\n\t\tETLBatchID_InsertDim = ETLBatchID_Insert,\n\t\tETLBatchID_UpdateDim = ETLBatchID_Update\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectOverrideDim\nFilterInsertsOnly alterRow(insertIf(isNull(Override_Reason_skDim)),\n\tupdateIf(!isNull(Override_Reason_skDim)&&HashKeyDim!=HashKeyStage)) ~> AlterRowUpdates\nFilterRemoveDuplicates filter(isNull(Override_Reason_skDim)) ~> FilterInsertsOnly\nSelectTbdwwrt filter(not(isNull(OVRRSNID)&&isNull(OVRUSRFNAM)&&isNull(OVRUSRLNAM)&&isNull(OVRRSNCMT)&&isNull(OVRRSNDESC))) ~> FilterNullsWritten\nSelectTbdwbld filter(not(isNull(OVRRSNID)&&isNull(OVRUSRFNAM)&&isNull(OVRUSRLNAM)&&isNull(OVRRSNCMT)&&isNull(OVRRSNDESC))) ~> FilterNullsDelivered\nUnionFactTables derive(each(match(type=='string'), $$ = iifNull(trim($$), ''))) ~> DeriveTrim\nDvClHashKeyETL window(over(Override_Reason_ID = Override_Reason_ID,\n\t\tOverride_Reason = Override_Reason,\n\t\tOverride_Reason_Text = Override_Reason_Text,\n\t\tOverride_Approve_First_Name = Override_Approve_First_Name,\n\t\tOverride_Approve_Last_Name = Override_Approve_Last_Name),\n\tasc(Override_Reason_ID, false),\n\tasc(Override_Reason, false),\n\tasc(Override_Reason_Text, false),\n\tasc(Override_Approve_First_Name, false),\n\tasc(Override_Approve_Last_Name, false),\n\tDupCount = rowNumber()) ~> WindowRemoveDuplicates\nWindowRemoveDuplicates filter(DupCount==1) ~> FilterRemoveDuplicates\nAlterRowUpdates sink(input(\n\t\tOverride_Reason_sk as integer,\n\t\tOverride_Reason_ID as integer,\n\t\tOverride_Reason as string,\n\t\tOverride_Reason_Text as string,\n\t\tOverride_Approve_First_Name as string,\n\t\tOverride_Approve_Last_Name as string,\n\t\tHashKey as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tOverride_Reason_ID,\n\t\tOverride_Reason,\n\t\tOverride_Reason_Text,\n\t\tOverride_Approve_First_Name,\n\t\tOverride_Approve_Last_Name,\n\t\tHashKey = HashKeyStage,\n\t\tSourceSystem_fk,\n\t\tETLBatchID_Insert,\n\t\tETLBatchID_Update\n\t)) ~> SinkOverrideReasonDim"
+		}
+	}
+}

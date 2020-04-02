@@ -1,0 +1,66 @@
+{
+	"name": "ds_AzureSqlTable_dim_OverrideReason",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Override_Reason_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Override_Reason_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Override_Reason",
+				"type": "varchar"
+			},
+			{
+				"name": "Override_Reason_Text",
+				"type": "varchar"
+			},
+			{
+				"name": "Override_Approve_First_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Override_Approve_Last_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "HashKey",
+				"type": "char"
+			},
+			{
+				"name": "SourceSystem_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Insert",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Update",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "DW",
+			"table": "Dim_OverrideReason"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,37 @@
+{
+	"name": "Dim_DeliveryArea",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_ALDS_to_Dim_DeliveryArea",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_ALDS_to_Dim_DeliveryArea",
+						"type": "DataFlowReference",
+						"parameters": {
+							"MasterProcessNumber": "1"
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "MDFIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "Dimensions/Unit Testing"
+		},
+		"annotations": []
+	}
+}

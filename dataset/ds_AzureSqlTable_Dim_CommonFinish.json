@@ -1,0 +1,54 @@
+{
+	"name": "ds_AzureSqlTable_Dim_CommonFinish",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Common_Finish_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Common_Finish_Code_nk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Common_Finish_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "HashKey",
+				"type": "char"
+			},
+			{
+				"name": "SourceSystem_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Insert",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Update",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "DW",
+			"table": "Dim_SKU_CommonFinish"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,19 @@
+{
+	"name": "ls_AzureSqlDatabase_HavertysDW",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=dataanalyticsqa-sql21.database.windows.net;Initial Catalog=HavertysDW_QA;User ID=ETL",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_KV_KV21",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "HavertysDWETLAccountPassword"
+			}
+		}
+	}
+}

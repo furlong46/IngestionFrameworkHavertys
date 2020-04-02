@@ -1,0 +1,44 @@
+{
+	"name": "Fact_WrittenSales",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_ADLS_to_Fact_WrittenSales",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_ADLS_to_Fact_WrittenSales",
+						"type": "DataFlowReference",
+						"parameters": {
+							"ControlStartDate": "'20100701'",
+							"ControlEndDate": "'20191201'"
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "MDFIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					}
+				}
+			}
+		],
+		"variables": {
+			"ControlStartDate": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Facts/Unit Testing"
+		},
+		"annotations": []
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

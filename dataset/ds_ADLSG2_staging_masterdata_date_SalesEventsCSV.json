@@ -1,0 +1,36 @@
+{
+	"name": "ds_ADLSG2_staging_masterdata_date_SalesEventsCSV",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DataLake"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "staging/master data/date/SaleEventsCSV_csv",
+				"fileSystem": "datalake"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "Date",
+				"type": "UTF8"
+			},
+			{
+				"name": "DOW",
+				"type": "UTF8"
+			},
+			{
+				"name": "DateTag",
+				"type": "UTF8"
+			}
+		]
+	}
+}

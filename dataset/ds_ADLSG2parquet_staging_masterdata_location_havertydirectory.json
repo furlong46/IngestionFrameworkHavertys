@@ -1,0 +1,36 @@
+{
+	"name": "ds_ADLSG2parquet_staging_masterdata_location_havertydirectory",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DataLake"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "staging/master data/location/sharepoint/Haverty_Directory",
+				"fileSystem": "datalake"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "Branch",
+				"type": "UTF8"
+			},
+			{
+				"name": "Manager",
+				"type": "UTF8"
+			},
+			{
+				"name": "Market",
+				"type": "UTF8"
+			}
+		]
+	}
+}

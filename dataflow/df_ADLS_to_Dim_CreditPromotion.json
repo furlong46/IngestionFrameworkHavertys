@@ -1,0 +1,66 @@
+{
+	"name": "df_ADLS_to_Dim_CreditPromotion",
+	"properties": {
+		"folder": {
+			"name": "Dim_DataFlows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2parquet_staging_masterdata_tbpromo",
+						"type": "DatasetReference"
+					},
+					"name": "SourceTbpromo"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_DW_Dim_CreditPromotion",
+						"type": "DatasetReference"
+					},
+					"name": "SourceCreditPromoDim"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_DW_Dim_CreditPromotion",
+						"type": "DatasetReference"
+					},
+					"name": "SinkDimCreditPromotion"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectPromo"
+				},
+				{
+					"name": "DrCLHashPlaceHolders"
+				},
+				{
+					"name": "AlterRowCreditPromo"
+				},
+				{
+					"name": "LookupCreditPromoDim"
+				},
+				{
+					"name": "SelectLookUpDim"
+				},
+				{
+					"name": "FilterUpdates"
+				},
+				{
+					"name": "WindowRemoveDuplicates"
+				},
+				{
+					"name": "FilterDuplicates"
+				},
+				{
+					"name": "DeriveNullTrim"
+				}
+			],
+			"script": "\nparameters{\n\tMasterProcessNumber as string ('1')\n}\nsource(output(\n\t\tPROMO as string,\n\t\tCMPKEY as decimal(38,18),\n\t\tCSTDESC as string,\n\t\tMINSALEAMT as decimal(38,18),\n\t\tCITIDPPCT as decimal(38,18),\n\t\tPLANNAME as string,\n\t\tPLANDESC as string,\n\t\tDURATION as decimal(38,18),\n\t\tPROMOAPR as decimal(38,18),\n\t\tPURCHAPR as decimal(38,18),\n\t\tOFPLANG as string,\n\t\tGENTERMS as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> SourceTbpromo\nsource(output(\n\t\tCredit_Promotion_sk as integer,\n\t\tCredit_Promotion_Code_nk as string,\n\t\tCredit_Promotion_Description as string,\n\t\tMinimum_Sale_Amount as decimal(8,2),\n\t\tDown_Payment_Percentage as integer,\n\t\tPlan_Name as string,\n\t\tPlan_Description as string,\n\t\tDuration as integer,\n\t\tPromo_APR as decimal(4,2),\n\t\tPurchase_APR as decimal(4,2),\n\t\tHashKey as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SourceCreditPromoDim\nSourceTbpromo select(mapColumn(\n\t\tCredit_Promotion_Code_nk = PROMO,\n\t\tCredit_Promotion_Description = CSTDESC,\n\t\tMinimum_Sale_Amount = MINSALEAMT,\n\t\tDown_Payment_Percentage = CITIDPPCT,\n\t\tPlan_Name = PLANNAME,\n\t\tPlan_Description = PLANDESC,\n\t\tDuration = DURATION,\n\t\tPromo_APR = PROMOAPR,\n\t\tPurchase_APR = PURCHAPR\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectPromo\nSelectLookUpDim derive(HashKey = sha1(Credit_Promotion_Code_nk,\r\nCredit_Promotion_Description,\r\nMinimum_Sale_Amount,\r\nDown_Payment_Percentage,\r\nPlan_Name,\r\nPlan_Description,\r\nDuration,\r\nPromo_APR,\r\nPurchase_APR\r\n),\n\t\tSourceSystem_fk = 0,\n\t\tETLBatchID_Insert = iifNull(ETLBatchID_InsertDim, toInteger($MasterProcessNumber)),\n\t\tETLBatchID_Update = toInteger($MasterProcessNumber)) ~> DrCLHashPlaceHolders\nFilterUpdates alterRow(insertIf(isNull(Credit_Promotion_Code_nkDim)),\n\tupdateIf(!isNull(Credit_Promotion_Code_nkDim)&&HashKey!=HashKeyDim)) ~> AlterRowCreditPromo\nDeriveNullTrim, SourceCreditPromoDim lookup(DeriveNullTrim@Credit_Promotion_Code_nk == SourceCreditPromoDim@Credit_Promotion_Code_nk,\n\tbroadcast: 'none')~> LookupCreditPromoDim\nLookupCreditPromoDim select(mapColumn(\n\t\tCredit_Promotion_Code_nk = {DeriveNullTrim@Credit_Promotion_Code_nk},\n\t\tCredit_Promotion_Description = {DeriveNullTrim@Credit_Promotion_Description},\n\t\tMinimum_Sale_Amount = {SelectPromo@Minimum_Sale_Amount},\n\t\tDown_Payment_Percentage = {SelectPromo@Down_Payment_Percentage},\n\t\tPlan_Name = {DeriveNullTrim@Plan_Name},\n\t\tPlan_Description = {DeriveNullTrim@Plan_Description},\n\t\tDuration = {SelectPromo@Duration},\n\t\tPromo_APR = {SelectPromo@Promo_APR},\n\t\tPurchase_APR = {SelectPromo@Purchase_APR},\n\t\tCredit_Promotion_Code_nkDim = {SourceCreditPromoDim@Credit_Promotion_Code_nk},\n\t\tHashKeyDim = HashKey,\n\t\tETLBatchID_InsertDim = ETLBatchID_Insert,\n\t\tETLBatchID_UpdateDim = ETLBatchID_Update\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectLookUpDim\nFilterDuplicates filter(isNull(Credit_Promotion_Code_nkDim)||(!isNull(Credit_Promotion_Code_nkDim)&&HashKey!=HashKeyDim)) ~> FilterUpdates\nDrCLHashPlaceHolders window(over(Credit_Promotion_Code_nk = Credit_Promotion_Code_nk),\n\tasc(Credit_Promotion_Code_nk, true),\n\tRowCount = rowNumber()) ~> WindowRemoveDuplicates\nWindowRemoveDuplicates filter(RowCount==1) ~> FilterDuplicates\nSelectPromo derive(each(match(type=='string'), $$ = iifNull(trim($$), ''))) ~> DeriveNullTrim\nAlterRowCreditPromo sink(input(\n\t\tCredit_Promotion_sk as integer,\n\t\tCredit_Promotion_Code_nk as string,\n\t\tCredit_Promotion_Description as string,\n\t\tMinimum_Sale_Amount as decimal(8,2),\n\t\tDown_Payment_Percentage as integer,\n\t\tPlan_Name as string,\n\t\tPlan_Description as string,\n\t\tDuration as integer,\n\t\tPromo_APR as decimal(4,2),\n\t\tPurchase_APR as decimal(4,2),\n\t\tHashKey as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['Credit_Promotion_Code_nk'],\n\tformat: 'table',\n\tmapColumn(\n\t\tCredit_Promotion_Code_nk,\n\t\tCredit_Promotion_Description,\n\t\tMinimum_Sale_Amount,\n\t\tDown_Payment_Percentage,\n\t\tPlan_Name,\n\t\tPlan_Description,\n\t\tDuration,\n\t\tPromo_APR,\n\t\tPurchase_APR,\n\t\tHashKey,\n\t\tSourceSystem_fk,\n\t\tETLBatchID_Insert,\n\t\tETLBatchID_Update\n\t)) ~> SinkDimCreditPromotion"
+		}
+	}
+}

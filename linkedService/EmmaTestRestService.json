@@ -1,0 +1,17 @@
+{
+	"name": "EmmaTestRestService",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "http://webdevstage11.havertys.com/wsext/rest/datawarehouse/stored-procedure",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		},
+		"connectVia": {
+			"referenceName": "Gateway01IR",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

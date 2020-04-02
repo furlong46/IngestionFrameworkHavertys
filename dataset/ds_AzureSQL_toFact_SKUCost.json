@@ -1,0 +1,74 @@
+{
+	"name": "ds_AzureSQL_toFact_SKUCost",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "SKU_Cost_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Cost",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 2
+			},
+			{
+				"name": "SKU_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "StartDate_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "EndDate_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Cost_Type",
+				"type": "varchar"
+			},
+			{
+				"name": "Terms",
+				"type": "varchar"
+			},
+			{
+				"name": "CreatingUser",
+				"type": "varchar"
+			},
+			{
+				"name": "SourceSystem_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Insert",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Update",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "Sales",
+			"table": "Fact_SKUCost"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

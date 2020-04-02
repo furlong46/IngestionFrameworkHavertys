@@ -1,0 +1,104 @@
+{
+	"name": "ds_AzureSqlTable_Dim_Employee",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Employee_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Employee_ID_nk",
+				"type": "varchar"
+			},
+			{
+				"name": "EmployeeType_Code",
+				"type": "varchar"
+			},
+			{
+				"name": "EmployeeType_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Sales_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "WMS_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Driver_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Designer_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "First_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Last_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Full_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Division_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Market_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Branch_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "HashKey",
+				"type": "char"
+			},
+			{
+				"name": "SourceSystem_fk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Insert",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Update",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "DW",
+			"table": "Dim_Employee"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

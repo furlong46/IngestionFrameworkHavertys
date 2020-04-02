@@ -1,0 +1,85 @@
+{
+	"name": "df_ADLS_to_Dim_Vendor",
+	"properties": {
+		"folder": {
+			"name": "Dim_DataFlows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2parquet_staging_masterdata_vendor_tbvendor",
+						"type": "DatasetReference"
+					},
+					"name": "SourceADLStbvendor"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2parquet_staging_masterdata_vendor_ippmvendor",
+						"type": "DatasetReference"
+					},
+					"name": "SourceADLSippmvendor"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_HavertysDW_DimVendor",
+						"type": "DatasetReference"
+					},
+					"name": "SourceDimVendor"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_HavertysDW_DimVendor",
+						"type": "DatasetReference"
+					},
+					"name": "SnkDimVendor"
+				}
+			],
+			"transformations": [
+				{
+					"name": "JoinSourceSourceADLSippmvendorADLStbvendor"
+				},
+				{
+					"name": "SelJoinSourceSourceADLSippmvendorADLStbvendor"
+				},
+				{
+					"name": "DvClSelJoin"
+				},
+				{
+					"name": "DvCleanUp"
+				},
+				{
+					"name": "LuDimVendor"
+				},
+				{
+					"name": "SelStaging"
+				},
+				{
+					"name": "DerivedColumn1"
+				},
+				{
+					"name": "DvHash"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "FilterUPdates"
+				},
+				{
+					"name": "DvSelDirectIndirect"
+				},
+				{
+					"name": "WindowRemoveDuplicates"
+				},
+				{
+					"name": "FilterRemoveDuplicates"
+				}
+			],
+			"script": "parameters{\n\tMasterProcessNumber as string ('1')\n}\nsource(output(\n\t\tVENDOR as string,\n\t\tCRTDATE as timestamp,\n\t\tUPDATED as timestamp,\n\t\tSYNCHED as timestamp,\n\t\tWEEKSOUT as decimal(38,18),\n\t\tDAYSOUT as decimal(38,18),\n\t\tCUBES as decimal(38,18),\n\t\tCMPEDAYD as decimal(38,18),\n\t\tCMPEDAYI as decimal(38,18),\n\t\tCMPLDAYD as decimal(38,18),\n\t\tCMPLDAYI as decimal(38,18),\n\t\tVENDORID as decimal(38,18),\n\t\tWEEKTOORD as string,\n\t\tAUTOFLG as string,\n\t\tLEADDAYS as decimal(38,18),\n\t\tSUNDAY as string,\n\t\tMONDAY as string,\n\t\tTUESDAY as string,\n\t\tWEDNESDAY as string,\n\t\tTHURSDAY as string,\n\t\tFRIDAY as string,\n\t\tSATURDAY as string,\n\t\tCONSOLPO as string,\n\t\tMICRODCAT as decimal(38,18),\n\t\tGTNPO as string,\n\t\tGTNLVDATE as timestamp,\n\t\tPARTYID as string,\n\t\tWEBSITE as string,\n\t\tPARENTCO as string,\n\t\tEXECNAME as string,\n\t\tEXECTITLE as string,\n\t\tEXECPHONE as decimal(38,18),\n\t\tEXECEMAIL as string,\n\t\tREPNAME as string,\n\t\tREPTITLE as string,\n\t\tREPPHONE as decimal(38,18),\n\t\tREPEMAIL as string,\n\t\tLOGNAME as string,\n\t\tLOGTITLE as string,\n\t\tLOGPHONE as decimal(38,18),\n\t\tLOGEMAIL as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinferDriftedColumnTypes: true,\n\tformat: 'parquet') ~> SourceADLStbvendor\nsource(output(\n\t\tCOMPANY as decimal(38,18),\n\t\tDIV as decimal(38,18),\n\t\tPC as decimal(38,18),\n\t\tVENDORID as string,\n\t\tVENDNUM as decimal(38,18),\n\t\tLONGNAME as string,\n\t\tSHORTNME as string,\n\t\tFACONTAC as string,\n\t\tFALINE1 as string,\n\t\tFALINE2 as string,\n\t\tFACITY as string,\n\t\tFASTATE as string,\n\t\tFAZIP5 as string,\n\t\tFAZIP4 as string,\n\t\tFAFORZIP as string,\n\t\tFAAREA as decimal(38,18),\n\t\tFAPHONE as decimal(38,18),\n\t\tFACTRY as string,\n\t\tFAFTCTRY as string,\n\t\tFAFTCITY as string,\n\t\tFAFTNBR as string,\n\t\tPOCONTAC as string,\n\t\tPOLINE1 as string,\n\t\tPOLINE2 as string,\n\t\tPOCITY as string,\n\t\tPOSTATE as string,\n\t\tPOZIP5 as string,\n\t\tPOZIP4 as string,\n\t\tPOFORZIP as string,\n\t\tPOAREA as decimal(38,18),\n\t\tPOPHONE as decimal(38,18),\n\t\tPOCTRY as string,\n\t\tPOFTCTRY as string,\n\t\tPOFTCITY as string,\n\t\tPOFTNBR as string,\n\t\tPALINE1 as string,\n\t\tPALINE2 as string,\n\t\tPACITY as string,\n\t\tPASTATE as string,\n\t\tPAZIP5 as string,\n\t\tPAZIP4 as string,\n\t\tPAFORZIP as string,\n\t\tPAAREA as decimal(38,18),\n\t\tPAPHONE as decimal(38,18),\n\t\tPACTRY as string,\n\t\tPAFTCTRY as string,\n\t\tPAFTCITY as string,\n\t\tPAFTNBR as string,\n\t\tCARRIER as string,\n\t\tSHIPCYCLE as decimal(38,18),\n\t\tMAJORCDE as string,\n\t\tVENDTYPE as string,\n\t\tIMPORTER as string,\n\t\tCODE1 as string,\n\t\tCODE2 as string,\n\t\tCODE3 as string,\n\t\tADCOOP as string,\n\t\tAPLYFRGT as string,\n\t\tBEGEFFDT as decimal(38,18),\n\t\tENDEFFDT as decimal(38,18),\n\t\tDATEADD as decimal(38,18),\n\t\tCHGDATE as decimal(38,18),\n\t\tCHGTIME as decimal(38,18),\n\t\tCHGOPER as string,\n\t\tTRANSTAT as decimal(38,18),\n\t\tFOB as string,\n\t\tTERMS as string,\n\t\tSTATCODE as string,\n\t\tAPLYDSCFRT as string,\n\t\tADDRESSOPT as string,\n\t\tICDIV as decimal(38,18),\n\t\tICPC as decimal(38,18),\n\t\tJOBBERFLAG as string,\n\t\tFRGTFREEFL as string,\n\t\tAPPRVSTAT as string,\n\t\tRQSTDIV as decimal(38,18),\n\t\tRQSTPC as decimal(38,18),\n\t\tMDSECLASS as decimal(38,18),\n\t\tFILLER as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> SourceADLSippmvendor\nsource(output(\n\t\tVendor_sk as integer,\n\t\tVendor_ID_nk as string,\n\t\tVendor_Number as integer,\n\t\tVendor_Long_Name as string,\n\t\tVendor_Short_Name as string,\n\t\tVendor_Type_Code as string,\n\t\tVendor_Type_Name as string,\n\t\tAddress_1 as string,\n\t\tAddress_2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZip as string,\n\t\tCountry as string,\n\t\tActive as boolean,\n\t\tIndirectDirect as string,\n\t\tStatus_ID as string,\n\t\tStatus as string,\n\t\tRTV_Credit_Allowed as string,\n\t\tHashKey as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer,\n\t\tParent_Company as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SourceDimVendor\nSourceADLSippmvendor, SourceADLStbvendor join(trim(SourceADLSippmvendor@VENDORID) == trim(VENDOR),\n\tjoinType:'left',\n\tbroadcast: 'none')~> JoinSourceSourceADLSippmvendorADLStbvendor\nJoinSourceSourceADLSippmvendorADLStbvendor select(mapColumn(\n\t\tVendor_ID_nk = SourceADLSippmvendor@VENDORID,\n\t\tVendor_Number = VENDNUM,\n\t\tVendor_Long_Name = LONGNAME,\n\t\tVendor_Short_Name = SHORTNME,\n\t\tAddress_1 = FALINE1,\n\t\tAddress_2 = FALINE2,\n\t\tCity = FACITY,\n\t\tState = FASTATE,\n\t\tZip = FAZIP5,\n\t\tZip4 = FAZIP4,\n\t\tZipForeign = FAFORZIP,\n\t\tAreaCode = FAAREA,\n\t\tPhone = FAPHONE,\n\t\tCountry = FACTRY,\n\t\tVendor_Type_Code = VENDTYPE,\n\t\tFILLER,\n\t\tStatus_ID = APPRVSTAT,\n\t\tParent_Company = PARENTCO\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelJoinSourceSourceADLSippmvendorADLStbvendor\nDvCleanUp derive(Country = case(isNull(Country), 'US', Country=='', 'US', Country),\n\t\tRTV_Credit_Allowed = iifNull(substring(FILLER, 5, 1), ''),\n\t\tVendor_Type_Name = case(Vendor_Type_Code=='F', 'Freight', Vendor_Type_Code=='M', 'Merchandise', Vendor_Type_Code=='I', 'Inter Company', Vendor_Type_Code=='FM', 'Freight and Merchandise', ''),\n\t\tStatus = case(Status_ID=='5', 'Unapproved', Status_ID=='2', 'Approved', Status_ID=='4', 'Selective', Status_ID=='1', 'Created', ''),\n\t\tSourceSystem_fk = 0,\n\t\tETLBatchID_Insert = toInteger($MasterProcessNumber),\n\t\tETLBatchID_Update = toInteger($MasterProcessNumber),\n\t\tIndirectDirect = IndirectDirect) ~> DvClSelJoin\nDvSelDirectIndirect derive(each(match(type=='string'), $$ = iifNull(ltrim(rtrim($$)),''))) ~> DvCleanUp\nDvHash, SourceDimVendor lookup(DvCleanUp@Vendor_ID_nk == SourceDimVendor@Vendor_ID_nk,\n\tmultiple: true,\n\tbroadcast: 'none')~> LuDimVendor\nLuDimVendor select(mapColumn(\n\t\tVendor_ID_nk = DvCleanUp@Vendor_ID_nk,\n\t\tVendor_Number = SelJoinSourceSourceADLSippmvendorADLStbvendor@Vendor_Number,\n\t\tVendor_Long_Name = DvCleanUp@Vendor_Long_Name,\n\t\tVendor_Short_Name = DvCleanUp@Vendor_Short_Name,\n\t\tAddress_1 = DvCleanUp@Address_1,\n\t\tAddress_2 = DvCleanUp@Address_2,\n\t\tCity = DvCleanUp@City,\n\t\tState = DvCleanUp@State,\n\t\tZip = DvCleanUp@Zip,\n\t\tZip4,\n\t\tZipForeign,\n\t\tAreaCode,\n\t\tPhone,\n\t\tCountry = DvClSelJoin@Country,\n\t\tVendor_Type_Code = DvCleanUp@Vendor_Type_Code,\n\t\tFILLER,\n\t\tStatus_ID = DvCleanUp@Status_ID,\n\t\tIndirectDirect = DvClSelJoin@IndirectDirect,\n\t\tRTV_Credit_Allowed = DvClSelJoin@RTV_Credit_Allowed,\n\t\tVendor_Type_Name = DvClSelJoin@Vendor_Type_Name,\n\t\tStatus = DvClSelJoin@Status,\n\t\tSourceSystem_fk = DvClSelJoin@SourceSystem_fk,\n\t\tETLBatchID_Insert = DvClSelJoin@ETLBatchID_Insert,\n\t\tETLBatchID_Update = DvClSelJoin@ETLBatchID_Update,\n\t\tHashKey = DvHash@HashKey,\n\t\tVendor_sk_Dest = Vendor_sk,\n\t\tHashKey_Dest = SourceDimVendor@HashKey,\n\t\tETLBatchID_Insert_Dest = SourceDimVendor@ETLBatchID_Insert,\n\t\tParent_Company = DvCleanUp@Parent_Company\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelStaging\nSelStaging derive(ETLBatchID_Insert = iifNull(ETLBatchID_Insert_Dest, ETLBatchID_Insert),\n\t\tActive = toBoolean('true')) ~> DerivedColumn1\nDvClSelJoin derive(HashKey = sha1(Vendor_Number,Vendor_Long_Name,Vendor_Short_Name,Address_1,Address_2,City,State,Zip,Country,Vendor_Type_Code,Status_ID,IndirectDirect,RTV_Credit_Allowed,Vendor_Type_Name,Status,Parent_Company)) ~> DvHash\nFilterUPdates alterRow(insertIf(isNull(Vendor_sk_Dest)),\n\tupdateIf(!isNull(Vendor_sk_Dest)&&HashKey!=HashKey_Dest)) ~> AlterRow1\nFilterRemoveDuplicates filter(isNull(Vendor_sk_Dest) || (!isNull(Vendor_sk_Dest) && HashKey != HashKey_Dest)) ~> FilterUPdates\nSelJoinSourceSourceADLSippmvendorADLStbvendor derive(IndirectDirect = case( substring(FILLER, 4, 1) == 'Y', 'Direct', substring(FILLER, 4, 1) == 'N', 'Indirect', '')) ~> DvSelDirectIndirect\nDerivedColumn1 window(over(Vendor_ID_nk),\n\tasc(Vendor_ID_nk, true),\n\tDupeCount = rowNumber()) ~> WindowRemoveDuplicates\nWindowRemoveDuplicates filter(DupeCount==1) ~> FilterRemoveDuplicates\nAlterRow1 sink(input(\n\t\tVendor_sk as integer,\n\t\tVendor_ID_nk as string,\n\t\tVendor_Number as integer,\n\t\tVendor_Long_Name as string,\n\t\tVendor_Short_Name as string,\n\t\tVendor_Type_Code as string,\n\t\tVendor_Type_Name as string,\n\t\tAddress_1 as string,\n\t\tAddress_2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZip as string,\n\t\tCountry as string,\n\t\tActive as boolean,\n\t\tIndirectDirect as string,\n\t\tStatus_ID as string,\n\t\tStatus as string,\n\t\tRTV_Credit_Allowed as string,\n\t\tHashKey as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer,\n\t\tParent_Company as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['Vendor_ID_nk'],\n\tformat: 'table',\n\tmapColumn(\n\t\tVendor_ID_nk,\n\t\tVendor_Number,\n\t\tVendor_Long_Name,\n\t\tVendor_Short_Name,\n\t\tVendor_Type_Code,\n\t\tVendor_Type_Name,\n\t\tAddress_1,\n\t\tAddress_2,\n\t\tCity,\n\t\tState,\n\t\tZip,\n\t\tCountry,\n\t\tActive,\n\t\tIndirectDirect,\n\t\tStatus_ID,\n\t\tStatus,\n\t\tRTV_Credit_Allowed,\n\t\tHashKey,\n\t\tSourceSystem_fk,\n\t\tParent_Company,\n\t\tETLBatchID_Insert,\n\t\tETLBatchID_Update\n\t)) ~> SnkDimVendor"
+		}
+	}
+}

@@ -1,0 +1,129 @@
+{
+	"name": "df_ADLS_to_Dim_ShippingOrigin",
+	"properties": {
+		"folder": {
+			"name": "Dim_DataFlows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2_staging_masterdata_shippingorigin_tborigin",
+						"type": "DatasetReference"
+					},
+					"name": "SourceTborigin"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2_staging_referencedata_CountryCodesCSV",
+						"type": "DatasetReference"
+					},
+					"name": "SourceCountryCodes"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2_staging_referencedata_StateCodesCSV",
+						"type": "DatasetReference"
+					},
+					"name": "SourceStateCodes"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2_staging_referencedata_UNLocCodesCSV",
+						"type": "DatasetReference"
+					},
+					"name": "SourceUNLocationCodes"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_Dim_ShippingOrigin",
+						"type": "DatasetReference"
+					},
+					"name": "SourceDimShippingOrigin"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_Dim_ShippingOrigin",
+						"type": "DatasetReference"
+					},
+					"name": "SinkDimShippingOrigin"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumnOriginType"
+				},
+				{
+					"name": "LookupDimShippingOrigin"
+				},
+				{
+					"name": "SelectShippingOrigin"
+				},
+				{
+					"name": "FilterUpdates"
+				},
+				{
+					"name": "DerivedColumnCountryCodes"
+				},
+				{
+					"name": "LookupCountryCodes"
+				},
+				{
+					"name": "WindowRemoveFirstRow"
+				},
+				{
+					"name": "FilterFirstRow"
+				},
+				{
+					"name": "SelectStateCodes"
+				},
+				{
+					"name": "LookupStateCodes"
+				},
+				{
+					"name": "LookupUNLocationCodes"
+				},
+				{
+					"name": "DerivedColumnUNLocationCodes"
+				},
+				{
+					"name": "DerivedColumnOriginName"
+				},
+				{
+					"name": "SelectUNLocationCodes"
+				},
+				{
+					"name": "SelectCountryCodes"
+				},
+				{
+					"name": "DerivedColumnCleanUp"
+				},
+				{
+					"name": "AlterRows"
+				},
+				{
+					"name": "DerivedColumnCamelCaseName"
+				},
+				{
+					"name": "SelectDerivedShippingOrigin"
+				},
+				{
+					"name": "DerivedColumnCleanUpNull"
+				},
+				{
+					"name": "DerivedColumnLatLon"
+				},
+				{
+					"name": "DerivedETLBatchHashKey"
+				},
+				{
+					"name": "DerivedColumnETLBatchInsert"
+				}
+			],
+			"script": "parameters{\n\tMasterProcessNumber as string ('1')\n}\nsource(output(\n\t\tORIGINID as decimal(38,18),\n\t\tTYPE as string,\n\t\tCOUNTRY as string,\n\t\tSTATE as string,\n\t\tCITY as string,\n\t\tORIGINCODE as string,\n\t\tCRTDATE as timestamp,\n\t\tUPDATED as timestamp,\n\t\tSYNCHED as timestamp,\n\t\tUNLOCCODE as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> SourceTborigin\nsource(output(\n\t\tCOUNTRY as string,\n\t\tCOUNTRY_CODE as string,\n\t\tISO_CODES as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SourceCountryCodes\nsource(output(\n\t\tColumn1 as string,\n\t\tColumn2 as string,\n\t\tColumn3 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SourceStateCodes\nsource(output(\n\t\tChange as string,\n\t\tCountry as string,\n\t\tLocation as string,\n\t\tName as string,\n\t\tNameWoDiacritics as string,\n\t\tSubdivision as string,\n\t\tStatus as string,\n\t\tFunction as string,\n\t\tDate as string,\n\t\tIATA as string,\n\t\tCoordinates as string,\n\t\tRemarks as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SourceUNLocationCodes\nsource(output(\n\t\tShipping_Origin_sk as integer,\n\t\tShipping_Origin_ID_nk as integer,\n\t\tShipping_Origin_Code as string,\n\t\tShipping_Origin_UN_Location_Code as string,\n\t\tShipping_Origin_Name as string,\n\t\tShipping_Origin_Type_Code as string,\n\t\tShipping_Origin_Type as string,\n\t\tCity as string,\n\t\tState_Code as string,\n\t\tState as string,\n\t\tCountry_Code as string,\n\t\tCountry as string,\n\t\tLatitude as decimal(9,6),\n\t\tLongitude as decimal(9,6),\n\t\tHashKey as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SourceDimShippingOrigin\nLookupUNLocationCodes derive(Shipping_Origin_Type = case(TYPE == 'D', 'Domestic', case(TYPE == 'F', 'Foreign', ''))) ~> DerivedColumnOriginType\nSelectDerivedShippingOrigin, SourceDimShippingOrigin lookup(SelectDerivedShippingOrigin@Shipping_Origin_ID_nk == SourceDimShippingOrigin@Shipping_Origin_ID_nk,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'none')~> LookupDimShippingOrigin\nLookupDimShippingOrigin select(mapColumn(\n\t\tShipping_Origin_ID_nk = SelectDerivedShippingOrigin@Shipping_Origin_ID_nk,\n\t\tShipping_Origin_Code = SelectDerivedShippingOrigin@Shipping_Origin_Code,\n\t\tShipping_Origin_UN_Location_Code = SelectDerivedShippingOrigin@Shipping_Origin_UN_Location_Code,\n\t\tShipping_Origin_Name = SelectDerivedShippingOrigin@Shipping_Origin_Name,\n\t\tShipping_Origin_Type_Code = SelectDerivedShippingOrigin@Shipping_Origin_Type_Code,\n\t\tShipping_Origin_Type = SelectDerivedShippingOrigin@Shipping_Origin_Type,\n\t\tCity = SelectDerivedShippingOrigin@City,\n\t\tState_Code = SelectDerivedShippingOrigin@State_Code,\n\t\tState = SelectDerivedShippingOrigin@State,\n\t\tCountry_Code = SelectDerivedShippingOrigin@Country_Code,\n\t\tCountry = SelectDerivedShippingOrigin@Country,\n\t\tLatitude = SelectDerivedShippingOrigin@Latitude,\n\t\tLongitude = SelectDerivedShippingOrigin@Longitude,\n\t\tShipping_Origin_sk_Dest = Shipping_Origin_sk,\n\t\tHashKey_Dest = HashKey,\n\t\tETLBatchID_Insert_Dest = ETLBatchID_Insert\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectShippingOrigin\nDerivedColumnETLBatchInsert filter(isNull(Shipping_Origin_sk_Dest) || (!isNull(Shipping_Origin_sk_Dest)&&HashKey!=HashKey_Dest)) ~> FilterUpdates\nSourceCountryCodes derive(Country_Code = iif(isNull(ISO_CODES), '', trim(left(ISO_CODES, instr(ISO_CODES, '/') -1)))) ~> DerivedColumnCountryCodes\nDerivedColumnCleanUp, SelectCountryCodes lookup(upper(COUNTRY) == upper(COUNTRY_CODE),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'none')~> LookupCountryCodes\nSourceStateCodes window(over(Column3),\n\tasc(Column3, true),\n\tRowCount = rowNumber()) ~> WindowRemoveFirstRow\nWindowRemoveFirstRow filter(RowCount == 1) ~> FilterFirstRow\nFilterFirstRow select(mapColumn(\n\t\tSTATE_NAME = Column1,\n\t\tSTATE_CODE = Column3\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectStateCodes\nLookupCountryCodes, SelectStateCodes lookup(upper(STATE) == upper(STATE_CODE),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'none')~> LookupStateCodes\nLookupStateCodes, SelectUNLocationCodes lookup(upper(UNLOCCODE) == upper(UNLocode),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'none')~> LookupUNLocationCodes\nSourceUNLocationCodes derive(UNLocode = concat(trim(Country), trim(Location)),\n\t\tLatitude_Coordinate = trim(split(Coordinates, ' ')[1]),\n\t\tLongitude_Coordinate = trim(split(Coordinates, ' ')[2])) ~> DerivedColumnUNLocationCodes\nDerivedColumnOriginType derive(Shipping_Origin_Name = case(isNull(UNLOCCODE) || length(UNLOCCODE) == 0, CITY, {UN Location Name}),\n\t\tLatitude = toDecimal(iifNull(Latitude, 0)),\n\t\tLongitude = toDecimal(iifNull(Longitude, 0))) ~> DerivedColumnOriginName\nDerivedColumnLatLon select(mapColumn(\n\t\t{UN Location Name} = NameWoDiacritics,\n\t\tCoordinates,\n\t\tUNLocode,\n\t\tLatitude,\n\t\tLongitude\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectUNLocationCodes\nDerivedColumnCountryCodes select(mapColumn(\n\t\tCOUNTRY_NAME = COUNTRY,\n\t\tCOUNTRY_CODE = DerivedColumnCountryCodes@Country_Code\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectCountryCodes\nSourceTborigin derive(each(match(type=='string'), $$ = iifNull(ltrim(rtrim($$)),''))) ~> DerivedColumnCleanUp\nFilterUpdates alterRow(insertIf(isNull(Shipping_Origin_sk_Dest)),\n\tupdateIf(!isNull(Shipping_Origin_sk_Dest)&&HashKey!=HashKey_Dest)) ~> AlterRows\nDerivedColumnCleanUpNull derive({Origin Name} = initCap(Shipping_Origin_Name),\n\t\t{City Name} = initCap(CITY),\n\t\t{State Name} = initCap(STATE_NAME),\n\t\t{Country Name} = initCap(COUNTRY_NAME)) ~> DerivedColumnCamelCaseName\nDerivedColumnCamelCaseName select(mapColumn(\n\t\tShipping_Origin_ID_nk = ORIGINID,\n\t\tShipping_Origin_Code = ORIGINCODE,\n\t\tShipping_Origin_UN_Location_Code = UNLOCCODE,\n\t\tShipping_Origin_Name = {Origin Name},\n\t\tShipping_Origin_Type_Code = TYPE,\n\t\tShipping_Origin_Type,\n\t\tCity = {City Name},\n\t\tState_Code = STATE,\n\t\tState = {State Name},\n\t\tCountry_Code = COUNTRY_CODE,\n\t\tCountry = {Country Name},\n\t\tLatitude,\n\t\tLongitude\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectDerivedShippingOrigin\nDerivedColumnOriginName derive(each(match(type=='string'), $$ = iifNull(ltrim(rtrim($$)),''))) ~> DerivedColumnCleanUpNull\nDerivedColumnUNLocationCodes derive(Latitude = case(endsWith(Latitude_Coordinate, 'N'), divide(toDecimal(left(Latitude_Coordinate, 4)),100), negate(divide(toDecimal(left(Latitude_Coordinate, 4)),100))),\n\t\tLongitude = case(endsWith(Longitude_Coordinate, 'E'), divide(toDecimal(left(Longitude_Coordinate, 5)),100), negate(divide(toDecimal(left(Longitude_Coordinate, 5)),100)))) ~> DerivedColumnLatLon\nSelectShippingOrigin derive(HashKey = sha1(Shipping_Origin_ID_nk,Shipping_Origin_Code,Shipping_Origin_UN_Location_Code,Shipping_Origin_Name,Shipping_Origin_Type_Code,Shipping_Origin_Type,City,State_Code,State,Country_Code,Country,Latitude,Longitude),\n\t\tSourceSystem_fk = 0,\n\t\tETLBatchID_Update = toInteger($MasterProcessNumber)) ~> DerivedETLBatchHashKey\nDerivedETLBatchHashKey derive(ETLBatchID_Insert = case(HashKey == HashKey_Dest, ETLBatchID_Insert_Dest, toInteger($MasterProcessNumber))) ~> DerivedColumnETLBatchInsert\nAlterRows sink(input(\n\t\tShipping_Origin_sk as integer,\n\t\tShipping_Origin_ID_nk as integer,\n\t\tShipping_Origin_Code as string,\n\t\tShipping_Origin_UN_Location_Code as string,\n\t\tShipping_Origin_Name as string,\n\t\tShipping_Origin_Type_Code as string,\n\t\tShipping_Origin_Type as string,\n\t\tCity as string,\n\t\tState_Code as string,\n\t\tState as string,\n\t\tCountry_Code as string,\n\t\tCountry as string,\n\t\tLatitude as decimal(9,6),\n\t\tLongitude as decimal(9,6),\n\t\tHashKey as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['Shipping_Origin_ID_nk'],\n\tformat: 'table',\n\tmapColumn(\n\t\tShipping_Origin_ID_nk,\n\t\tShipping_Origin_Code,\n\t\tShipping_Origin_UN_Location_Code,\n\t\tShipping_Origin_Name,\n\t\tShipping_Origin_Type_Code,\n\t\tShipping_Origin_Type,\n\t\tCity,\n\t\tState_Code,\n\t\tState,\n\t\tCountry_Code,\n\t\tCountry,\n\t\tLatitude,\n\t\tLongitude,\n\t\tHashKey,\n\t\tSourceSystem_fk,\n\t\tETLBatchID_Insert,\n\t\tETLBatchID_Update\n\t)) ~> SinkDimShippingOrigin"
+		}
+	}
+}

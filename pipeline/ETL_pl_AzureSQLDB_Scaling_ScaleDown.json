@@ -1,0 +1,85 @@
+{
+	"name": "ETL_pl_AzureSQLDB_Scaling_ScaleDown",
+	"properties": {
+		"activities": [
+			{
+				"name": "ADF_Scale_Azure_SQLDB",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Lookup_KeyValueConfig",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@concat('https://management.azure.com/subscriptions/', activity('Lookup_KeyValueConfig').output.firstRow.SubscriptionID,'/resourceGroups/',activity('Lookup_KeyValueConfig').output.firstRow.ResourceGroupName, '/providers/Microsoft.Sql/servers/',activity('Lookup_KeyValueConfig').output.firstRow.AzureSQLServerName,'/databases/',activity('Lookup_KeyValueConfig').output.firstRow.AzureSQLDatabaseName,'?api-version=2017-10-01-preview')",
+						"type": "Expression"
+					},
+					"method": "PUT",
+					"headers": {
+						"Content-Type": "application/json"
+					},
+					"body": {
+						"value": "@json(concat('{\"sku\":{\"name\":\"', activity('Lookup_KeyValueConfig').output.firstRow.SQLComputeSizeLow, '\",\"tier\":\"', pipeline().parameters.ServiceTier, '\"}, \"location\": \"', pipeline().parameters.AzureRegionName, ' \"}' ) )",
+						"type": "Expression"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://management.azure.com/"
+					}
+				}
+			},
+			{
+				"name": "Lookup_KeyValueConfig",
+				"description": "This LookUp calls a stored procedure which\npulls the key/value pairs ",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT [dbo].[udf_GetETLConfiguration]('AzureSQLServerName') AS AzureSQLServerName,\n\t   [dbo].[udf_GetETLConfiguration]('AzureSQLDatabaseName') AS AzureSQLDatabaseName,\n\t   [dbo].[udf_GetETLConfiguration]('SubscriptionID') AS SubscriptionID,\n\t   [dbo].[udf_GetETLConfiguration]('ResourceGroupName') AS ResourceGroupName,\n           dbo.udf_GetETLConfiguration('SQLComputeSizeHigh') AS SQLComputeSizeHigh,\n\t   dbo.udf_GetETLConfiguration('SQLComputeSizeLow') AS SQLComputeSizeLow",
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_ETL_Master",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"ServiceTier": {
+				"type": "String",
+				"defaultValue": "GeneralPurpose"
+			},
+			"AzureRegionName": {
+				"type": "String",
+				"defaultValue": "East US"
+			}
+		},
+		"folder": {
+			"name": "MasterPipeline"
+		},
+		"annotations": []
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

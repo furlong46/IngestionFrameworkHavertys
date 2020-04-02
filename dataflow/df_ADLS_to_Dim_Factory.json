@@ -1,0 +1,67 @@
+{
+	"name": "df_ADLS_to_Dim_Factory",
+	"properties": {
+		"description": "Factory MDF",
+		"folder": {
+			"name": "Dim_DataFlows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2parquet_staging_masterdata_factory_tbfactry",
+						"type": "DatasetReference"
+					},
+					"name": "SourceADLStbfactry"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_HavertysDW_DimFactory",
+						"type": "DatasetReference"
+					},
+					"name": "SourceDimFactory"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_HavertysDW_DimFactory",
+						"type": "DatasetReference"
+					},
+					"name": "SnkDimFactory"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelSourceADLStbfactry"
+				},
+				{
+					"name": "DvClSel"
+				},
+				{
+					"name": "DvHash"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "SelStaging"
+				},
+				{
+					"name": "LuDimFactory"
+				},
+				{
+					"name": "FilterUpdates"
+				},
+				{
+					"name": "WindowDuplicateRow"
+				},
+				{
+					"name": "FilterDuplicateRows"
+				}
+			],
+			"script": "\nparameters{\n\tMasterProcessNumber as string ('1')\n}\nsource(output(\n\t\tFACTORYID as decimal(38,18),\n\t\tSORTSEQ as decimal(38,18),\n\t\tDESC as string,\n\t\tADDRESS1 as string,\n\t\tADDRESS2 as string,\n\t\tCITY as string,\n\t\tSTATE as string,\n\t\tZIPCODE as decimal(38,18),\n\t\tPOSTALCODE as string,\n\t\tCOUNTRY as string,\n\t\tPHONE as string,\n\t\tFAX as string,\n\t\tCONTACT as string,\n\t\tACTIVE as string,\n\t\tCREATED as timestamp,\n\t\tUPDATED as timestamp,\n\t\tSYNCHED as timestamp,\n\t\tCNTRYCODE as string,\n\t\tPARTYID as string,\n\t\tLATITUDE as decimal(38,18),\n\t\tLONGITUDE as decimal(38,18)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> SourceADLStbfactry\nsource(output(\n\t\tFactory_sk as integer,\n\t\tFactory_Code_nk as integer,\n\t\tFactory_Name as string,\n\t\tAddress_1 as string,\n\t\tAddress_2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZip as integer,\n\t\tCountry as string,\n\t\tActive as string,\n\t\tHashKey as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer,\n\t\tLatitude as decimal(9,6),\n\t\tLongitude as decimal(9,6),\n\t\tCountry_Code as string,\n\t\tCreated_Date as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SourceDimFactory\nSourceADLStbfactry select(mapColumn(\n\t\tFactory_Code_nk = FACTORYID,\n\t\tFactory_Name = DESC,\n\t\tAddress_1 = ADDRESS1,\n\t\tAddress_2 = ADDRESS2,\n\t\tCity = CITY,\n\t\tState = STATE,\n\t\tZip = ZIPCODE,\n\t\tCountry = COUNTRY,\n\t\tActive = ACTIVE,\n\t\tLatitude = LATITUDE,\n\t\tLongitude = LONGITUDE,\n\t\tCountry_Code = CNTRYCODE,\n\t\tCreated_Date = CREATED\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelSourceADLStbfactry\nSelSourceADLStbfactry derive(Factory_Name = trim(upper(Factory_Name)),\n\t\tAddress_1 = iifNull(trim(upper(Address_1)), ''),\n\t\tAddress_2 = iifNull(trim(upper(Address_2)), ''),\n\t\tCity = iifNull(trim(upper(City)), ''),\n\t\tState = iifNull(trim(upper(State)), ''),\n\t\tZip = iif(iifNull(toInteger(Zip), 0) == 0 , '', toString(Zip, '00000')),\n\t\tCountry = iifNull(trim(upper(Country)), ''),\n\t\tSourceSystem_fk = 0,\n\t\tETLBatchID_Insert = $MasterProcessNumber,\n\t\tETLBatchID_Update = $MasterProcessNumber,\n\t\tCountry_Code = iifNull(trim(Country_Code), ''),\n\t\tLongitude = iifNull(Longitude, 0),\n\t\tLatitude = iifNull(Latitude, 0)) ~> DvClSel\nDvClSel derive(HashKey = sha1(Factory_Code_nk,Factory_Name,Address_1,Address_2,City,State,Zip,Country,Active,Latitude,Longitude,Country_Code,Created_Date)) ~> DvHash\nFilterUpdates alterRow(insertIf(isNull(Factory_sk_Dest)),\n\tupdateIf(!isNull(Factory_sk_Dest)&&HashKey!=HashKey_Dest)) ~> AlterRow1\nLuDimFactory select(mapColumn(\n\t\tFactory_Code_nk = {SelSourceADLStbfactry@Factory_Code_nk},\n\t\tFactory_Name = {DvClSel@Factory_Name},\n\t\tAddress_1 = {DvClSel@Address_1},\n\t\tAddress_2 = {DvClSel@Address_2},\n\t\tCity = {DvClSel@City},\n\t\tState = {DvClSel@State},\n\t\tZip = {DvClSel@Zip},\n\t\tCountry = {DvClSel@Country},\n\t\tActive = {SelSourceADLStbfactry@Active},\n\t\tLatitude = {DvClSel@Latitude},\n\t\tLongitude = {DvClSel@Longitude},\n\t\tCountry_Code = {DvClSel@Country_Code},\n\t\tCreated_Date = {SelSourceADLStbfactry@Created_Date},\n\t\tSourceSystem_fk = {DvClSel@SourceSystem_fk},\n\t\tETLBatchID_Insert = {DvClSel@ETLBatchID_Insert},\n\t\tETLBatchID_Update = {DvClSel@ETLBatchID_Update},\n\t\tHashKey = {DvHash@HashKey},\n\t\tHashKey_Dest = {SourceDimFactory@HashKey},\n\t\tFactory_sk_Dest = Factory_sk\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelStaging\nDvHash, SourceDimFactory lookup(SelSourceADLStbfactry@Factory_Code_nk == SourceDimFactory@Factory_Code_nk,\n\tbroadcast: 'none')~> LuDimFactory\nFilterDuplicateRows filter(isNull(Factory_sk_Dest) || (!isNull(Factory_sk_Dest) && HashKey != HashKey_Dest)) ~> FilterUpdates\nSelStaging window(over(Factory_Code_nk = Factory_Code_nk),\n\tasc(Factory_Code_nk, true),\n\tRowCount = rowNumber()) ~> WindowDuplicateRow\nWindowDuplicateRow filter(RowCount==1) ~> FilterDuplicateRows\nAlterRow1 sink(input(\n\t\tFactory_sk as integer,\n\t\tFactory_Code_nk as integer,\n\t\tFactory_Name as string,\n\t\tAddress_1 as string,\n\t\tAddress_2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZip as integer,\n\t\tCountry as string,\n\t\tActive as string,\n\t\tHashKey as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer,\n\t\tLatitude as decimal(9,6),\n\t\tLongitude as decimal(9,6),\n\t\tCountry_Code as string,\n\t\tCreated_Date as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['Factory_Code_nk'],\n\tformat: 'table',\n\tmapColumn(\n\t\tFactory_Code_nk,\n\t\tFactory_Name,\n\t\tAddress_1,\n\t\tAddress_2,\n\t\tCity,\n\t\tState,\n\t\tZip,\n\t\tCountry,\n\t\tActive,\n\t\tLatitude,\n\t\tLongitude,\n\t\tCountry_Code,\n\t\tCreated_Date,\n\t\tHashKey,\n\t\tSourceSystem_fk,\n\t\tETLBatchID_Insert,\n\t\tETLBatchID_Update\n\t)) ~> SnkDimFactory"
+		}
+	}
+}

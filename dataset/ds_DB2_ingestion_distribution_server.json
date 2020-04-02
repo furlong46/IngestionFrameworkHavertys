@@ -1,0 +1,15 @@
+{
+	"name": "ds_DB2_ingestion_distribution_server",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "PC04010",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Framework"
+		},
+		"annotations": [],
+		"type": "Db2Table",
+		"schema": []
+	}
+}

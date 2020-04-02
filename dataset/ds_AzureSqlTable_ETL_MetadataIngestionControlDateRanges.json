@@ -1,0 +1,58 @@
+{
+	"name": "ds_AzureSqlTable_ETL_MetadataIngestionControlDateRanges",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "DB2TableID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "DB2SchemaTable",
+				"type": "varchar"
+			},
+			{
+				"name": "DB2ControlTable",
+				"type": "varchar"
+			},
+			{
+				"name": "DB2ControlTableStartDateColumn",
+				"type": "varchar"
+			},
+			{
+				"name": "DB2ControlTableEndDateColumn",
+				"type": "varchar"
+			},
+			{
+				"name": "ControlProcessNumber",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ControlStartDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ControlEndDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "ETL",
+			"table": "MetadataIngestionControlDateRanges"
+		}
+	}
+}

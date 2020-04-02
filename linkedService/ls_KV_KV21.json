@@ -1,0 +1,12 @@
+{
+	"name": "ls_KV_KV21",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"description": "This is a linked service to our Key Vault service",
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://DataAnalyticsQA-KV21.vault.azure.net/"
+		}
+	}
+}

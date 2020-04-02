@@ -1,0 +1,377 @@
+{
+	"name": "ETL_pl_ManualIngestion",
+	"properties": {
+		"activities": [
+			{
+				"name": "LookUp_JobConfigurationAzureMetadataList",
+				"description": "This LookUp calls a stored procedure and returns the metadata for the DB2 tables that need to be copied to Azure Data Lake",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat('SELECT \n\tGetDate()  AS StartTime,\n\tIL.[TableID], \n\tIL.[DB2SchemaTable], \n\tIL.[DataLakeSchemaTable], \n\tIL.[PKColumnList], \n\tIL.[FilterColumn], \n\tIL.[FilterColumnValue],\n\tIL.[FilterColumnDatatype],\n\tIL.[SelectQuery], \n\tIL.[DataLakeStagingFolder],\n\tIL.[ServerName],\n\tIL.[SqlOverrideQuery],\n\tIL.[LoadCurated]\nFROM\n[ETL].[MetadataIngestionList] IL \nWHERE \nIL.TableID = ' , string(pipeline().parameters.TableID)  )",
+							"type": "Expression"
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_ETL_MetadataIngestionList",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach_CopyStagingRaw",
+				"description": "This ForEach loops through the metadata list and copies data nto Staging and Raw in Azure Data Lake.",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "LookUp_JobConfigurationAzureMetadataList",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('LookUp_JobConfigurationAzureMetadataList').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 15,
+					"activities": [
+						{
+							"name": "Copy_ADLStaging_ADLRaw",
+							"description": "This activity copies data from the ADL Staging location into a Raw storage folder. File path and name are dynamically derived from the Metadata lookup.",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Delete_ExistingRaw",
+									"dependencyConditions": [
+										"Completed"
+									]
+								},
+								{
+									"activity": "Copy_DB2_ADLStaging",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "ParquetSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"wildcardFileName": "*",
+										"enablePartitionDiscovery": false
+									}
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"parallelCopies": {
+									"value": "@pipeline().parameters.JobParallelism",
+									"type": "Expression"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+									"type": "DatasetReference",
+									"parameters": {
+										"FolderPath": {
+											"value": "@concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_'))",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+									"type": "DatasetReference",
+									"parameters": {
+										"FolderPath": {
+											"value": "@concat(replace(concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_')), 'staging', 'raw'), '/TS=',string(item().StartTime))",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Delete_ExistingStaging",
+							"description": "This activity deletes all existing files in the destination staging folder for each file being copied.",
+							"type": "Delete",
+							"dependsOn": [
+								{
+									"activity": "LookUp_DB2SelectSql",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+									"type": "DatasetReference",
+									"parameters": {
+										"FolderPath": {
+											"value": "@concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_'))",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true
+								}
+							}
+						},
+						{
+							"name": "Delete_ExistingRaw",
+							"description": "This activity deletes files that have the same start time as the current run (i.e. only when this is a rerun). Therefore, most of the time this activity will not delete any files and will fail. The pipeline will continue upon completion of this activity - not success.",
+							"type": "Delete",
+							"dependsOn": [
+								{
+									"activity": "Delete_ExistingStaging",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+									"type": "DatasetReference",
+									"parameters": {
+										"FolderPath": {
+											"value": "@concat(replace(concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_')), 'staging', 'raw'), '/TS=',string(item().StartTime))",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true
+								}
+							}
+						},
+						{
+							"name": "LookUp_DB2SelectSql",
+							"description": "",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderStoredProcedureName": "[dbo].[usp_MetadataListDB2Sql]",
+									"storedProcedureParameters": {
+										"DB2SchemaTable": {
+											"type": "String",
+											"value": {
+												"value": "@item().DB2SchemaTable",
+												"type": "Expression"
+											}
+										},
+										"EndDate": {
+											"type": "String",
+											"value": {
+												"value": "@toLower('')",
+												"type": "Expression"
+											}
+										},
+										"FilterColumn": {
+											"type": "String",
+											"value": {
+												"value": "@item().FilterColumn",
+												"type": "Expression"
+											}
+										},
+										"FilterColumnDataType": {
+											"type": "String",
+											"value": {
+												"value": "@item().FilterColumnDataType",
+												"type": "Expression"
+											}
+										},
+										"FilterColumnValue": {
+											"type": "String",
+											"value": {
+												"value": "@item().FilterColumnValue",
+												"type": "Expression"
+											}
+										},
+										"SelectQuery": {
+											"type": "String",
+											"value": {
+												"value": "@item().SelectQuery",
+												"type": "Expression"
+											}
+										},
+										"SqlOverrideQuery": {
+											"type": "String",
+											"value": {
+												"value": "@item().SqlOverrideQuery",
+												"type": "Expression"
+											}
+										},
+										"StartDate": {
+											"type": "String",
+											"value": {
+												"value": "@toLower('')",
+												"type": "Expression"
+											}
+										}
+									},
+									"queryTimeout": "02:00:00"
+								},
+								"dataset": {
+									"referenceName": "ds_AzureSqlTable_ETL_MetadataIngestionList",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "Copy_DB2_ADLStaging",
+							"description": "A query returns applicable data for each from DB2 which is then copied into Azure Data Lake in a staging folder. File path and name are dynamically derived from the Metadata lookup.",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Delete_ExistingStaging",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "Db2Source",
+									"query": {
+										"value": "@activity('LookUp_DB2SelectSql').output.firstRow.Query",
+										"type": "Expression"
+									},
+									"sqlReaderQuery": {
+										"value": "@item().SelectQuery",
+										"type": "Expression"
+									}
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"parallelCopies": {
+									"value": "@pipeline().parameters.JobParallelism",
+									"type": "Expression"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_DB2_ingestion",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_ADLSG2parquet_DataLakeIngestionNamedFile",
+									"type": "DatasetReference",
+									"parameters": {
+										"FolderPath": {
+											"value": "@concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_'))",
+											"type": "Expression"
+										},
+										"FileName": {
+											"value": "@concat(item().DataLakeSchemaTable,'_',string(pipeline().parameters.MasterProcessNumber),'.parquet')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"MasterProcessNumber": {
+				"type": "int",
+				"defaultValue": 1
+			},
+			"JobParallelism": {
+				"type": "int",
+				"defaultValue": 10
+			},
+			"TableID": {
+				"type": "int",
+				"defaultValue": 0
+			}
+		},
+		"folder": {
+			"name": "MasterPipeline/Manual Ingestion"
+		},
+		"annotations": []
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

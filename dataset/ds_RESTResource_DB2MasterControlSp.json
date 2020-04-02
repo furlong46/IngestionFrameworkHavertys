@@ -1,0 +1,16 @@
+{
+	"name": "ds_RESTResource_DB2MasterControlSp",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_REST_DB2MasterControlSp",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DB2REST"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

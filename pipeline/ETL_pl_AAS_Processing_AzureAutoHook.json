@@ -1,0 +1,394 @@
+{
+	"name": "ETL_pl_AAS_Processing_AzureAutoHook",
+	"properties": {
+		"activities": [
+			{
+				"name": "SP_MasterJobEnd_Success",
+				"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after successful execution of previous steps.",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Full or Incremental AAS Processing",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 1,
+					"retryIntervalInSeconds": 60,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_MasterJobEnd_Success]",
+					"storedProcedureParameters": {
+						"MasterProcessNumber": {
+							"value": {
+								"value": "@pipeline().parameters.MasterProcessNumber",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "SP_MasterJobEnd_Failure_Pipeline",
+				"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after failed execution of previous steps.",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Full or Incremental AAS Processing",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_MasterJobEnd_Failure]",
+					"storedProcedureParameters": {
+						"MasterProcessNumber": {
+							"value": {
+								"value": "@pipeline().parameters.MasterProcessNumber",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Full or Incremental AAS Processing",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Lookup_KeyValueConfig",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(pipeline().parameters.RunType, 'N')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Web_AzureAutomation_Webhook_Full",
+							"type": "WebHook",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@activity('Lookup_KeyValueConfig').output.firstRow.WebHookFull",
+									"type": "Expression"
+								},
+								"method": "POST",
+								"headers": {
+									"Content-Type": "application/json"
+								},
+								"body": {
+									"value": "@json(concat('{\"AnalysisServicesDatabaseName\":\"Havertys Semantic Layer\",\"AnalysisServicesServer\":\"', activity('Lookup_KeyValueConfig').output.firstRow.AnalysisServicesServer,'\"}'))",
+									"type": "Expression"
+								},
+								"timeout": "01:00:00",
+								"reportStatusOnCallBack": true
+							}
+						},
+						{
+							"name": "Web_AzureAutomation_Webhook_Full_copy1",
+							"type": "WebHook",
+							"dependsOn": [
+								{
+									"activity": "Web_AzureAutomation_Webhook_Full",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@activity('Lookup_KeyValueConfig').output.firstRow.WebHookFull",
+									"type": "Expression"
+								},
+								"method": "POST",
+								"headers": {
+									"Content-Type": "application/json"
+								},
+								"body": {
+									"value": "@json(concat('{\"AnalysisServicesDatabaseName\":\"Havertys Semantic Layer\",\"AnalysisServicesServer\":\"', activity('Lookup_KeyValueConfig').output.firstRow.AnalysisServicesServer,'\"}'))",
+									"type": "Expression"
+								},
+								"timeout": "01:00:00",
+								"reportStatusOnCallBack": true
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Web_AzureAutomation_Webhook_Incremental",
+							"type": "WebHook",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@activity('Lookup_KeyValueConfig').output.firstRow.WebHookFull",
+									"type": "Expression"
+								},
+								"method": "POST",
+								"headers": {
+									"Content-Type": "application/json"
+								},
+								"body": {
+									"value": "@json(concat('{\"AnalysisServicesDatabaseName\":\"Havertys Semantic Layer\",\"AnalysisServicesServer\":\"', activity('Lookup_KeyValueConfig').output.firstRow.AnalysisServicesServer,'\"}'))",
+									"type": "Expression"
+								},
+								"timeout": "01:00:00",
+								"reportStatusOnCallBack": true
+							}
+						},
+						{
+							"name": "Web_AzureAutomation_Webhook_Incremental_copy1",
+							"type": "WebHook",
+							"dependsOn": [
+								{
+									"activity": "Web_AzureAutomation_Webhook_Incremental",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@activity('Lookup_KeyValueConfig').output.firstRow.WebHookFull",
+									"type": "Expression"
+								},
+								"method": "POST",
+								"headers": {
+									"Content-Type": "application/json"
+								},
+								"body": {
+									"value": "@json(concat('{\"AnalysisServicesDatabaseName\":\"Havertys Semantic Layer\",\"AnalysisServicesServer\":\"', activity('Lookup_KeyValueConfig').output.firstRow.AnalysisServicesServer,'\"}'))",
+									"type": "Expression"
+								},
+								"timeout": "01:00:00",
+								"reportStatusOnCallBack": true
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "900or1000",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Full or Incremental AAS Processing",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(pipeline().parameters.RunType, 'N')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "DB2_RESTCall_1000",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "POST",
+										"requestBody": {
+											"value": "@{concat('{', '\"status\": ', '1000', ', ', '\"processNumber\": ', string(pipeline().parameters.MasterProcessNumber), ', ', '\"runType\": ', pipeline().parameters.RunType, ', \"runId\": ', pipeline().RunId, '}')}",
+											"type": "Expression"
+										},
+										"requestTimeout": ""
+									}
+								},
+								"dataset": {
+									"referenceName": "DB2StoredProcedureHTTPJson",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "Execute_pl_ScaleDBDown",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "DB2_RESTCall_1000",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "ETL_pl_AzureSQLDB_Scaling",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"ServiceTier": "GeneralPurpose",
+									"AzureRegionName": "East US"
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "DB2_RESTCall_900",
+							"description": "@{concat('{', '\"status\": ', '900', ', ', '\"processNumber\": ', string(pipeline().parameters.MasterProcessNumber), ', ', '\"runType\": ', pipeline().parameters.RunType, '}')}",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "POST",
+										"requestBody": {
+											"value": "@{concat('{', '\"status\": ', '900', ', ', '\"processNumber\": ', string(pipeline().parameters.MasterProcessNumber), ', ', '\"runType\": ', pipeline().parameters.RunType, ', \"runId\": ', pipeline().RunId, '}')}",
+											"type": "Expression"
+										},
+										"requestTimeout": ""
+									}
+								},
+								"dataset": {
+									"referenceName": "DB2StoredProcedureHTTPJson",
+									"type": "DatasetReference"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Execute ETL_pl_Error_StoredProcedure_Execute",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "SP_MasterJobEnd_Failure_Pipeline",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ETL_pl_Error_StoredProcedure_Execute",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"MasterProcessNumber": {
+							"value": "@pipeline().parameters.MasterProcessNumber",
+							"type": "Expression"
+						},
+						"RunType": {
+							"value": "@pipeline().parameters.RunType",
+							"type": "Expression"
+						},
+						"RunId": {
+							"value": "@pipeline().RunId",
+							"type": "Expression"
+						},
+						"CallingPipelineName": {
+							"value": "@pipeline().Pipeline",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Lookup_KeyValueConfig",
+				"description": "This LookUp calls a stored procedure which\npulls the key/value pairs ",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT dbo.udf_GetETLConfiguration('WebHookFull') AS WebHookFull,\n\t   dbo.udf_GetETLConfiguration('WebHookIncremental') AS WebHookIncremental,\n\t   dbo.udf_GetETLConfiguration('AnalysisServicesServer') AS AnalysisServicesServer,\n\t   dbo.udf_GetETLConfiguration('AzureSQLServerName') AS AzureSQLServerName,\n\t   dbo.udf_GetETLConfiguration('AzureSQLDatabaseName') AS AzureSQLDatabaseName,\n\t   dbo.udf_GetETLConfiguration('SubscriptionID') AS SubscriptionID,\n\t   dbo.udf_GetETLConfiguration('ResourceGroupName') AS ResourceGroupName,\n           dbo.udf_GetETLConfiguration('SQLComputeSizeHigh') AS SQLComputeSizeHigh,\n\t   dbo.udf_GetETLConfiguration('SQLComputeSizeLow') AS SQLComputeSizeLow",
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_ETL_Master",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"MasterProcessNumber": {
+				"type": "int",
+				"defaultValue": 1
+			},
+			"RunType": {
+				"type": "string",
+				"defaultValue": "N"
+			}
+		},
+		"folder": {
+			"name": "AAS Processing"
+		},
+		"annotations": []
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

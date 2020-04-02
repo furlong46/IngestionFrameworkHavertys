@@ -1,0 +1,109 @@
+{
+	"name": "ETL_pl_Error_StoredProcedure_Execute",
+	"properties": {
+		"description": "Calls the stored procedure for an error",
+		"activities": [
+			{
+				"name": "Set ErrorMessageJson",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set RunIdJson",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ErrorMessageJson",
+					"value": {
+						"value": "@if(and(\nequals(coalesce(pipeline().parameters.CallingPipelineName, ''), ''), equals(coalesce(pipeline().parameters.ErrorMessage, ''), '')), \n'', \nconcat(\n',\"errorMessage\": \"', \nif(\nequals(coalesce(pipeline().parameters.CallingPipelineName, ''), ''), pipeline().parameters.ErrorMessage, \nconcat('Error in pipeline ', pipeline().parameters.CallingPipelineName, \nif(equals(coalesce(pipeline().parameters.ErrorMessage, ''), ''), '', concat(': ', pipeline().parameters.ErrorMessage)))\n),\n'\"'))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set RunIdJson",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RunIdJson",
+					"value": {
+						"value": "@if(equals(coalesce(pipeline().parameters.RunId, ''), ''), '', concat(', \"runId\": \"', pipeline().parameters.RunId, '\"'))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "LookUpHTTP",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Set ErrorMessageJson",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "POST",
+							"requestBody": {
+								"value": "@{concat('{', '\"status\": \"550\"', ', \"processNumber\": ', string(pipeline().parameters.MasterProcessNumber), ', \"runType\": ', string(pipeline().parameters.RunType), variables('RunIdJson'), \nvariables('ErrorMessageJson'), '}')}",
+								"type": "Expression"
+							},
+							"requestTimeout": ""
+						}
+					},
+					"dataset": {
+						"referenceName": "DB2StoredProcedureHTTPJson",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"MasterProcessNumber": {
+				"type": "int"
+			},
+			"RunType": {
+				"type": "string",
+				"defaultValue": "'N'"
+			},
+			"ErrorMessage": {
+				"type": "string"
+			},
+			"RunId": {
+				"type": "string"
+			},
+			"CallingPipelineName": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"ErrorMessageJson": {
+				"type": "String"
+			},
+			"RunIdJson": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "REST/FinalVersion"
+		},
+		"annotations": []
+	}
+}

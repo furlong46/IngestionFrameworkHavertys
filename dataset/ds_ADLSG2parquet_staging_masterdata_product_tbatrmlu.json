@@ -1,0 +1,115 @@
+{
+	"name": "ds_ADLSG2parquet_staging_masterdata_product_tbatrmlu",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DataLake"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "staging/master data/product/DB203002/pcrundata_tbatrmlu",
+				"fileSystem": "datalake"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "ATRID",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "TYPEID",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "VALUE1",
+				"type": "UTF8"
+			},
+			{
+				"name": "VALUE2",
+				"type": "UTF8"
+			},
+			{
+				"name": "SEQ",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "CRTDATE",
+				"type": "INT96"
+			},
+			{
+				"name": "UPDATED",
+				"type": "INT96"
+			},
+			{
+				"name": "SYNCHED",
+				"type": "INT96"
+			},
+			{
+				"name": "VALUE3",
+				"type": "UTF8"
+			},
+			{
+				"name": "VALUE4",
+				"type": "UTF8"
+			},
+			{
+				"name": "VALUE5",
+				"type": "UTF8"
+			},
+			{
+				"name": "VALUE6",
+				"type": "UTF8"
+			},
+			{
+				"name": "VALUE7",
+				"type": "UTF8"
+			},
+			{
+				"name": "VALUE8",
+				"type": "UTF8"
+			},
+			{
+				"name": "VALUE9",
+				"type": "UTF8"
+			},
+			{
+				"name": "VALUE10",
+				"type": "UTF8"
+			},
+			{
+				"name": "VALUE11",
+				"type": "UTF8"
+			},
+			{
+				"name": "VALUE12",
+				"type": "UTF8"
+			},
+			{
+				"name": "VALUE13",
+				"type": "UTF8"
+			},
+			{
+				"name": "VALUE14",
+				"type": "UTF8"
+			},
+			{
+				"name": "VALUE15",
+				"type": "UTF8"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

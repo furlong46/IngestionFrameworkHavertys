@@ -1,0 +1,125 @@
+{
+	"name": "df_ADLS_to_Fact_MaterialsBridge",
+	"properties": {
+		"folder": {
+			"name": "Fact_DataFlows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2parquet_staging_masterdata_product_tbitem",
+						"type": "DatasetReference"
+					},
+					"name": "SourceTbitem"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_HavertysDW_Fact_MaterialsBridge",
+						"type": "DatasetReference"
+					},
+					"name": "SourceFactMaterialsBridge"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2parquet_staging_masterdata_product_tbgroup",
+						"type": "DatasetReference"
+					},
+					"name": "SourceTbgroup"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2parquet_staging_masterdata_product_tbatrgrp",
+						"type": "DatasetReference"
+					},
+					"name": "SourceTbatrgrp"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2parquet_staging_masterdata_product_tbatrmlu",
+						"type": "DatasetReference"
+					},
+					"name": "SourceTbatrmlu"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_Dim_SKU_Materials",
+						"type": "DatasetReference"
+					},
+					"name": "sourceSKUMaterials"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_Dim_SKU",
+						"type": "DatasetReference"
+					},
+					"name": "sourceSKU"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_HavertysDW_Fact_MaterialsBridge",
+						"type": "DatasetReference"
+					},
+					"name": "SinkFactMaterialsBridge"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectMaterials"
+				},
+				{
+					"name": "DvClHashPlaceHolders"
+				},
+				{
+					"name": "JoinTbGroup"
+				},
+				{
+					"name": "JoinTbAtrgrp"
+				},
+				{
+					"name": "JoinTbatrmlu"
+				},
+				{
+					"name": "FilterTypeId"
+				},
+				{
+					"name": "LookupSKUMaterialsPK"
+				},
+				{
+					"name": "LookupSKU"
+				},
+				{
+					"name": "DvClStage"
+				},
+				{
+					"name": "WindowRemoveDuplicates"
+				},
+				{
+					"name": "FilterRemoveDuplicates"
+				},
+				{
+					"name": "AggRemoveDups"
+				},
+				{
+					"name": "DeriveNullTrim"
+				},
+				{
+					"name": "LeftJoinWithSku"
+				},
+				{
+					"name": "SelectColumns"
+				},
+				{
+					"name": "FilterFailedLookupRow"
+				},
+				{
+					"name": "DerivedColumn1"
+				}
+			],
+			"script": "parameters{\n\tMasterProcessNumber as string ('1')\n}\nsource(output(\n\t\tITEM as string,\n\t\tVENDOR as string,\n\t\tORIGVND as string,\n\t\tCRTDATE as timestamp,\n\t\tUPDATED as timestamp,\n\t\tSYNCHED as timestamp,\n\t\tSTOCKED as string,\n\t\tSKUTYPE as string,\n\t\tRPTCLASS as string,\n\t\tDESC as string,\n\t\tMFGID as string,\n\t\tCOLOR as string,\n\t\tGROUPID as decimal(38,18),\n\t\tWIDTH as decimal(38,18),\n\t\tLENGTH as decimal(38,18),\n\t\tHEIGHT as decimal(38,18),\n\t\tSKUREL as string,\n\t\tPRINTOPT as string,\n\t\tWEIGHT as decimal(38,18),\n\t\tTAXABLE as string,\n\t\tPMAMOUNT as decimal(38,18),\n\t\tTAGDESC as string,\n\t\tSETUPTIME as decimal(38,18),\n\t\tMINPRICE as decimal(38,18),\n\t\tVENDORDEF as string,\n\t\tREORDERPT as decimal(38,18),\n\t\tREORDERQTY as decimal(38,18),\n\t\tSEQUENCE as decimal(38,18),\n\t\tFLOWSTR as timestamp,\n\t\tFLOWEND as timestamp,\n\t\tCUBES as decimal(38,18),\n\t\tPTAGDESCUP as timestamp,\n\t\tHIDEORSHOW as string,\n\t\tWEBDESC as string,\n\t\tPRODID as decimal(38,18),\n\t\tDIRECTSHIP as string,\n\t\tWEBSTATUS as decimal(38,18),\n\t\tINCOMCAT as string,\n\t\tPROTECTION as decimal(38,18),\n\t\tATRID02 as decimal(38,18),\n\t\tATRID03 as decimal(38,18),\n\t\tATRID09 as decimal(38,18),\n\t\tATRID12 as decimal(38,18),\n\t\tALTDLV as string,\n\t\tSHIPWIDTH as decimal(38,18),\n\t\tSHIPLENGTH as decimal(38,18),\n\t\tSHIPHEIGHT as decimal(38,18),\n\t\tPREPCUBES as decimal(38,18),\n\t\tREPORTSKU as string,\n\t\tHTSNUMBER as decimal(38,18),\n\t\tGNRSUBFLG as string,\n\t\tUNTSPERPKG as decimal(38,18),\n\t\tMINORDQTY as decimal(38,18),\n\t\tSTRVWMRKDN as string,\n\t\tFCTSTREAM as decimal(38,18),\n\t\tUPCCODE as decimal(38,18),\n\t\tVNDITEMID as string,\n\t\tADVPRICE as decimal(38,18),\n\t\tSTORESTKD as string,\n\t\tDIAMETER as decimal(38,18),\n\t\tARMHEIGHT as decimal(38,18),\n\t\tSEATHEIGHT as decimal(38,18),\n\t\tSEATDEPTH as decimal(38,18),\n\t\tINSIDEWDTH as decimal(38,18),\n\t\tINSIDEDPTH as decimal(38,18),\n\t\tLINEUPSTAT as string,\n\t\tITEMTYPE as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> SourceTbitem\nsource(output(\n\t\tMaterials_Bridge_sk as integer,\n\t\tCount as integer,\n\t\tSKU_fk as integer,\n\t\tMaterials_fk as integer,\n\t\tSKU_Unformatted_nk as string,\n\t\tMaterial_Name as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_COMMITTED',\n\tformat: 'table') ~> SourceFactMaterialsBridge\nsource(output(\n\t\tGROUPID as decimal(38,18),\n\t\tVENDOR as string,\n\t\tGROUP as string,\n\t\tCRTDATE as timestamp,\n\t\tUPDATED as timestamp,\n\t\tSYNCHED as timestamp,\n\t\tDESC as string,\n\t\tRPTCLASS as string,\n\t\tCATMDS as decimal(38,18),\n\t\tWEBDESC as string,\n\t\tCOLLID as decimal(38,18),\n\t\tGRPSORT as string,\n\t\tWEBSHOW as string,\n\t\tSHOWPRICE as string,\n\t\tPRODFEAT as string,\n\t\tSTYLE as decimal(38,18),\n\t\tPRICEPT as decimal(38,18),\n\t\tTABDESC as string,\n\t\tFACNAME as string,\n\t\tCATWEB as decimal(38,18),\n\t\tSRCPCNT as decimal(38,18),\n\t\tORIGVND as string,\n\t\tORIGINID as decimal(38,18),\n\t\tUPDATEDBY as string,\n\t\tANALYSTID as decimal(38,18),\n\t\tSPLORDPROD as decimal(38,18),\n\t\tACTIVESTR as timestamp,\n\t\tACTIVEEND as timestamp,\n\t\tPRCTAGDESC as string,\n\t\tCOMMENT as string,\n\t\tVENDORLEAD as decimal(38,18),\n\t\tPTAGDESCUP as timestamp,\n\t\tMIORIGIN as decimal(38,18),\n\t\tIMAGELOC as string,\n\t\tWEBSTATUS as decimal(38,18),\n\t\tMDSSIGNOFF as string,\n\t\tADVSIGNOFF as string,\n\t\tINCOMCAT as string,\n\t\tMDSUSER as string,\n\t\tMDSDATE as timestamp,\n\t\tADVUSER as string,\n\t\tADVDATE as timestamp,\n\t\tSTARRATING as decimal(38,18),\n\t\tRATINGCNT as decimal(38,18),\n\t\tDSPNAME as string,\n\t\tCARRYPARTS as string,\n\t\tPARTSDEFND as string,\n\t\tWATCH as timestamp,\n\t\tCLOSEOUT as timestamp,\n\t\tFACTORYID as decimal(38,18),\n\t\tDIRECTIMP as string,\n\t\tQUALITYLVL as decimal(38,18),\n\t\tSPECORDAVL as string,\n\t\tORDBYSALE as string,\n\t\tCSLEADFM as decimal(38,18),\n\t\tCSLEADTO as decimal(38,18),\n\t\tSOLEADFM as decimal(38,18),\n\t\tSOLEADTO as decimal(38,18),\n\t\tOMITLCLA as string,\n\t\tQCNUM as decimal(38,18)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> SourceTbgroup\nsource(output(\n\t\tGROUPID as decimal(38,18),\n\t\tATRID as decimal(38,18),\n\t\tATRLOC as string,\n\t\tINHERIT as string,\n\t\tSEQ as decimal(38,18),\n\t\tCRTDATE as timestamp,\n\t\tUPDATED as timestamp,\n\t\tSYNCHED as timestamp,\n\t\tSHOWONPAGE as string,\n\t\tREPRPTCAT as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> SourceTbatrgrp\nsource(output(\n\t\tATRID as decimal(38,18),\n\t\tTYPEID as decimal(38,18),\n\t\tVALUE1 as string,\n\t\tVALUE2 as string,\n\t\tSEQ as decimal(38,18),\n\t\tCRTDATE as timestamp,\n\t\tUPDATED as timestamp,\n\t\tSYNCHED as timestamp,\n\t\tVALUE3 as string,\n\t\tVALUE4 as string,\n\t\tVALUE5 as string,\n\t\tVALUE6 as string,\n\t\tVALUE7 as string,\n\t\tVALUE8 as string,\n\t\tVALUE9 as string,\n\t\tVALUE10 as string,\n\t\tVALUE11 as string,\n\t\tVALUE12 as string,\n\t\tVALUE13 as string,\n\t\tVALUE14 as string,\n\t\tVALUE15 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> SourceTbatrmlu\nsource(output(\n\t\tMaterials_sk as integer,\n\t\tMaterial_Code_nk as integer,\n\t\tMaterial_Name as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'SELECT Materials_sk,Material_Code_nk, Material_Name FROM DW.Dim_SKU_Materials',\n\tformat: 'query') ~> sourceSKUMaterials\nsource(output(\n\t\tSKU_sk as integer,\n\t\tSKU_Unformatted_nk as string,\n\t\tSKU as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'SELECT SKU_sk, SKU_Unformatted_nk, SKU FROM DW.Dim_SKU',\n\tformat: 'query') ~> sourceSKU\nJoinTbatrmlu select(mapColumn(\n\t\tITEM,\n\t\tVALUE1,\n\t\tATRID = SourceTbatrmlu@ATRID\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectMaterials\nDvClStage derive(ETLBatchID_Insert = toInteger($MasterProcessNumber),\n\t\tETLBatchID_Update = toInteger($MasterProcessNumber),\n\t\tSourceSystem_fk = 0,\n\t\tCount = 1,\n\t\tMaterials_fk = case(isNull(ATRID), -1, isNull(Materials_fk) && not(isNull(ATRID)), 0, Materials_fk),\n\t\tSKU_fk = iifNull(SKU_fk, 0)) ~> DvClHashPlaceHolders\nSourceTbitem, SourceTbgroup join(SourceTbitem@GROUPID == SourceTbgroup@GROUPID,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> JoinTbGroup\nJoinTbGroup, SourceTbatrgrp join(SourceTbitem@GROUPID == SourceTbatrgrp@GROUPID,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> JoinTbAtrgrp\nJoinTbAtrgrp, FilterTypeId join(SourceTbatrgrp@ATRID == SourceTbatrmlu@ATRID,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> JoinTbatrmlu\nSourceTbatrmlu filter(TYPEID==11) ~> FilterTypeId\nSelectColumns, sourceSKUMaterials lookup(ATRID == Material_Code_nk,\n\tmultiple: true,\n\tbroadcast: 'none')~> LookupSKUMaterialsPK\nLookupSKUMaterialsPK, sourceSKU lookup(ITEM == SKU_Unformatted_nk,\n\tmultiple: true,\n\tbroadcast: 'none')~> LookupSKU\nLookupSKU select(mapColumn(\n\t\tMaterials_fk = Materials_sk,\n\t\tSKU_fk = SKU_sk,\n\t\tSKU_Unformatted_nk = ITEM,\n\t\tMaterial_Name,\n\t\tATRID\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> DvClStage\nDvClHashPlaceHolders window(over(SKU_Unformatted_nk,\n\t\tMaterial_Name),\n\tasc(SKU_Unformatted_nk, true),\n\tDupeRow = rowNumber()) ~> WindowRemoveDuplicates\nWindowRemoveDuplicates filter(DupeRow==1) ~> FilterRemoveDuplicates\nDeriveNullTrim aggregate(groupBy(ITEM,\n\t\tVALUE1,\n\t\tATRID),\n\tCount = sum(1)) ~> AggRemoveDups\nSelectMaterials derive(each(match(type=='string'), $$ = iifNull(trim($$), ''))) ~> DeriveNullTrim\nsourceSKU, AggRemoveDups join(SKU_Unformatted_nk == ITEM,\n\tjoinType:'left',\n\tbroadcast: 'none')~> LeftJoinWithSku\nDerivedColumn1 select(mapColumn(\n\t\tITEM = SKU_Unformatted_nk,\n\t\tVALUE1,\n\t\tATRID,\n\t\tCount\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nLeftJoinWithSku filter(SKU_sk > 0) ~> FilterFailedLookupRow\nFilterFailedLookupRow derive(ATRID = coalesce(toInteger(ATRID), -1)) ~> DerivedColumn1\nFilterRemoveDuplicates sink(input(\n\t\tMaterials_Bridge_sk as integer,\n\t\tCount as integer,\n\t\tSKU_fk as integer,\n\t\tMaterials_fk as integer,\n\t\tSKU_Unformatted_nk as string,\n\t\tMaterial_Name as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\ttruncate:true,\n\tformat: 'table',\n\tmapColumn(\n\t\tCount,\n\t\tSKU_fk,\n\t\tMaterials_fk,\n\t\tSKU_Unformatted_nk,\n\t\tMaterial_Name,\n\t\tSourceSystem_fk,\n\t\tETLBatchID_Insert,\n\t\tETLBatchID_Update\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SinkFactMaterialsBridge"
+		}
+	}
+}

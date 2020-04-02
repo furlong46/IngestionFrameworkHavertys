@@ -1,0 +1,66 @@
+{
+	"name": "df_ADLS_to_Dim_Employee",
+	"properties": {
+		"folder": {
+			"name": "Dim_DataFlows/Replaced by DBX"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2_staging_masterdata_employee_tbdwemp",
+						"type": "DatasetReference"
+					},
+					"name": "SourceTbdwemp"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_Dim_Employee",
+						"type": "DatasetReference"
+					},
+					"name": "SourceEmployeeDim"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_Dim_Employee",
+						"type": "DatasetReference"
+					},
+					"name": "SinkEmployeeDim"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumnFullName"
+				},
+				{
+					"name": "SelectTbdwemp"
+				},
+				{
+					"name": "DvClHashETLPlaceHolders"
+				},
+				{
+					"name": "LookupEmployeeDim"
+				},
+				{
+					"name": "SelectEmployee"
+				},
+				{
+					"name": "FilterUpdates"
+				},
+				{
+					"name": "AlterRow"
+				},
+				{
+					"name": "WindowDuplicatesRows"
+				},
+				{
+					"name": "FilterDuplicateRows"
+				}
+			],
+			"script": "\nparameters{\n\tMasterProcessNumber as string ('1')\n}\nsource(output(\n\t\tEMPLOYEE_NUMBER_TYPE as string,\n\t\tEMPLOYEE_NUMBER as string,\n\t\tFIRST_NAME as string,\n\t\tLAST_NAME as string,\n\t\tDIVISION as decimal(38,18),\n\t\tCENTER as decimal(38,18),\n\t\tBRANCH as decimal(38,18),\n\t\tSALES_NUMBER as decimal(38,18),\n\t\tWMS_NUMBER as decimal(38,18),\n\t\tDRIVER_NUMBER as decimal(38,18),\n\t\tDESIGNER_NUMBER as decimal(38,18)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> SourceTbdwemp\nsource(output(\n\t\tEmployee_sk as integer,\n\t\tEmployee_ID_nk as string,\n\t\tEmployeeType_Code as string,\n\t\tEmployeeType_Name as string,\n\t\tSales_ID as integer,\n\t\tWMS_ID as integer,\n\t\tDriver_ID as integer,\n\t\tDesigner_ID as integer,\n\t\tFirst_Name as string,\n\t\tLast_Name as string,\n\t\tFull_Name as string,\n\t\tDivision_ID as integer,\n\t\tMarket_ID as integer,\n\t\tBranch_ID as integer,\n\t\tHashKey as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SourceEmployeeDim\nSourceTbdwemp derive(Full_Name = concat(trim(FIRST_NAME), ' ', trim(LAST_NAME)),\n\t\tEmployeeType_Name = case(EMPLOYEE_NUMBER_TYPE=='E', 'Employee', EMPLOYEE_NUMBER_TYPE=='G', 'Contractor', ''),\n\t\teach(match(type=='string'), $$ = iifNull(trim($$), '')),\n\t\tDESIGNER_NUMBER = iifNull(DESIGNER_NUMBER, 0)) ~> DerivedColumnFullName\nDerivedColumnFullName select(mapColumn(\n\t\tEmployeeType_Code = EMPLOYEE_NUMBER_TYPE,\n\t\tEmployee_ID_nk = EMPLOYEE_NUMBER,\n\t\tFirst_Name = FIRST_NAME,\n\t\tLast_Name = LAST_NAME,\n\t\tDivision_ID = DIVISION,\n\t\tMarket_ID = CENTER,\n\t\tBranch_ID = BRANCH,\n\t\tSales_ID = SALES_NUMBER,\n\t\tWMS_ID = WMS_NUMBER,\n\t\tDriver_ID = DRIVER_NUMBER,\n\t\tFull_Name,\n\t\tEmployeeType_Name,\n\t\tDesigner_ID = DESIGNER_NUMBER\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectTbdwemp\nSelectEmployee derive(HashKey = sha1(EmployeeType_Code,First_Name,Last_Name,Division_ID,Market_ID,Branch_ID,Sales_ID,WMS_ID,Driver_ID,Full_Name,EmployeeType_Name,Designer_ID),\n\t\tETLBatchID_Insert = iifNull(ETLBatchID_Insert_Dim, toInteger($MasterProcessNumber)),\n\t\tETLBatchID_Update = toInteger($MasterProcessNumber),\n\t\tSourceSystem_fk = 0) ~> DvClHashETLPlaceHolders\nSelectTbdwemp, SourceEmployeeDim lookup(SelectTbdwemp@Employee_ID_nk == SourceEmployeeDim@Employee_ID_nk,\n\tbroadcast: 'none')~> LookupEmployeeDim\nLookupEmployeeDim select(mapColumn(\n\t\tEmployeeType_Code = {SelectTbdwemp@EmployeeType_Code},\n\t\tEmployee_ID_nk = {SelectTbdwemp@Employee_ID_nk},\n\t\tFirst_Name = {SelectTbdwemp@First_Name},\n\t\tLast_Name = {SelectTbdwemp@Last_Name},\n\t\tDivision_ID = {SelectTbdwemp@Division_ID},\n\t\tMarket_ID = {SelectTbdwemp@Market_ID},\n\t\tBranch_ID = {SelectTbdwemp@Branch_ID},\n\t\tSales_ID = {SelectTbdwemp@Sales_ID},\n\t\tWMS_ID = {SelectTbdwemp@WMS_ID},\n\t\tDriver_ID = {SelectTbdwemp@Driver_ID},\n\t\tFull_Name = {SelectTbdwemp@Full_Name},\n\t\tEmployeeType_Name = {SelectTbdwemp@EmployeeType_Name},\n\t\tDesigner_ID = {SelectTbdwemp@Designer_ID},\n\t\tEmployee_sk_Dim = Employee_sk,\n\t\tHashKey_Dim = HashKey,\n\t\tETLBatchID_Insert_Dim = ETLBatchID_Insert\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectEmployee\nFilterDuplicateRows filter(isNull(Employee_sk_Dim)||(!isNull(Employee_sk_Dim)&&HashKey!=HashKey_Dim)) ~> FilterUpdates\nFilterUpdates alterRow(updateIf(!isNull(Employee_sk_Dim)&&HashKey!=HashKey_Dim),\n\tinsertIf(isNull(Employee_sk_Dim))) ~> AlterRow\nDvClHashETLPlaceHolders window(over(Employee_ID_nk = Employee_ID_nk),\n\tasc(Employee_ID_nk, true),\n\tRowCount = rowNumber()) ~> WindowDuplicatesRows\nWindowDuplicatesRows filter(RowCount==1) ~> FilterDuplicateRows\nAlterRow sink(input(\n\t\tEmployee_sk as integer,\n\t\tEmployee_ID_nk as string,\n\t\tEmployeeType_Code as string,\n\t\tEmployeeType_Name as string,\n\t\tSales_ID as integer,\n\t\tWMS_ID as integer,\n\t\tDriver_ID as integer,\n\t\tDesigner_ID as integer,\n\t\tFirst_Name as string,\n\t\tLast_Name as string,\n\t\tFull_Name as string,\n\t\tDivision_ID as integer,\n\t\tMarket_ID as integer,\n\t\tBranch_ID as integer,\n\t\tHashKey as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['Employee_ID_nk'],\n\tformat: 'table',\n\tmapColumn(\n\t\tEmployee_ID_nk,\n\t\tEmployeeType_Code,\n\t\tEmployeeType_Name,\n\t\tSales_ID,\n\t\tWMS_ID,\n\t\tDriver_ID,\n\t\tDesigner_ID,\n\t\tFirst_Name,\n\t\tLast_Name,\n\t\tFull_Name,\n\t\tDivision_ID,\n\t\tMarket_ID,\n\t\tBranch_ID,\n\t\tHashKey,\n\t\tSourceSystem_fk,\n\t\tETLBatchID_Insert,\n\t\tETLBatchID_Update\n\t)) ~> SinkEmployeeDim"
+		}
+	}
+}

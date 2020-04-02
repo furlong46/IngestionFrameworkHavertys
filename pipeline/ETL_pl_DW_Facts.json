@@ -1,0 +1,768 @@
+{
+	"name": "ETL_pl_DW_Facts",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_ADLS_to_Fact_MaterialsBridge",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_ADLS_to_Fact_MaterialsBridge",
+						"type": "DataFlowReference",
+						"parameters": {
+							"MasterProcessNumber": {
+								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "MDFIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					}
+				}
+			},
+			{
+				"name": "df_ADLS_to_Fact_WrittenSales",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "SP_usp_Delete_Fact_WrittenSales",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_ADLS_to_Fact_WrittenSales",
+						"type": "DataFlowReference",
+						"parameters": {
+							"ControlStartDate": {
+								"value": "'@{if(equals(pipeline().parameters.RunType, 'N'), substring(\nreplace(\nstring(activity('LookUp_DB2ControlDates_Written').output.firstrow.Extracted_From), \n'-', ''),\n0,\n8\n), substring(\nreplace(\nstring(activity('LookUp_DWControlDates_Written').output.firstrow.ControlStartDate), \n'-', ''),\n0,\n8\n))}'",
+								"type": "Expression"
+							},
+							"ControlEndDate": {
+								"value": "'@{if(equals(pipeline().parameters.RunType, 'N'), substring(\nreplace(\nstring(activity('LookUp_DB2ControlDates_Written').output.firstrow.Extracted_Thru), \n'-', ''),\n0,\n8\n), substring(\nreplace(\nstring(activity('LookUp_DWControlDates_Written').output.firstrow.ControlEndDate), \n'-', ''),\n0,\n8\n))}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "MDFIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					}
+				}
+			},
+			{
+				"name": "df_ADLS_to_Fact_DeliveredSales",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "SP_usp_Delete_Fact_DeliveredSales",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_ADLS_to_Fact_DeliveredSales",
+						"type": "DataFlowReference",
+						"parameters": {
+							"ControlStartDate": {
+								"value": "'@{if(equals(pipeline().parameters.RunType, 'N'), substring(\nreplace(\nstring(activity('LookUp_DB2ControlDates_Delivered').output.firstrow.Extracted_From), \n'-', ''),\n0,\n8\n), substring(\nreplace(\nstring(activity('LookUp_DWControlDates_Delivered').output.firstrow.ControlStartDate), \n'-', ''),\n0,\n8\n))}'",
+								"type": "Expression"
+							},
+							"ControlEndDate": {
+								"value": "'@{if(equals(pipeline().parameters.RunType, 'N'), substring(\nreplace(\nstring(activity('LookUp_DB2ControlDates_Delivered').output.firstrow.Extracted_Thru), \n'-', ''),\n0,\n8\n), substring(\nreplace(\nstring(activity('LookUp_DWControlDates_Delivered').output.firstrow.ControlEndDate), \n'-', ''),\n0,\n8\n))}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "MDFIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					}
+				}
+			},
+			{
+				"name": "df_ADLS_to_Fact_SKUCost",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_ADLS_to_Fact_SKUCost",
+						"type": "DataFlowReference",
+						"parameters": {
+							"MasterProcessNumber": {
+								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "MDFIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					}
+				}
+			},
+			{
+				"name": "df_ADLS_to_Fact_SpecialOrderAttributesKeyValuesBridge",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_ADLS_to_Fact_SpecialOrderAttributesKeyValuesBridge",
+						"type": "DataFlowReference",
+						"parameters": {
+							"MasterProcessNumber": {
+								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "MDFIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					}
+				}
+			},
+			{
+				"name": "df_ADLS_to_Fact_CommonColorBridge",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_ADLS_to_Fact_CommonColorBridge",
+						"type": "DataFlowReference",
+						"parameters": {
+							"MasterProcessNumber": {
+								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "MDFIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					}
+				}
+			},
+			{
+				"name": "df_ADLS_to_Fact_CommonFinishBridge",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_ADLS_to_Fact_CommonFinishBridge",
+						"type": "DataFlowReference",
+						"parameters": {
+							"MasterProcessNumber": {
+								"value": "'@{string(pipeline().parameters.MasterProcessNumber)}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "MDFIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					}
+				}
+			},
+			{
+				"name": "LookUp_DB2ControlDates_Delivered",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "LookUp_DWControlDates_Delivered",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "Db2Source",
+						"query": {
+							"value": "@concat('select * from ', string(activity('LookUp_DWControlDates_Delivered').output.firstrow.DB2ControlTable))",
+							"type": "Expression"
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_DB2_ControlTable",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "LookUp_DWControlDates_Written",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat('select * from ETL.MetadataIngestionControlDateRanges where DB2SchemaTable =','''','ipcorpdta.tbdwwrt','''')",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_ETL_MetadataIngestionControlDateRanges",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "SP_usp_Delete_Fact_WrittenSales",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "LookUp_DB2ControlDates_Written",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_Delete_Fact_WrittenSales]",
+					"storedProcedureParameters": {
+						"ControlEndDate": {
+							"value": {
+								"value": "@{if(equals(pipeline().parameters.RunType, 'N'), substring(\nreplace(\nstring(activity('LookUp_DB2ControlDates_Written').output.firstrow.Extracted_Thru), \n'-', ''),\n0,\n8\n), substring(\nreplace(\nstring(activity('LookUp_DWControlDates_Written').output.firstrow.ControlEndDate), \n'-', ''),\n0,\n8\n))}",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"ControlStartDate": {
+							"value": {
+								"value": "@{if(equals(pipeline().parameters.RunType, 'N'), substring(\nreplace(\nstring(activity('LookUp_DB2ControlDates_Written').output.firstrow.Extracted_From), \n'-', ''),\n0,\n8\n), substring(\nreplace(\nstring(activity('LookUp_DWControlDates_Written').output.firstrow.ControlStartDate), \n'-', ''),\n0,\n8\n))}",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "SP_usp_Delete_Fact_DeliveredSales",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "LookUp_DB2ControlDates_Delivered",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_Delete_Fact_DeliveredSales]",
+					"storedProcedureParameters": {
+						"ControlEndDate": {
+							"value": {
+								"value": "@{if(equals(pipeline().parameters.RunType, 'N'), substring(\nreplace(\nstring(activity('LookUp_DB2ControlDates_Delivered').output.firstrow.Extracted_Thru), \n'-', ''),\n0,\n8\n), substring(\nreplace(\nstring(activity('LookUp_DWControlDates_Delivered').output.firstrow.ControlEndDate), \n'-', ''),\n0,\n8\n))}",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"ControlStartDate": {
+							"value": {
+								"value": "@{if(equals(pipeline().parameters.RunType, 'N'), substring(\nreplace(\nstring(activity('LookUp_DB2ControlDates_Delivered').output.firstrow.Extracted_From), \n'-', ''),\n0,\n8\n), substring(\nreplace(\nstring(activity('LookUp_DWControlDates_Delivered').output.firstrow.ControlStartDate), \n'-', ''),\n0,\n8\n))}",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Execute_pl_AAS_Processing",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "df_ADLS_to_Fact_WrittenSales",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "df_ADLS_to_Fact_DeliveredSales",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "df_ADLS_to_Fact_MaterialsBridge",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "df_ADLS_to_Fact_SKUCost",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "df_ADLS_to_Fact_SpecialOrderAttributesKeyValuesBridge",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "df_ADLS_to_Fact_CommonColorBridge",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "df_ADLS_to_Fact_CommonFinishBridge",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "adbx_ADLS_to_Fact_SalesTeamBridge",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "adbx_ADLS_to_Fact_DesignerTeamBridge",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "adbx_ADLS_to_Fact_SalesBudget",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "adbx_ADLS_to_Fact_Traffic",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ETL_pl_AAS_Processing_AzureAutoHook",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"MasterProcessNumber": {
+							"value": "@pipeline().parameters.MasterProcessNumber",
+							"type": "Expression"
+						},
+						"RunType": {
+							"value": "@pipeline().parameters.RunType",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "SP_MasterJobEnd_Failure_Pipeline",
+				"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after failed execution of previous steps.",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Execute_pl_AAS_Processing",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_MasterJobEnd_Failure]",
+					"storedProcedureParameters": {
+						"MasterProcessNumber": {
+							"value": {
+								"value": "@pipeline().parameters.MasterProcessNumber",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "adbx_ADLS_to_Fact_DesignerTeamBridge",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Fact Loads/Load Fact_DesignerTeamBridge",
+					"baseParameters": {
+						"MasterProcessNumber": {
+							"value": "@string(pipeline().parameters.MasterProcessNumber)",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "adbx_ADLS_to_Fact_SalesTeamBridge",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Fact Loads/Load Fact_SalesTeamBridge",
+					"baseParameters": {
+						"MasterProcessNumber": {
+							"value": "@string(pipeline().parameters.MasterProcessNumber)",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "adbx_ADLS_to_Fact_SalesBudget",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Fact Loads/Load Fact_SalesBudget",
+					"baseParameters": {
+						"MasterProcessNumber": {
+							"value": "@string(pipeline().parameters.MasterProcessNumber)",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "adbx_ADLS_to_Fact_Traffic",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Fact Loads/Load Fact_Traffic",
+					"baseParameters": {
+						"MasterProcessNumber": {
+							"value": "@string(pipeline().parameters.MasterProcessNumber)",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Execute_CuratedMaintenance",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "adbx_ADLS_to_Fact_DesignerTeamBridge",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "adbx_ADLS_to_Fact_SalesTeamBridge",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "adbx_ADLS_to_Fact_SalesBudget",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "adbx_ADLS_to_Fact_Traffic",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "CuratedMaintenance",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Execute Execute ETL_pl_Error_StoredProcedure_Execute",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "SP_MasterJobEnd_Failure_Pipeline",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ETL_pl_Error_StoredProcedure_Execute",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"MasterProcessNumber": {
+							"value": "@pipeline().parameters.MasterProcessNumber",
+							"type": "Expression"
+						},
+						"RunType": {
+							"value": "@pipeline().parameters.RunType",
+							"type": "Expression"
+						},
+						"ErrorMessage": {
+							"value": "@activity('Execute_pl_AAS_Processing').Error.Message",
+							"type": "Expression"
+						},
+						"RunId": {
+							"value": "@pipeline().RunId",
+							"type": "Expression"
+						},
+						"CallingPipelineName": {
+							"value": "@pipeline().Pipeline",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "LookUp_DB2ControlDates_Written",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "LookUp_DWControlDates_Written",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "Db2Source",
+						"query": {
+							"value": "@concat('select * from ', string(activity('LookUp_DWControlDates_Written').output.firstrow.DB2ControlTable))",
+							"type": "Expression"
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_DB2_ControlTable",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "LookUp_DWControlDates_Delivered",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat('select * from ETL.MetadataIngestionControlDateRanges where DB2SchemaTable =','''','ipcorpdta.tbdwbld','''')",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_ETL_MetadataIngestionControlDateRanges",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			}
+		],
+		"parameters": {
+			"MasterProcessNumber": {
+				"type": "int",
+				"defaultValue": 1
+			},
+			"RunType": {
+				"type": "string",
+				"defaultValue": "N"
+			}
+		},
+		"folder": {
+			"name": "Facts"
+		},
+		"annotations": []
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

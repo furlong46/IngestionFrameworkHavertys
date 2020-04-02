@@ -1,0 +1,7 @@
+{
+	"name": "Gateway01IR",
+	"properties": {
+		"type": "SelfHosted",
+		"description": "Self hosted IR running on Gateway01"
+	}
+}

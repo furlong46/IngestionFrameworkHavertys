@@ -1,0 +1,261 @@
+{
+	"name": "ds_AzureSqlTable_DW_DimDate",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "HavertysDW"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Date_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Isworkday_Store",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Isworkday_Delivery",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Calendar_date",
+				"type": "date"
+			},
+			{
+				"name": "Calendar_name_sht",
+				"type": "varchar"
+			},
+			{
+				"name": "Calendar_name_lng",
+				"type": "varchar"
+			},
+			{
+				"name": "Calendar_year_day_number",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "Calendar_year_day_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Calendar_quarter_day_number",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Calendar_quarter_day_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Calendar_month_day_number",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Calendar_month_day_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Calendar_weekday_number",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Calendar_weekday_code",
+				"type": "char"
+			},
+			{
+				"name": "Calendar_weekday_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Calendar_week_of_month_number",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Calendar_week_of_month_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Calendar_week_of_year_number",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "Calendar_week_of_year_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Calendar_month_number",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Calendar_month_code",
+				"type": "char"
+			},
+			{
+				"name": "Calendar_month_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Calendar_quarter_number",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Calendar_quarter_code",
+				"type": "char"
+			},
+			{
+				"name": "Calendar_quarter_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Calendar_month_week_year_number",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Calendar_month_week_year_code",
+				"type": "varchar"
+			},
+			{
+				"name": "Calendar_month_year_number",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Calendar_month_year_code",
+				"type": "varchar"
+			},
+			{
+				"name": "Calendar_quarter_year_number",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Calendar_quarter_year_code",
+				"type": "varchar"
+			},
+			{
+				"name": "Calendar_quarter_year_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Calendar_year_number",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Calendar_year_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Reporting_week_number",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Reporting_weekending_date",
+				"type": "date"
+			},
+			{
+				"name": "Reporting_weekending_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Reporting_weekday_number",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Reporting_month_number",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Reporting_month_code",
+				"type": "char"
+			},
+			{
+				"name": "Reporting_month_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Reporting_quarter_number",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Reporting_quarter_code",
+				"type": "char"
+			},
+			{
+				"name": "Reporting_quarter_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Reporting_month_year_number",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Reporting_month_year_code",
+				"type": "varchar"
+			},
+			{
+				"name": "Reporting_quarter_year_number",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Reporting_quarter_year_code",
+				"type": "varchar"
+			},
+			{
+				"name": "Reporting_quarter_year_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Reporting_year_number",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Reporting_year_name",
+				"type": "varchar"
+			},
+			{
+				"name": "Holiday_name",
+				"type": "varchar"
+			},
+			{
+				"name": "ETLBatchID_Insert",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ETLBatchID_Update",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "DW",
+			"table": "Dim_Date"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

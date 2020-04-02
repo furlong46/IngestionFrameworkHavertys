@@ -1,0 +1,69 @@
+{
+	"name": "df_ADLS_to_Dim_Materials",
+	"properties": {
+		"folder": {
+			"name": "Dim_DataFlows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ADLSG2parquet_staging_Material",
+						"type": "DatasetReference"
+					},
+					"name": "SourceTbatrmlu"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_Dim_SKU_Materials",
+						"type": "DatasetReference"
+					},
+					"name": "SourceDimMaterials"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_AzureSqlTable_Dim_SKU_Materials",
+						"type": "DatasetReference"
+					},
+					"name": "SinkDimMaterials"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectMaterials"
+				},
+				{
+					"name": "DvClHashPlaceHolders"
+				},
+				{
+					"name": "AlterUpdateInsert"
+				},
+				{
+					"name": "FilterTypeid11"
+				},
+				{
+					"name": "LookupMaterials"
+				},
+				{
+					"name": "SelectDimLookup"
+				},
+				{
+					"name": "FilterUpdates"
+				},
+				{
+					"name": "WindowRemoveDuplicate"
+				},
+				{
+					"name": "FilterRemoveDuplicates"
+				},
+				{
+					"name": "DeriveNullTrim"
+				}
+			],
+			"script": "parameters{\n\tMasterProcessNumber as string ('1')\n}\nsource(output(\n\t\tATRID as decimal(38,18),\n\t\tTYPEID as decimal(38,18),\n\t\tVALUE1 as string,\n\t\tVALUE2 as string,\n\t\tSEQ as decimal(38,18),\n\t\tCRTDATE as timestamp,\n\t\tUPDATED as timestamp,\n\t\tSYNCHED as timestamp,\n\t\tVALUE3 as string,\n\t\tVALUE4 as string,\n\t\tVALUE5 as string,\n\t\tVALUE6 as string,\n\t\tVALUE7 as string,\n\t\tVALUE8 as string,\n\t\tVALUE9 as string,\n\t\tVALUE10 as string,\n\t\tVALUE11 as string,\n\t\tVALUE12 as string,\n\t\tVALUE13 as string,\n\t\tVALUE14 as string,\n\t\tVALUE15 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> SourceTbatrmlu\nsource(output(\n\t\tMaterials_sk as integer,\n\t\tMaterial_Code_nk as integer,\n\t\tMaterial_Name as string,\n\t\tHashKey as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SourceDimMaterials\nFilterTypeid11 select(mapColumn(\n\t\tMaterial_Code_nk = ATRID,\n\t\tMaterial_Name = VALUE1\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectMaterials\nSelectDimLookup derive(HashKeyStage = sha1(Material_Code_nk_Staging,Material_Name_staging),\n\t\t{ETL.BatchID_Insert} = iifNull(ETLBatchID_InsertDim, toInteger($MasterProcessNumber)),\n\t\t{ETL.BatchID_Update} = toInteger($MasterProcessNumber),\n\t\tSource_System_fk = 0) ~> DvClHashPlaceHolders\nFilterUpdates alterRow(insertIf(isNull(Material_Code_nk_Dim)),\n\tupdateIf(!isNull(Material_Code_nk_Dim)&&HashKeyStage!=HashKeyDim)) ~> AlterUpdateInsert\nSourceTbatrmlu filter(TYPEID == 11) ~> FilterTypeid11\nDeriveNullTrim, SourceDimMaterials lookup(SelectMaterials@Material_Code_nk == SourceDimMaterials@Material_Code_nk,\n\tmultiple: true,\n\tbroadcast: 'none')~> LookupMaterials\nLookupMaterials select(mapColumn(\n\t\tMaterial_Code_nk_Staging = SelectMaterials@Material_Code_nk,\n\t\tMaterial_Name_staging = DeriveNullTrim@Material_Name,\n\t\tMaterials_sk,\n\t\tMaterial_Code_nk_Dim = SourceDimMaterials@Material_Code_nk,\n\t\tMaterial_Name_Dim = SourceDimMaterials@Material_Name,\n\t\tHashKeyDim = HashKey,\n\t\tETLBatchID_InsertDim = ETLBatchID_Insert,\n\t\tETLBatchID_UpdateDim = ETLBatchID_Update\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SelectDimLookup\nFilterRemoveDuplicates filter(isNull(Material_Code_nk_Dim)||(!isNull(Material_Code_nk_Dim)&&HashKeyStage!=HashKeyDim)) ~> FilterUpdates\nDvClHashPlaceHolders window(over(Material_Code_nk_Staging),\n\tasc(Material_Code_nk_Staging, true),\n\tRowCount = rowNumber()) ~> WindowRemoveDuplicate\nWindowRemoveDuplicate filter(RowCount==1) ~> FilterRemoveDuplicates\nSelectMaterials derive(each(match(type=='string'), $$ = iifNull(trim($$), ''))) ~> DeriveNullTrim\nAlterUpdateInsert sink(input(\n\t\tMaterials_sk as integer,\n\t\tMaterial_Code_nk as integer,\n\t\tMaterial_Name as string,\n\t\tHashKey as string,\n\t\tSourceSystem_fk as integer,\n\t\tETLBatchID_Insert as integer,\n\t\tETLBatchID_Update as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:true,\n\tupsertable:true,\n\tkeys:['Material_Code_nk'],\n\tformat: 'table',\n\tmapColumn(\n\t\tMaterial_Code_nk = Material_Code_nk_Staging,\n\t\tMaterial_Name = Material_Name_staging,\n\t\tHashKey = HashKeyStage,\n\t\tSourceSystem_fk = Source_System_fk,\n\t\tETLBatchID_Insert = {ETL.BatchID_Insert},\n\t\tETLBatchID_Update = {ETL.BatchID_Update}\n\t)) ~> SinkDimMaterials"
+		}
+	}
+}

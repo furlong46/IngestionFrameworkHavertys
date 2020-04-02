@@ -1,0 +1,17 @@
+{
+	"name": "ls_HTTP_REST_dwstoredprocedure11",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "https://ext01-1.havertys.com//wsext/rest/datawarehouse/stored-procedure",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		},
+		"connectVia": {
+			"referenceName": "Gateway01IR",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

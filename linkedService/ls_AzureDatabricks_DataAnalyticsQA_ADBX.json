@@ -1,0 +1,20 @@
+{
+	"name": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://eastus.azuredatabricks.net",
+			"accessToken": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_KV_KV21",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "DatabricksAccessToken"
+			},
+			"existingClusterId": "0302-202529-well285"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

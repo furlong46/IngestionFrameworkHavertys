@@ -1,0 +1,24 @@
+{
+	"name": "PC04010",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"description": "This is the connection for ingestion and connects to 4010 (distribution server)",
+		"annotations": [],
+		"type": "Db2",
+		"typeProperties": {
+			"connectionString": "server=pc04010:446;database=pc04010;authenticationType=Basic;username=userazure",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_KV_KV21",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "DB2UserAzurePassword"
+			}
+		},
+		"connectVia": {
+			"referenceName": "Gateway01IR",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
