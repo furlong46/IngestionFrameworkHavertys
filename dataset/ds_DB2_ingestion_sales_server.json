@@ -1,10 +1,6 @@
 {
 	"name": "ds_DB2_ingestion_sales_server",
 	"properties": {
-		"linkedServiceName": {
-			"referenceName": "PC03004",
-			"type": "LinkedServiceReference"
-		},
 		"folder": {
 			"name": "Framework"
 		},

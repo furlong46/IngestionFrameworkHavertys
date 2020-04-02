@@ -1,10 +1,6 @@
 {
 	"name": "ds_AzureBlobStorage_parquet_file",
 	"properties": {
-		"linkedServiceName": {
-			"referenceName": "ls_Blob_dataanalyticsqablob21",
-			"type": "LinkedServiceReference"
-		},
 		"parameters": {
 			"FolderPath": {
 				"type": "string"

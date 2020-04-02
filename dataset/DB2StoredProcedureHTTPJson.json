@@ -1,10 +1,6 @@
 {
 	"name": "DB2StoredProcedureHTTPJson",
 	"properties": {
-		"linkedServiceName": {
-			"referenceName": "ls_HTTP_REST_webdevstage11",
-			"type": "LinkedServiceReference"
-		},
 		"folder": {
 			"name": "DB2REST"
 		},
