@@ -1,10 +1,6 @@
 {
 	"name": "ds_Blob_DB2StoredProcedureConfigJson",
 	"properties": {
-		"linkedServiceName": {
-			"referenceName": "ls_Blob_dataanalyticsqablob21",
-			"type": "LinkedServiceReference"
-		},
 		"folder": {
 			"name": "DB2REST"
 		},
