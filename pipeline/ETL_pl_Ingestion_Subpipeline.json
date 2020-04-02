@@ -377,82 +377,6 @@
 							}
 						},
 						{
-							"name": "Execute ETL_pl_Error_StoredProcedure_2",
-							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "SP_JobTableLogEnd_Failure2",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"waitOnCompletion": true,
-								"parameters": {
-									"MasterProcessNumber": {
-										"value": "@pipeline().parameters.MasterProcessNumber",
-										"type": "Expression"
-									},
-									"RunType": {
-										"value": "@pipeline().parameters.RunType",
-										"type": "Expression"
-									},
-									"RunId": {
-										"value": "@pipeline().RunId",
-										"type": "Expression"
-									},
-									"CallingPipelineName": {
-										"value": "@pipeline().Pipeline",
-										"type": "Expression"
-									},
-									"ErrorMessage": {
-										"value": "@concat('Could not ingest ', item().SchemaTable)",
-										"type": "Expression"
-									}
-								}
-							}
-						},
-						{
-							"name": "Execute ETL_pl_Error_StoredProcedure_3",
-							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "SP_JobTableLogEnd_Failure3",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"waitOnCompletion": true,
-								"parameters": {
-									"MasterProcessNumber": {
-										"value": "@pipeline().parameters.MasterProcessNumber",
-										"type": "Expression"
-									},
-									"RunType": {
-										"value": "@pipeline().parameters.RunType",
-										"type": "Expression"
-									},
-									"ErrorMessage": {
-										"value": "@activity('Copy_ADLStaging_ADLRaw').Error.Message",
-										"type": "Expression"
-									},
-									"RunId": {
-										"value": "@pipeline().RunId",
-										"type": "Expression"
-									},
-									"CallingPipelineName": {
-										"value": "@pipeline().Pipeline",
-										"type": "Expression"
-									}
-								}
-							}
-						},
-						{
 							"name": "Switch_ServerName",
 							"type": "Switch",
 							"dependsOn": [
@@ -882,44 +806,6 @@
 							}
 						},
 						{
-							"name": "Execute ETL_pl_Error_StoredProcedure_5",
-							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "SP_JobTableLogEnd_Failure5",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"waitOnCompletion": true,
-								"parameters": {
-									"MasterProcessNumber": {
-										"value": "@pipeline().parameters.MasterProcessNumber",
-										"type": "Expression"
-									},
-									"RunType": {
-										"value": "@pipeline().parameters.RunType",
-										"type": "Expression"
-									},
-									"ErrorMessage": {
-										"value": "@activity('SP_MetadataListUpdate').Error.Message",
-										"type": "Expression"
-									},
-									"RunId": {
-										"value": "@pipeline().RunId",
-										"type": "Expression"
-									},
-									"CallingPipelineName": {
-										"value": "@pipeline().Pipeline",
-										"type": "Expression"
-									}
-								}
-							}
-						},
-						{
 							"name": "If_LoadCurated",
 							"type": "IfCondition",
 							"dependsOn": [
@@ -1009,44 +895,6 @@
 							"linkedServiceName": {
 								"referenceName": "ls_AzureSqlDatabase_HavertysDW",
 								"type": "LinkedServiceReference"
-							}
-						},
-						{
-							"name": "Execute ETL_pl_Error_StoredProcedure_4",
-							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "SP_JobTableLogEnd_Failure4",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"waitOnCompletion": true,
-								"parameters": {
-									"MasterProcessNumber": {
-										"value": "@pipeline().parameters.MasterProcessNumber",
-										"type": "Expression"
-									},
-									"RunType": {
-										"value": "@pipeline().parameters.RunType",
-										"type": "Expression"
-									},
-									"ErrorMessage": {
-										"value": "@concat('Curated load databricks notebook failed for table ', item().DataLakeSchemaTable)",
-										"type": "Expression"
-									},
-									"RunId": {
-										"value": "@pipeline().RunId",
-										"type": "Expression"
-									},
-									"CallingPipelineName": {
-										"value": "@pipeline().Pipeline",
-										"type": "Expression"
-									}
-								}
 							}
 						}
 					]
