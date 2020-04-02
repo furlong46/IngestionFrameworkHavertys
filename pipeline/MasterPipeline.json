@@ -228,10 +228,6 @@
 									"MasterProcessNumber": {
 										"value": "@activity('LookUp_MasterJobStart').output.firstRow.MasterProcessNumber",
 										"type": "Expression"
-									},
-									"RunType": {
-										"value": "@pipeline().parameters.RunType",
-										"type": "Expression"
 									}
 								}
 							}
@@ -306,10 +302,6 @@
 			"JobConfiguration": {
 				"type": "string",
 				"defaultValue": "NightlyLoad"
-			},
-			"RunType": {
-				"type": "string",
-				"defaultValue": "N"
 			}
 		},
 		"folder": {
