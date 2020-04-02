@@ -389,10 +389,6 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"pipeline": {
-									"referenceName": "ETL_pl_Error_StoredProcedure_Execute",
-									"type": "PipelineReference"
-								},
 								"waitOnCompletion": true,
 								"parameters": {
 									"MasterProcessNumber": {
@@ -431,10 +427,6 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"pipeline": {
-									"referenceName": "ETL_pl_Error_StoredProcedure_Execute",
-									"type": "PipelineReference"
-								},
 								"waitOnCompletion": true,
 								"parameters": {
 									"MasterProcessNumber": {
@@ -1174,10 +1166,6 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"pipeline": {
-									"referenceName": "ETL_pl_Error_StoredProcedure_Execute",
-									"type": "PipelineReference"
-								},
 								"waitOnCompletion": true,
 								"parameters": {
 									"MasterProcessNumber": {
@@ -1308,10 +1296,6 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"pipeline": {
-									"referenceName": "ETL_pl_Error_StoredProcedure_Execute",
-									"type": "PipelineReference"
-								},
 								"waitOnCompletion": true,
 								"parameters": {
 									"MasterProcessNumber": {
@@ -1375,44 +1359,6 @@
 				"linkedServiceName": {
 					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
 					"type": "LinkedServiceReference"
-				}
-			},
-			{
-				"name": "Execute ETL_pl_Error_StoredProcedure_Execute",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "SP_MasterJobEnd_Failure",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "ETL_pl_Error_StoredProcedure_Execute",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true,
-					"parameters": {
-						"MasterProcessNumber": {
-							"value": "@pipeline().parameters.MasterProcessNumber",
-							"type": "Expression"
-						},
-						"RunType": {
-							"value": "@pipeline().parameters.RunType",
-							"type": "Expression"
-						},
-						"RunId": {
-							"value": "@pipeline().RunId",
-							"type": "Expression"
-						},
-						"CallingPipelineName": {
-							"value": "@pipeline().Pipeline",
-							"type": "Expression"
-						}
-					}
 				}
 			}
 		],
