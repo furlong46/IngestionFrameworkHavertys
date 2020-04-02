@@ -1,12 +1,13 @@
 {
 	"name": "ls_ADLSGen2_dataanalyticsadls21",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"description": "connect to ADLS Gen 2 via key vault using storage key secret",
 		"annotations": [],
 		"type": "AzureBlobFS",
 		"typeProperties": {
-			"url": "https://dataanalyticsqaadls21.dfs.core.windows.net"
+			"url": "https://adlsmdpdemo.dfs.core.windows.net",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkFERi1NRFAtREVNT18yMWE0ZDQzNi1jZWQ0LTQ0OGMtYWE5ZS05MGU1NDI1ZWY2N2EiDQp9"
 		}
-	},
-	"type": "Microsoft.DataFactory/factories/linkedservices"
+	}
 }
