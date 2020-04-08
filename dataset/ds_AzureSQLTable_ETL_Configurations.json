@@ -6,7 +6,7 @@
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "HavertysDW"
+			"name": "DW"
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
