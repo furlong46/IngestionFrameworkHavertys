@@ -240,7 +240,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "HavertysDW"
+					"name": "DW"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -273,7 +273,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "HavertysDW"
+					"name": "DW"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -538,7 +538,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "HavertysDW"
+					"name": "DW"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -839,7 +839,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "HavertysDW"
+					"name": "DW"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -892,7 +892,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "HavertysDW"
+					"name": "DW"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -955,7 +955,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "HavertysDW"
+					"name": "DW"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -1330,6 +1330,8 @@
 								"value": "@json(concat('{\"sku\":{\"name\":\"', pipeline().parameters.ComputeSize, '\",\"tier\":\"', pipeline().parameters.ServiceTier, '\"}, \"location\": \"', pipeline().parameters.AzureRegionName, ' \"}' ) )",
 								"type": "Expression"
 							},
+							"linkedServices": [],
+							"datasets": [],
 							"authentication": {
 								"type": "MSI",
 								"resource": "https://management.azure.com/"

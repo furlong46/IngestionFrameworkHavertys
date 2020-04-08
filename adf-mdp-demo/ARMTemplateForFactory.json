@@ -34,10 +34,6 @@
 		"Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration": {
 			"type": "string",
 			"defaultValue": "OverrideLoad"
-		},
-		"Mornings at 8AM_properties_MasterPipeline_parameters_RunType": {
-			"type": "string",
-			"defaultValue": "O"
 		}
 	},
 	"variables": {
@@ -334,6 +330,8 @@
 								"value": "@json(concat('{\"sku\":{\"name\":\"', pipeline().parameters.ComputeSize, '\",\"tier\":\"', pipeline().parameters.ServiceTier, '\"}, \"location\": \"', pipeline().parameters.AzureRegionName, ' \"}' ) )",
 								"type": "Expression"
 							},
+							"linkedServices": [],
+							"datasets": [],
 							"authentication": {
 								"type": "MSI",
 								"resource": "https://management.azure.com/"
@@ -540,7 +538,7 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
-							"batchCount": 15,
+							"batchCount": 5,
 							"activities": [
 								{
 									"name": "Copy_ADLStaging_ADLRaw",
@@ -900,7 +898,7 @@
 															"source": {
 																"type": "AzureSqlSource",
 																"sqlReaderQuery": {
-																	"value": "@item().SelectQuery",
+																	"value": "@activity('LookUp_DB2SelectSql').output.firstRow.Query",
 																	"type": "Expression"
 																},
 																"queryTimeout": "02:00:00"
@@ -1013,7 +1011,7 @@
 													"source": {
 														"type": "AzureSqlSource",
 														"sqlReaderQuery": {
-															"value": "@item().SelectQuery",
+															"value": "@activity('LookUp_DB2SelectSql').output.firstRow.Query",
 															"type": "Expression"
 														},
 														"queryTimeout": "02:00:00"
@@ -1439,10 +1437,6 @@
 					"JobParallelism": {
 						"type": "int",
 						"defaultValue": 10
-					},
-					"RunType": {
-						"type": "string",
-						"defaultValue": "O"
 					}
 				},
 				"folder": {
@@ -1622,12 +1616,6 @@
 											"dependencyConditions": [
 												"Failed"
 											]
-										},
-										{
-											"activity": "adbx_Start_Cluster",
-											"dependencyConditions": [
-												"Failed"
-											]
 										}
 									],
 									"policy": {
@@ -1656,26 +1644,6 @@
 									}
 								},
 								{
-									"name": "adbx_Start_Cluster",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": "/Dimension Loads/Count Curated Tables and Start Cluster"
-									},
-									"linkedServiceName": {
-										"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
-										"type": "LinkedServiceReference"
-									}
-								},
-								{
 									"name": "Execute_pl_DB2MetadataIngestion",
 									"type": "ExecutePipeline",
 									"dependsOn": [],
@@ -1693,10 +1661,6 @@
 											},
 											"MasterProcessNumber": {
 												"value": "@activity('LookUp_MasterJobStart').output.firstRow.MasterProcessNumber",
-												"type": "Expression"
-											},
-											"RunType": {
-												"value": "@pipeline().parameters.RunType",
 												"type": "Expression"
 											}
 										}
@@ -1773,10 +1737,6 @@
 					"JobConfiguration": {
 						"type": "string",
 						"defaultValue": "NightlyLoad"
-					},
-					"RunType": {
-						"type": "string",
-						"defaultValue": "N"
 					}
 				},
 				"folder": {
@@ -1789,7 +1749,6 @@
 				"[concat(variables('factoryId'), '/pipelines/ETL_pl_AzureSQLDB_Scaling')]",
 				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_HavertysDW')]",
 				"[concat(variables('factoryId'), '/pipelines/ETL_pl_AzureSQLDB_Scaling_ScaleDown')]",
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureDatabricks_DataAnalyticsQA_ADBX')]",
 				"[concat(variables('factoryId'), '/pipelines/ETL_pl_Ingestion_Subpipeline')]"
 			]
 		},
@@ -1891,7 +1850,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "HavertysDW"
+					"name": "DW"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -1924,7 +1883,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "HavertysDW"
+					"name": "DW"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -2189,7 +2148,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "HavertysDW"
+					"name": "DW"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -2490,7 +2449,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "HavertysDW"
+					"name": "DW"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -2543,7 +2502,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "HavertysDW"
+					"name": "DW"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -2606,7 +2565,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "HavertysDW"
+					"name": "DW"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -2781,8 +2740,7 @@
 							"type": "PipelineReference"
 						},
 						"parameters": {
-							"JobConfiguration": "[parameters('Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration')]",
-							"RunType": "[parameters('Mornings at 8AM_properties_MasterPipeline_parameters_RunType')]"
+							"JobConfiguration": "[parameters('Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration')]"
 						}
 					}
 				],

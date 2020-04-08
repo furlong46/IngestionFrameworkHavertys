@@ -35,10 +35,6 @@
 			"type": "string",
 			"defaultValue": "OverrideLoad"
 		},
-		"Mornings at 8AM_properties_MasterPipeline_parameters_RunType": {
-			"type": "string",
-			"defaultValue": "O"
-		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -104,9 +100,6 @@
 					},
 					"Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration": {
 						"value": "[parameters('Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration')]"
-					},
-					"Mornings at 8AM_properties_MasterPipeline_parameters_RunType": {
-						"value": "[parameters('Mornings at 8AM_properties_MasterPipeline_parameters_RunType')]"
 					}
 				}
 			},

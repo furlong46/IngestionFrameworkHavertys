@@ -26,9 +26,6 @@
 		"Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration": {
 			"value": "OverrideLoad"
 		},
-		"Mornings at 8AM_properties_MasterPipeline_parameters_RunType": {
-			"value": "O"
-		},
 		"containerUri": {
 			"value": ""
 		},
