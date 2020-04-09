@@ -34,7 +34,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "Customer",
+						"referenceName": "ds_sourcesystem_Customer",
 						"type": "DatasetReference"
 					}
 				],

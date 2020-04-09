@@ -5,6 +5,9 @@
 			"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "Simple"
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
