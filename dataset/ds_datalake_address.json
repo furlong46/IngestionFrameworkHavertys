@@ -1,74 +1,47 @@
 {
-	"name": "ds_datalake_customer",
+	"name": "ds_datalake_address",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
 			"type": "LinkedServiceReference"
-		},
-		"folder": {
-			"name": "DataLake"
 		},
 		"annotations": [],
 		"type": "Parquet",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "staging/master data/customer/erp/SalesLT_Customer",
+				"folderPath": "staging/master data/customer/erp/SalesLT_Address",
 				"fileSystem": "datalake"
 			},
 			"compressionCodec": "snappy"
 		},
 		"schema": [
 			{
-				"name": "CustomerID",
+				"name": "AddressID",
 				"type": "INT32"
 			},
 			{
-				"name": "NameStyle",
-				"type": "BOOLEAN"
-			},
-			{
-				"name": "Title",
+				"name": "AddressLine1",
 				"type": "UTF8"
 			},
 			{
-				"name": "FirstName",
+				"name": "AddressLine2",
 				"type": "UTF8"
 			},
 			{
-				"name": "MiddleName",
+				"name": "City",
 				"type": "UTF8"
 			},
 			{
-				"name": "LastName",
+				"name": "StateProvince",
 				"type": "UTF8"
 			},
 			{
-				"name": "Suffix",
+				"name": "CountryRegion",
 				"type": "UTF8"
 			},
 			{
-				"name": "CompanyName",
-				"type": "UTF8"
-			},
-			{
-				"name": "SalesPerson",
-				"type": "UTF8"
-			},
-			{
-				"name": "EmailAddress",
-				"type": "UTF8"
-			},
-			{
-				"name": "Phone",
-				"type": "UTF8"
-			},
-			{
-				"name": "PasswordHash",
-				"type": "UTF8"
-			},
-			{
-				"name": "PasswordSalt",
+				"name": "PostalCode",
 				"type": "UTF8"
 			},
 			{
