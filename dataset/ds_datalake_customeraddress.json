@@ -13,7 +13,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "staging/master data/customer/DB203002/SalesLT_CustomerAddress",
+				"folderPath": "staging/master data/customer/erp/SalesLT_CustomerAddress",
 				"fileSystem": "datalake"
 			},
 			"compressionCodec": "snappy"
