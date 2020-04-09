@@ -1,9 +1,12 @@
 {
-	"name": "Customer",
+	"name": "ds_sourcesystem_Customer",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_sourcesystem",
 			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Simple"
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
