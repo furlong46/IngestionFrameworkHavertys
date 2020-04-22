@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.757
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "HavertysDW", "HavertysDW\HavertysDW.sqlproj", "{DE34A0A3-11DB-4E28-850E-837D18A664EA}"
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "HavertysIngestionFramework", "HavertysDW\HavertysIngestionFramework.sqlproj", "{DE34A0A3-11DB-4E28-850E-837D18A664EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,4 +1,4 @@
-﻿CREATE    PROCEDURE [dbo].[usp_MetadataListDB2Sql] (
+﻿CREATE    PROCEDURE [dbo].[usp_MetadataListSql] (
 @DB2SchemaTable VARCHAR(50),
 @FilterColumn VARCHAR(50),
 @FilterColumnDataType VARCHAR(50),
@@ -12,4 +12,4 @@ AS
 
 -- This stored procedure is used to allow ADF to call this scalar function since that can't be done directly
 SELECT 
-dbo.udf_GenerateDB2Sql(@DB2SchemaTable, @FilterColumn, @FilterColumnDataType, @FilterColumnValue, @SelectQuery, @SqlOverrideQuery, @StartDate, @EndDate) AS Query
+dbo.udf_GenerateSql(@DB2SchemaTable, @FilterColumn, @FilterColumnDataType, @FilterColumnValue, @SelectQuery, @SqlOverrideQuery, @StartDate, @EndDate) AS Query

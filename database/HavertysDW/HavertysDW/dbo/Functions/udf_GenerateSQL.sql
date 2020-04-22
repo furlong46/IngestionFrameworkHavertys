@@ -1,4 +1,4 @@
-﻿CREATE FUNCTION [dbo].[udf_GenerateDB2SQL]
+﻿CREATE FUNCTION [dbo].[udf_GenerateSQL]
 (@SchemaTable VARCHAR(50),
 @FilterColumn VARCHAR(50),
 @FilterColumnDataType VARCHAR(50),
