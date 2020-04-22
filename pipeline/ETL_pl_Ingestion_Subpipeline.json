@@ -398,8 +398,8 @@
 										"value": "PC03002",
 										"activities": [
 											{
-												"name": "Copy_DB2_ADLStaging_3002",
-												"description": "A query returns applicable data for each from DB2 which is then copied into Azure Data Lake in a staging folder. File path and name are dynamically derived from the Metadata lookup.",
+												"name": "Copy_Source_ADLStaging",
+												"description": "A query returns applicable data for each from Source which is then copied into Azure Data Lake in a staging folder. File path and name are dynamically derived from the Metadata lookup.",
 												"type": "Copy",
 												"dependsOn": [],
 												"policy": {
@@ -414,7 +414,7 @@
 													"source": {
 														"type": "AzureSqlSource",
 														"sqlReaderQuery": {
-															"value": "@activity('LookUp_DB2SelectSql').output.firstRow.Query",
+															"value": "@activity('LookUp_SelectSql').output.firstRow.Query",
 															"type": "Expression"
 														},
 														"queryTimeout": "02:00:00"
@@ -460,7 +460,7 @@
 												"type": "SqlServerStoredProcedure",
 												"dependsOn": [
 													{
-														"activity": "Copy_DB2_ADLStaging_3002",
+														"activity": "Copy_Source_ADLStaging",
 														"dependencyConditions": [
 															"Succeeded"
 														]
@@ -486,14 +486,14 @@
 														},
 														"RowsCopied": {
 															"value": {
-																"value": "@activity('Copy_DB2_ADLStaging_3002').output.rowsCopied",
+																"value": "@activity('Copy_Source_ADLStaging_3002').output.rowsCopied",
 																"type": "Expression"
 															},
 															"type": "Int32"
 														},
 														"SqlStatementUsed": {
 															"value": {
-																"value": "@activity('LookUp_DB2SelectSql').output.firstRow.Query",
+																"value": "@activity('LookUp_SelectSql').output.firstRow.Query",
 																"type": "Expression"
 															},
 															"type": "String"
