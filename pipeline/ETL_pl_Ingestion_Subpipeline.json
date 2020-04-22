@@ -165,7 +165,7 @@
 										"SchemaTable": {
 											"type": "String",
 											"value": {
-												"value": "@item().DB2SchemaTable",
+												"value": "@item().SchemaTable",
 												"type": "Expression"
 											}
 										},
