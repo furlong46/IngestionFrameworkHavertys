@@ -171,7 +171,7 @@
 										},
 										"TableControlType": {
 											"type": "String",
-											"value": "DB2"
+											"value": "Azure"
 										},
 										"TableID": {
 											"type": "Int32",
