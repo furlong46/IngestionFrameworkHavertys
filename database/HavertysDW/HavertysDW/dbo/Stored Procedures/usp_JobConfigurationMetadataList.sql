@@ -1,4 +1,5 @@
-﻿CREATE    PROCEDURE [dbo].[usp_JobConfigurationMetadataList] (
+﻿
+CREATE    PROCEDURE [dbo].[usp_JobConfigurationMetadataList] (
 @MasterProcessNumber int
 )
 AS
@@ -35,7 +36,7 @@ SELECT
 
 FROM
 [ETL].[JobMaster] JM
-INNER JOIN [ETL].[JobConfiguration] JCon ON JCon.TableControlType='DB2' 
+INNER JOIN [ETL].[JobConfiguration] JCon ON JCon.TableControlType='Azure' 
 	AND JM.JobConfiguration = JCon.JobConfiguration 
 	AND JM.Status IN ('Running','ReRunning') 
 	AND JM.MasterProcessNumber = @MasterProcessNumber 

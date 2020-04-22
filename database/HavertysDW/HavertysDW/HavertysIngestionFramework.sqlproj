@@ -220,7 +220,10 @@
     <Build Include="dbo\Functions\udf_GenerateSQL.sql" />
     <Build Include="dbo\Stored Procedures\usp_JobConfigurationMetadataList.sql" />
     <Build Include="dbo\Stored Procedures\usp_JobTableLogIngestionUpdate.sql" />
-    <Build Include="dbo\Stored Procedures\usp_MetadataListSql.sql" />
+    <Build Include="dbo\Stored Procedures\usp_MetadataListSql.sql">
+      <AnsiNulls>Off</AnsiNulls>
+      <QuotedIdentifier>Off</QuotedIdentifier>
+    </Build>
     <Build Include="dbo\Stored Procedures\usp_MetadataListUpdate.sql" />
     <Build Include="ETL\Tables\JobConfigurationType.sql" />
     <Build Include="ETL\Tables\MetadataIngestionControlDateRanges.sql" />
