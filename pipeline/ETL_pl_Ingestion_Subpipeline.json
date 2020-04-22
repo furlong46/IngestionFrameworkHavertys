@@ -455,7 +455,7 @@
 												]
 											},
 											{
-												"name": "SP_JobTableLogUpdate_3002",
+												"name": "SP_JobTableLogUpdate",
 												"description": "This stored procedure updates the JobTableLog with the SQL statement used and the number of rows read after successful execution of the copy from DB2 to staging",
 												"type": "SqlServerStoredProcedure",
 												"dependsOn": [
@@ -486,7 +486,7 @@
 														},
 														"RowsCopied": {
 															"value": {
-																"value": "@activity('Copy_Source_ADLStaging_3002').output.rowsCopied",
+																"value": "@activity('Copy_Source_ADLStaging').output.rowsCopied",
 																"type": "Expression"
 															},
 															"type": "Int32"
