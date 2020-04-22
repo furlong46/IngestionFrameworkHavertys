@@ -306,7 +306,7 @@
 							"type": "Delete",
 							"dependsOn": [
 								{
-									"activity": "LookUp_DB2SelectSql",
+									"activity": "LookUp_SelectSql",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -621,8 +621,8 @@
 							}
 						},
 						{
-							"name": "LookUp_DB2SelectSql",
-							"description": "Using a stored procedure, outputs correct SQL to use to select rows from DB2 ",
+							"name": "LookUp_SelectSql",
+							"description": "Using a stored procedure, outputs correct SQL to use",
 							"type": "Lookup",
 							"dependsOn": [
 								{
@@ -643,12 +643,12 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
-									"sqlReaderStoredProcedureName": "[dbo].[usp_MetadataListDB2Sql]",
+									"sqlReaderStoredProcedureName": "[dbo].[usp_MetadataListSql]",
 									"storedProcedureParameters": {
-										"DB2SchemaTable": {
+										"SchemaTable": {
 											"type": "String",
 											"value": {
-												"value": "@item().DB2SchemaTable",
+												"value": "@item().SchemaTable",
 												"type": "Expression"
 											}
 										},
