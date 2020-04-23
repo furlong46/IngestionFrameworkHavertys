@@ -874,7 +874,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
-									"value": "@activity('StagingExists').output.value[0].Exists",
+									"value": "@activity('StagingExists').output.firstRow.exists",
 									"type": "Expression"
 								},
 								"ifTrueActivities": [
@@ -965,7 +965,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
-									"value": "@activity('RawExists').output.value[0].Exists",
+									"value": "@activity('RawExists').output.firstRow.exists",
 									"type": "Expression"
 								},
 								"ifTrueActivities": [
