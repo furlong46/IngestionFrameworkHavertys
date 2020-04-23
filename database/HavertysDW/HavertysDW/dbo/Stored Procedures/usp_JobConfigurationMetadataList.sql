@@ -46,7 +46,7 @@ WHERE
 NOT EXISTS (SELECT 1 
 			FROM [ETL].[JobTableLog] 
 			WHERE MasterProcessNumber = JM.MasterProcessNumber 
-			 	AND TableControlType='DB2' 
+			 	AND TableControlType='Azure' 
 				AND TableID = JCon.TableID
 				AND JobConfiguration = JM.JobConfiguration 
 				AND [Status] IN ('Running','ReRunning','Success')) -- This table must not have an existing successful or running log for this run 
