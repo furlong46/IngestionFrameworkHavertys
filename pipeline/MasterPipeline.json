@@ -152,7 +152,7 @@
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Execute_pl_DB2MetadataIngestion",
+									"activity": "Execute_pl_MetadataIngestion",
 									"dependencyConditions": [
 										"Failed"
 									]
@@ -184,7 +184,7 @@
 							}
 						},
 						{
-							"name": "Execute_pl_DB2MetadataIngestion",
+							"name": "Execute_pl_MetadataIngestion",
 							"type": "ExecutePipeline",
 							"dependsOn": [],
 							"userProperties": [],

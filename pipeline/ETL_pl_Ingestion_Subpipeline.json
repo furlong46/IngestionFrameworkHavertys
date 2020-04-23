@@ -165,13 +165,13 @@
 										"SchemaTable": {
 											"type": "String",
 											"value": {
-												"value": "@item().DB2SchemaTable",
+												"value": "@item().SchemaTable",
 												"type": "Expression"
 											}
 										},
 										"TableControlType": {
 											"type": "String",
-											"value": "DB2"
+											"value": "Azure"
 										},
 										"TableID": {
 											"type": "Int32",
@@ -306,7 +306,7 @@
 							"type": "Delete",
 							"dependsOn": [
 								{
-									"activity": "LookUp_DB2SelectSql",
+									"activity": "LookUp_SelectSql",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -398,8 +398,8 @@
 										"value": "PC03002",
 										"activities": [
 											{
-												"name": "Copy_DB2_ADLStaging_3002",
-												"description": "A query returns applicable data for each from DB2 which is then copied into Azure Data Lake in a staging folder. File path and name are dynamically derived from the Metadata lookup.",
+												"name": "Copy_Source_ADLStaging_Source1",
+												"description": "A query returns applicable data for each from Source which is then copied into Azure Data Lake in a staging folder. File path and name are dynamically derived from the Metadata lookup.",
 												"type": "Copy",
 												"dependsOn": [],
 												"policy": {
@@ -414,7 +414,7 @@
 													"source": {
 														"type": "AzureSqlSource",
 														"sqlReaderQuery": {
-															"value": "@activity('LookUp_DB2SelectSql').output.firstRow.Query",
+															"value": "@activity('LookUp_SelectSql').output.firstRow.Query",
 															"type": "Expression"
 														},
 														"queryTimeout": "02:00:00"
@@ -455,12 +455,12 @@
 												]
 											},
 											{
-												"name": "SP_JobTableLogUpdate_3002",
+												"name": "SP_JobTableLogUpdate_Source1",
 												"description": "This stored procedure updates the JobTableLog with the SQL statement used and the number of rows read after successful execution of the copy from DB2 to staging",
 												"type": "SqlServerStoredProcedure",
 												"dependsOn": [
 													{
-														"activity": "Copy_DB2_ADLStaging_3002",
+														"activity": "Copy_Source_ADLStaging_Source1",
 														"dependencyConditions": [
 															"Succeeded"
 														]
@@ -486,14 +486,14 @@
 														},
 														"RowsCopied": {
 															"value": {
-																"value": "@activity('Copy_DB2_ADLStaging_3002').output.rowsCopied",
+																"value": "@activity('Copy_Source_ADLStaging_Source1').output.rowsCopied",
 																"type": "Expression"
 															},
 															"type": "Int32"
 														},
 														"SqlStatementUsed": {
 															"value": {
-																"value": "@activity('LookUp_DB2SelectSql').output.firstRow.Query",
+																"value": "@activity('LookUp_SelectSql').output.firstRow.Query",
 																"type": "Expression"
 															},
 															"type": "String"
@@ -510,8 +510,8 @@
 								],
 								"defaultActivities": [
 									{
-										"name": "Copy_DB2_ADLStaging_Default",
-										"description": "A query returns applicable data for each from DB2 which is then copied into Azure Data Lake in a staging folder. File path and name are dynamically derived from the Metadata lookup.",
+										"name": "Copy_Source_ADLStaging_Default",
+										"description": "A query returns applicable data for each from Source which is then copied into Azure Data Lake in a staging folder. File path and name are dynamically derived from the Metadata lookup.",
 										"type": "Copy",
 										"dependsOn": [],
 										"policy": {
@@ -526,7 +526,7 @@
 											"source": {
 												"type": "AzureSqlSource",
 												"sqlReaderQuery": {
-													"value": "@activity('LookUp_DB2SelectSql').output.firstRow.Query",
+													"value": "@activity('LookUp_SelectSql').output.firstRow.Query",
 													"type": "Expression"
 												},
 												"queryTimeout": "02:00:00"
@@ -572,7 +572,7 @@
 										"type": "SqlServerStoredProcedure",
 										"dependsOn": [
 											{
-												"activity": "Copy_DB2_ADLStaging_Default",
+												"activity": "Copy_Source_ADLStaging_Default",
 												"dependencyConditions": [
 													"Succeeded"
 												]
@@ -598,14 +598,14 @@
 												},
 												"RowsCopied": {
 													"value": {
-														"value": "@activity('Copy_DB2_ADLStaging_Default').output.rowsCopied",
+														"value": "@activity('Copy_Source_ADLStaging_Default').output.rowsCopied",
 														"type": "Expression"
 													},
 													"type": "Int32"
 												},
 												"SqlStatementUsed": {
 													"value": {
-														"value": "@activity('LookUp_DB2SelectSql').output.firstRow.Query",
+														"value": "@activity('LookUp_SelectSql').output.firstRow.Query",
 														"type": "Expression"
 													},
 													"type": "String"
@@ -621,8 +621,8 @@
 							}
 						},
 						{
-							"name": "LookUp_DB2SelectSql",
-							"description": "Using a stored procedure, outputs correct SQL to use to select rows from DB2 ",
+							"name": "LookUp_SelectSql",
+							"description": "Using a stored procedure, outputs correct SQL to use",
 							"type": "Lookup",
 							"dependsOn": [
 								{
@@ -643,12 +643,12 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
-									"sqlReaderStoredProcedureName": "[dbo].[usp_MetadataListDB2Sql]",
+									"sqlReaderStoredProcedureName": "[dbo].[usp_MetadataListSql]",
 									"storedProcedureParameters": {
-										"DB2SchemaTable": {
+										"SchemaTable": {
 											"type": "String",
 											"value": {
-												"value": "@item().DB2SchemaTable",
+												"value": "@item().SchemaTable",
 												"type": "Expression"
 											}
 										},

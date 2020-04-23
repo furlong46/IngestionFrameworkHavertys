@@ -23,11 +23,11 @@ WHERE TableID = @TableID AND FilterColumn IS NOT NULL AND FilterColumnValue IS N
 UPDATE [ETL].[MetadataIngestionList] SET FilterColumnValue = convert(varchar(10), @StartTime, 120) 
 WHERE TableID = @TableID AND FilterColumn IS NOT NULL AND FilterColumnValue IS NOT NULL And COALESCE(FilterColumnDatatype, '') = 'DATE'
 
-DECLARE @Count INT = ISNULL((SELECT COUNT(1) FROM [ETL].[MetadataIngestionControlDateRanges] WHERE DB2TableID = @TableID), 0)
+DECLARE @Count INT = ISNULL((SELECT COUNT(1) FROM [ETL].[MetadataIngestionControlDateRanges] WHERE TableID = @TableID), 0)
 
 IF @Count > 0
 BEGIN
 	UPDATE [ETL].[MetadataIngestionControlDateRanges] 
 	SET ControlStartDate = @StartDate, ControlEndDate = @EndDate, ControlProcessNumber = @ProcessNumber
-	WHERE DB2TableID = @TableID 
+	WHERE TableID = @TableID 
 END
