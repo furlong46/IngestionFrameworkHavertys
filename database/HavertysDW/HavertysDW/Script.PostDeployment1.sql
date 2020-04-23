@@ -36,41 +36,41 @@ INSERT [ETL].[JobConfigurationType] ([ConfigurationType], [Description]) VALUES 
 GO
 SET IDENTITY_INSERT [ETL].[JobConfiguration] ON 
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (251, N'NightlyLoad', N'DB2', 8, N'SalesLT.Address', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (251, N'NightlyLoad', N'Azure', 8, N'SalesLT.Address', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (252, N'NightlyLoad', N'DB2', 9, N'SalesLT.Customer', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (252, N'NightlyLoad', N'Azure', 9, N'SalesLT.Customer', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (253, N'NightlyLoad', N'DB2', 10, N'SalesLT.CustomerAddress', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (253, N'NightlyLoad', N'Azure', 10, N'SalesLT.CustomerAddress', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (254, N'NightlyLoad', N'DB2', 11, N'SalesLT.Product', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (254, N'NightlyLoad', N'Azure', 11, N'SalesLT.Product', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (255, N'NightlyLoad', N'DB2', 12, N'SalesLT.ProductCategory', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (255, N'NightlyLoad', N'Azure', 12, N'SalesLT.ProductCategory', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (256, N'NightlyLoad', N'DB2', 13, N'SalesLT.ProductDescription', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (256, N'NightlyLoad', N'Azure', 13, N'SalesLT.ProductDescription', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (257, N'NightlyLoad', N'DB2', 14, N'SalesLT.ProductModel', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (257, N'NightlyLoad', N'Azure', 14, N'SalesLT.ProductModel', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (258, N'NightlyLoad', N'DB2', 15, N'SalesLT.ProductModelProductDescription', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (258, N'NightlyLoad', N'Azure', 15, N'SalesLT.ProductModelProductDescription', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (344, N'OverrideLoad', N'DB2', 8, N'SalesLT.Address', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (344, N'OverrideLoad', N'Azure', 8, N'SalesLT.Address', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (345, N'OverrideLoad', N'DB2', 9, N'SalesLT.Customer', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (345, N'OverrideLoad', N'Azure', 9, N'SalesLT.Customer', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (346, N'OverrideLoad', N'DB2', 10, N'SalesLT.CustomerAddress', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (346, N'OverrideLoad', N'Azure', 10, N'SalesLT.CustomerAddress', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (347, N'OverrideLoad', N'DB2', 11, N'SalesLT.Product', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (347, N'OverrideLoad', N'Azure', 11, N'SalesLT.Product', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (348, N'OverrideLoad', N'DB2', 12, N'SalesLT.ProductCategory', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (348, N'OverrideLoad', N'Azure', 12, N'SalesLT.ProductCategory', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (349, N'OverrideLoad', N'DB2', 13, N'SalesLT.ProductDescription', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (349, N'OverrideLoad', N'Azure', 13, N'SalesLT.ProductDescription', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (350, N'OverrideLoad', N'DB2', 14, N'SalesLT.ProductModel', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (350, N'OverrideLoad', N'Azure', 14, N'SalesLT.ProductModel', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (351, N'OverrideLoad', N'DB2', 15, N'SalesLT.ProductModelProductDescription', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (351, N'OverrideLoad', N'Azure', 15, N'SalesLT.ProductModelProductDescription', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (386, N'OverrideLoad', N'DB2', 50, N'SalesLT.SalesOrderDetail', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (386, N'OverrideLoad', N'Azure', 50, N'SalesLT.SalesOrderDetail', 1)
 GO
-INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (387, N'OverrideLoad', N'DB2', 51, N'SalesLT.SalesOrderHeader', 1)
+INSERT [ETL].[JobConfiguration] ([JobConfigurationID], [JobConfiguration], [TableControlType], [TableID], [SchemaTable], [ExecuteFlag]) VALUES (387, N'OverrideLoad', N'Azure', 51, N'SalesLT.SalesOrderHeader', 1)
 GO
 SET IDENTITY_INSERT [ETL].[JobConfiguration] OFF
 GO
@@ -78,79 +78,24 @@ INSERT [ETL].[JobParallelism] ([JobConfiguration], [JobParallelism]) VALUES (N'N
 GO
 INSERT [ETL].[JobParallelism] ([JobConfiguration], [JobParallelism]) VALUES (N'OverrideLoad', 10)
 GO
+
 INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'CDCOffsetDays', N'3')
 GO
-INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'AnalysisServicesServer', N'asazure://eastus.asazure.windows.net/dataanalyticsqaaas21')
+INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'AnalysisServicesServer', N'asazure://eastus.asazure.windows.net/<servername>')
 GO
-INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'AzureSQLServerName', N'dataanalyticsqa-sql21')
+INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'AzureSQLServerName', N'sqlserver-mdp-demo')
 GO
-INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'AzureSQLDatabaseName', N'HavertysDW_QA')
+INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'AzureSQLDatabaseName', N'sql-mdp-demo')
 GO
-INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'SubscriptionID', N'e2f53281-fd58-437e-82e1-088d1b79fcbc')
+INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'SubscriptionID', N'75bd89de-4fa2-41ad-9b88-b2b7360945fe')
 GO
-INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'ResourceGroupName', N'DataAnalytics_QA_RG')
+INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'ResourceGroupName', N'MDP-Demo')
 GO
-INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'WebHookFull', N'https://s16events.azure-automation.net/webhooks?token=F2xAYLKuX%2fs1VY%2byw7QFUIL0cQal1QKrBmrISNEKBBU%3d')
+INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'WebHookFull', N'https://')
 GO
-INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'WebHookIncremental', N'https://s16events.azure-automation.net/webhooks?token=t7GUWw%2bHL81EfJlHJhqaFSfrB6dkjELv0yWdTjTx7TI%3d')
+INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'WebHookIncremental', N'https://')
 GO
-INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'SQLComputeSizeHigh', N'GP_Gen5_16')
+INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'SQLComputeSizeHigh', N'GP_S_Gen5_1')
 GO
-INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'SQLComputeSizeLow', N'GP_Gen5_2')
-GO
-SET IDENTITY_INSERT [ETL].[DWLoadList] ON 
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (1, N'DW.Dim_CreditPromotion', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (2, N'DW.Dim_Customer', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (4, N'DW.Dim_Employee', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (5, N'DW.Dim_Factory', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (6, N'DW.Dim_Location', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (7, N'DW.Dim_MerchandisingPromotion', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (8, N'DW.Dim_OverrideReason', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (9, N'DW.Dim_SKU', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (10, N'DW.Dim_SKU_CommonColor', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (11, N'DW.Dim_SKU_CommonFinish', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (12, N'DW.Dim_SKU_Materials', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (13, N'DW.Dim_SKU_SpecialOrderAttributes', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (14, N'DW.Dim_SKU_SpecialOrderAttributesKey', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (15, N'DW.Dim_Team', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (17, N'DW.Dim_Vendor', N'Dim', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (18, N'DW.Fact_CommonColorBridge', N'Bridge', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (19, N'DW.Fact_CommonFinishBridge', N'Bridge', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (20, N'DW.Fact_DesignerTeamBridge', N'Bridge', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (21, N'DW.Fact_MaterialsBridge', N'Bridge', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (22, N'DW.Fact_SalesTeamBridge', N'Bridge', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (23, N'DW.Fact_SpecialOrderAttributesKeyValuesBridge', N'Bridge', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (24, N'Sales.Fact_DeliveredSales', N'Fact', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (25, N'Sales.Fact_SalesBudget', N'Fact', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (26, N'Sales.Fact_SKUCost', N'Fact', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (27, N'Sales.Fact_Traffic', N'Fact', 0, NULL)
-GO
-INSERT [ETL].[DWLoadList] ([TableID], [SchemaTable], [DWType], [Disabled], [DbxNotebookPath]) VALUES (28, N'Sales.Fact_WrittenSales', N'Fact', 0, NULL)
-GO
-SET IDENTITY_INSERT [ETL].[DWLoadList] OFF
+INSERT [ETL].[Configurations] ([ConfigKey], [ConfigValue]) VALUES (N'SQLComputeSizeLow', N'GP_S_Gen5_1')
 GO
