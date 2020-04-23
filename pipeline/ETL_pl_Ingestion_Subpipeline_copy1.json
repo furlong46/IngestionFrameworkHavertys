@@ -896,6 +896,45 @@
 								"referenceName": "ls_AzureSqlDatabase_ETL",
 								"type": "LinkedServiceReference"
 							}
+						},
+						{
+							"name": "StagingExists",
+							"type": "GetMetadata",
+							"dependsOn": [
+								{
+									"activity": "LookUp_SelectSql",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+									"type": "DatasetReference",
+									"parameters": {
+										"FolderPath": {
+											"value": "@concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_'))",
+											"type": "Expression"
+										}
+									}
+								},
+								"fieldList": [
+									"exists"
+								],
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true
+								}
+							}
 						}
 					]
 				}
