@@ -63,7 +63,7 @@
 							"type": "Copy",
 							"dependsOn": [
 								{
-									"activity": "Switch_ServerName",
+									"activity": "Switch_ServerName_CopySourceToStage",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -269,7 +269,7 @@
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Switch_ServerName",
+									"activity": "Switch_ServerName_CopySourceToStage",
 									"dependencyConditions": [
 										"Failed"
 									]
@@ -301,7 +301,7 @@
 							}
 						},
 						{
-							"name": "Switch_ServerName",
+							"name": "Switch_ServerName_CopySourceToStage",
 							"type": "Switch",
 							"dependsOn": [
 								{
