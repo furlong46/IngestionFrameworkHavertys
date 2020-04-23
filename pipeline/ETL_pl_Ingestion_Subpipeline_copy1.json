@@ -930,7 +930,26 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
-							"userProperties": []
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+									"type": "DatasetReference",
+									"parameters": {
+										"FolderPath": {
+											"value": "@concat(replace(concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_') ), 'staging', 'raw'), '/TS=',string(item().StartTime))",
+											"type": "Expression"
+										}
+									}
+								},
+								"fieldList": [
+									"exists"
+								],
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true
+								}
+							}
 						},
 						{
 							"name": "DeleteRawIfExists",
