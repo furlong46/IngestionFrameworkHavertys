@@ -1,5 +1,5 @@
 {
-	"name": "ETL_pl_Ingestion_Subpipeline_copy1",
+	"name": "ETL_pl_Ingestion_Subpipeline",
 	"properties": {
 		"activities": [
 			{
