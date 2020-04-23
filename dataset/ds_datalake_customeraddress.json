@@ -2,7 +2,7 @@
 	"name": "ds_datalake_customeraddress",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+			"referenceName": "ls_ADLSGen2",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {

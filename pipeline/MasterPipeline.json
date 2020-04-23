@@ -116,7 +116,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+								"referenceName": "ls_AzureSqlDatabase_ETL",
 								"type": "LinkedServiceReference"
 							}
 						},
@@ -179,7 +179,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+								"referenceName": "ls_AzureSqlDatabase_ETL",
 								"type": "LinkedServiceReference"
 							}
 						},
@@ -242,7 +242,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"referenceName": "ls_AzureSqlDatabase_ETL",
 					"type": "LinkedServiceReference"
 				}
 			},
