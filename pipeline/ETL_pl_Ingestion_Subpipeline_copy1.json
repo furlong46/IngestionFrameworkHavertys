@@ -69,7 +69,7 @@
 									]
 								},
 								{
-									"activity": "If Condition1",
+									"activity": "DeleteRawIfExists",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -305,7 +305,7 @@
 							"type": "Switch",
 							"dependsOn": [
 								{
-									"activity": "DeleteIfExists",
+									"activity": "DeleteStagingIfExists",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -861,7 +861,7 @@
 							}
 						},
 						{
-							"name": "DeleteIfExists",
+							"name": "DeleteStagingIfExists",
 							"type": "IfCondition",
 							"dependsOn": [
 								{
@@ -917,7 +917,7 @@
 							"type": "GetMetadata",
 							"dependsOn": [
 								{
-									"activity": "DeleteIfExists",
+									"activity": "DeleteStagingIfExists",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -933,7 +933,7 @@
 							"userProperties": []
 						},
 						{
-							"name": "If Condition1",
+							"name": "DeleteRawIfExists",
 							"type": "IfCondition",
 							"dependsOn": [
 								{
