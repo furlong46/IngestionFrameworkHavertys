@@ -301,55 +301,10 @@
 							}
 						},
 						{
-							"name": "Delete_ExistingStaging",
-							"description": "This activity deletes all existing files in the destination staging folder for each file being copied.",
-							"type": "Delete",
-							"dependsOn": [
-								{
-									"activity": "LookUp_SelectSql",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "7.00:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"dataset": {
-									"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
-									"type": "DatasetReference",
-									"parameters": {
-										"FolderPath": {
-											"value": "@concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_'))",
-											"type": "Expression"
-										}
-									}
-								},
-								"enableLogging": false,
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true
-								}
-							}
-						},
-						{
 							"name": "Delete_ExistingRaw",
 							"description": "This activity deletes files that have the same start time as the current run (i.e. only when this is a rerun). Therefore, most of the time this activity will not delete any files and will fail. The pipeline will continue upon completion of this activity - not success.",
 							"type": "Delete",
-							"dependsOn": [
-								{
-									"activity": "Delete_ExistingStaging",
-									"dependencyConditions": [
-										"Completed"
-									]
-								}
-							],
+							"dependsOn": [],
 							"policy": {
 								"timeout": "7.00:00:00",
 								"retry": 0,
@@ -381,9 +336,9 @@
 							"type": "Switch",
 							"dependsOn": [
 								{
-									"activity": "Delete_ExistingStaging",
+									"activity": "DeleteIfExists",
 									"dependencyConditions": [
-										"Completed"
+										"Succeeded"
 									]
 								}
 							],
@@ -934,6 +889,58 @@
 									"type": "AzureBlobFSReadSettings",
 									"recursive": true
 								}
+							}
+						},
+						{
+							"name": "DeleteIfExists",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "StagingExists",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@activity('StagingExists').output.firstrow.exists",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "Delete_ExistingStaging",
+										"description": "This activity deletes all existing files in the destination staging folder for each file being copied.",
+										"type": "Delete",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"dataset": {
+												"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+												"type": "DatasetReference",
+												"parameters": {
+													"FolderPath": {
+														"value": "@concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_'))",
+														"type": "Expression"
+													}
+												}
+											},
+											"enableLogging": false,
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true
+											}
+										}
+									}
+								]
 							}
 						}
 					]
