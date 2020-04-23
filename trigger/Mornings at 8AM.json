@@ -10,8 +10,7 @@
 					"type": "PipelineReference"
 				},
 				"parameters": {
-					"JobConfiguration": "OverrideLoad",
-					"RunType": "O"
+					"JobConfiguration": "OverrideLoad"
 				}
 			}
 		],
