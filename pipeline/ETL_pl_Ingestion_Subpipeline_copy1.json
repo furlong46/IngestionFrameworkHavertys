@@ -874,7 +874,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
-									"value": "@activity('StagingExists').output.firstrow.exists",
+									"value": "@activity('StagingExists').output.value[0].Exists",
 									"type": "Expression"
 								},
 								"ifTrueActivities": [
@@ -964,6 +964,10 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
+								"expression": {
+									"value": "@activity('RawExists').output.value[0].Exists",
+									"type": "Expression"
+								},
 								"ifTrueActivities": [
 									{
 										"name": "Delete_ExistingRaw",
