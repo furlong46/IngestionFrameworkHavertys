@@ -63,13 +63,13 @@
 							"type": "Copy",
 							"dependsOn": [
 								{
-									"activity": "Delete_ExistingRaw",
+									"activity": "Switch_ServerName",
 									"dependencyConditions": [
-										"Completed"
+										"Succeeded"
 									]
 								},
 								{
-									"activity": "Switch_ServerName",
+									"activity": "If Condition1",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -298,37 +298,6 @@
 							"linkedServiceName": {
 								"referenceName": "ls_AzureSqlDatabase_ETL",
 								"type": "LinkedServiceReference"
-							}
-						},
-						{
-							"name": "Delete_ExistingRaw",
-							"description": "This activity deletes files that have the same start time as the current run (i.e. only when this is a rerun). Therefore, most of the time this activity will not delete any files and will fail. The pipeline will continue upon completion of this activity - not success.",
-							"type": "Delete",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "7.00:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"dataset": {
-									"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
-									"type": "DatasetReference",
-									"parameters": {
-										"FolderPath": {
-											"value": "@concat(replace(concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_') ), 'staging', 'raw'), '/TS=',string(item().StartTime))",
-											"type": "Expression"
-										}
-									}
-								},
-								"enableLogging": false,
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true
-								}
 							}
 						},
 						{
@@ -929,6 +898,74 @@
 												"parameters": {
 													"FolderPath": {
 														"value": "@concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_'))",
+														"type": "Expression"
+													}
+												}
+											},
+											"enableLogging": false,
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true
+											}
+										}
+									}
+								]
+							}
+						},
+						{
+							"name": "RawExists",
+							"type": "GetMetadata",
+							"dependsOn": [
+								{
+									"activity": "DeleteIfExists",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": []
+						},
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "RawExists",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"ifTrueActivities": [
+									{
+										"name": "Delete_ExistingRaw",
+										"description": "This activity deletes files that have the same start time as the current run (i.e. only when this is a rerun). Therefore, most of the time this activity will not delete any files and will fail. The pipeline will continue upon completion of this activity - not success.",
+										"type": "Delete",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"dataset": {
+												"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+												"type": "DatasetReference",
+												"parameters": {
+													"FolderPath": {
+														"value": "@concat(replace(concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_') ), 'staging', 'raw'), '/TS=',string(item().StartTime))",
 														"type": "Expression"
 													}
 												}
