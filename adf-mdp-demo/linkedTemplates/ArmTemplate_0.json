@@ -7,27 +7,27 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-mdp-demo"
 		},
-		"ls_ADLSGen2_dataanalyticsadls21_accountKey": {
+		"ls_ADLSGen2_accountKey": {
 			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'ls_ADLSGen2_dataanalyticsadls21'"
+			"metadata": "Secure string for 'accountKey' of 'ls_ADLSGen2'"
 		},
-		"ls_AzureDatabricks_DataAnalyticsQA_ADBX_accessToken": {
+		"ls_AzureDatabricks_accessToken": {
 			"type": "secureString",
-			"metadata": "Secure string for 'accessToken' of 'ls_AzureDatabricks_DataAnalyticsQA_ADBX'"
+			"metadata": "Secure string for 'accessToken' of 'ls_AzureDatabricks'"
 		},
-		"ls_AzureSqlDatabase_HavertysDW_connectionString": {
+		"ls_AzureSqlDatabase_ETL_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'ls_AzureSqlDatabase_HavertysDW'"
+			"metadata": "Secure string for 'connectionString' of 'ls_AzureSqlDatabase_ETL'"
 		},
 		"ls_sourcesystem_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_sourcesystem'"
 		},
-		"ls_ADLSGen2_dataanalyticsadls21_properties_typeProperties_url": {
+		"ls_ADLSGen2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://adlsmdpdemo.dfs.core.windows.net"
 		},
-		"ls_KV_KV21_properties_typeProperties_baseUrl": {
+		"ls_KV_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://kv-mdp-demo.vault.azure.net/"
 		}
@@ -37,7 +37,7 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/ls_ADLSGen2_dataanalyticsadls21')]",
+			"name": "[concat(parameters('factoryName'), '/ls_ADLSGen2')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -45,17 +45,17 @@
 				"annotations": [],
 				"type": "AzureBlobFS",
 				"typeProperties": {
-					"url": "[parameters('ls_ADLSGen2_dataanalyticsadls21_properties_typeProperties_url')]",
+					"url": "[parameters('ls_ADLSGen2_properties_typeProperties_url')]",
 					"accountKey": {
 						"type": "SecureString",
-						"value": "[parameters('ls_ADLSGen2_dataanalyticsadls21_accountKey')]"
+						"value": "[parameters('ls_ADLSGen2_accountKey')]"
 					}
 				}
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ls_AzureDatabricks_DataAnalyticsQA_ADBX')]",
+			"name": "[concat(parameters('factoryName'), '/ls_AzureDatabricks')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -65,7 +65,7 @@
 					"domain": "https://eastus2.azuredatabricks.net",
 					"accessToken": {
 						"type": "SecureString",
-						"value": "[parameters('ls_AzureDatabricks_DataAnalyticsQA_ADBX_accessToken')]"
+						"value": "[parameters('ls_AzureDatabricks_accessToken')]"
 					},
 					"existingClusterId": "0402-152549-adder831"
 				}
@@ -73,20 +73,20 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ls_AzureSqlDatabase_HavertysDW')]",
+			"name": "[concat(parameters('factoryName'), '/ls_AzureSqlDatabase_ETL')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
-					"connectionString": "[parameters('ls_AzureSqlDatabase_HavertysDW_connectionString')]"
+					"connectionString": "[parameters('ls_AzureSqlDatabase_ETL_connectionString')]"
 				}
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ls_KV_KV21')]",
+			"name": "[concat(parameters('factoryName'), '/ls_KV')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -94,7 +94,7 @@
 				"annotations": [],
 				"type": "AzureKeyVault",
 				"typeProperties": {
-					"baseUrl": "[parameters('ls_KV_KV21_properties_typeProperties_baseUrl')]"
+					"baseUrl": "[parameters('ls_KV_properties_typeProperties_baseUrl')]"
 				}
 			},
 			"dependsOn": []
@@ -148,7 +148,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+					"referenceName": "ls_ADLSGen2",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
@@ -179,7 +179,7 @@
 				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_ADLSGen2_dataanalyticsadls21')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_ADLSGen2')]"
 			]
 		},
 		{
@@ -188,7 +188,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+					"referenceName": "ls_ADLSGen2",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
@@ -227,7 +227,7 @@
 				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_ADLSGen2_dataanalyticsadls21')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_ADLSGen2')]"
 			]
 		},
 		{
@@ -236,7 +236,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"referenceName": "ls_AzureSqlDatabase_ETL",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -260,7 +260,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_HavertysDW')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]"
 			]
 		},
 		{
@@ -269,7 +269,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"referenceName": "ls_AzureSqlDatabase_ETL",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -525,7 +525,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_HavertysDW')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]"
 			]
 		},
 		{
@@ -534,7 +534,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"referenceName": "ls_AzureSqlDatabase_ETL",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -636,7 +636,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_HavertysDW')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]"
 			]
 		},
 		{
@@ -835,7 +835,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"referenceName": "ls_AzureSqlDatabase_ETL",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -879,7 +879,7 @@
 				"typeProperties": {}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_HavertysDW')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]"
 			]
 		},
 		{
@@ -888,7 +888,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"referenceName": "ls_AzureSqlDatabase_ETL",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -942,7 +942,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_HavertysDW')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]"
 			]
 		},
 		{
@@ -951,7 +951,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"referenceName": "ls_AzureSqlDatabase_ETL",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -1037,7 +1037,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_HavertysDW')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]"
 			]
 		},
 		{
@@ -1046,7 +1046,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+					"referenceName": "ls_ADLSGen2",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -1102,7 +1102,7 @@
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_ADLSGen2_dataanalyticsadls21')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_ADLSGen2')]"
 			]
 		},
 		{
@@ -1111,7 +1111,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+					"referenceName": "ls_ADLSGen2",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -1191,7 +1191,7 @@
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_ADLSGen2_dataanalyticsadls21')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_ADLSGen2')]"
 			]
 		},
 		{
@@ -1200,7 +1200,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+					"referenceName": "ls_ADLSGen2",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -1222,7 +1222,7 @@
 				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_ADLSGen2_dataanalyticsadls21')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_ADLSGen2')]"
 			]
 		}
 	]

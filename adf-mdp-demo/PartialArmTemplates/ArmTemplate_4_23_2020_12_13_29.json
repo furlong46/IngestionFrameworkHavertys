@@ -6,34 +6,6 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-mdp-demo"
-		},
-		"ls_ADLSGen2_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'ls_ADLSGen2'"
-		},
-		"ls_AzureDatabricks_accessToken": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accessToken' of 'ls_AzureDatabricks'"
-		},
-		"ls_AzureSqlDatabase_ETL_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'ls_AzureSqlDatabase_ETL'"
-		},
-		"ls_sourcesystem_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'ls_sourcesystem'"
-		},
-		"ls_ADLSGen2_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://adlsmdpdemo.dfs.core.windows.net"
-		},
-		"ls_KV_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://kv-mdp-demo.vault.azure.net/"
-		},
-		"Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration": {
-			"type": "string",
-			"defaultValue": "OverrideLoad"
 		}
 	},
 	"variables": {
@@ -266,8 +238,7 @@
 							},
 							"dataset": {
 								"referenceName": "ds_AzureSqlTable_ETL_Master",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						}
 					}
@@ -284,191 +255,6 @@
 				},
 				"folder": {
 					"name": "AAS Processing"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]",
-				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_Master')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ETL_pl_AzureSQLDB_Scaling')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ADF_Scale_Azure_SQLDB",
-						"type": "WebActivity",
-						"dependsOn": [
-							{
-								"activity": "Lookup_KeyValueConfig",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": {
-								"value": "@concat('https://management.azure.com/subscriptions/', activity('Lookup_KeyValueConfig').output.firstRow.SubscriptionID,'/resourceGroups/',activity('Lookup_KeyValueConfig').output.firstRow.ResourceGroupName, '/providers/Microsoft.Sql/servers/',activity('Lookup_KeyValueConfig').output.firstRow.AzureSQLServerName,'/databases/',activity('Lookup_KeyValueConfig').output.firstRow.AzureSQLDatabaseName,'?api-version=2017-10-01-preview')",
-								"type": "Expression"
-							},
-							"method": "PUT",
-							"headers": {
-								"Content-Type": "application/json"
-							},
-							"body": {
-								"value": "@json(concat('{\"sku\":{\"name\":\"', pipeline().parameters.ComputeSize, '\",\"tier\":\"', pipeline().parameters.ServiceTier, '\"}, \"location\": \"', pipeline().parameters.AzureRegionName, ' \"}' ) )",
-								"type": "Expression"
-							},
-							"authentication": {
-								"type": "MSI",
-								"resource": "https://management.azure.com/"
-							}
-						}
-					},
-					{
-						"name": "Lookup_KeyValueConfig",
-						"description": "This LookUp calls a stored procedure which\npulls the key/value pairs ",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT [dbo].[udf_GetETLConfiguration]('AzureSQLServerName') AS AzureSQLServerName,\n\t   [dbo].[udf_GetETLConfiguration]('AzureSQLDatabaseName') AS AzureSQLDatabaseName,\n\t   [dbo].[udf_GetETLConfiguration]('SubscriptionID') AS SubscriptionID,\n\t   [dbo].[udf_GetETLConfiguration]('ResourceGroupName') AS ResourceGroupName",
-								"queryTimeout": "02:00:00"
-							},
-							"dataset": {
-								"referenceName": "ds_AzureSqlTable_ETL_Master",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					}
-				],
-				"parameters": {
-					"ServiceTier": {
-						"type": "String",
-						"defaultValue": "GeneralPurpose"
-					},
-					"AzureRegionName": {
-						"type": "String",
-						"defaultValue": "East US"
-					},
-					"ComputeSize": {
-						"type": "string",
-						"defaultValue": "GP_Gen5_2"
-					}
-				},
-				"folder": {
-					"name": "MasterPipeline"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_Master')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ETL_pl_AzureSQLDB_Scaling_ScaleDown')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ADF_Scale_Azure_SQLDB",
-						"type": "WebActivity",
-						"dependsOn": [
-							{
-								"activity": "Lookup_KeyValueConfig",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": {
-								"value": "@concat('https://management.azure.com/subscriptions/', activity('Lookup_KeyValueConfig').output.firstRow.SubscriptionID,'/resourceGroups/',activity('Lookup_KeyValueConfig').output.firstRow.ResourceGroupName, '/providers/Microsoft.Sql/servers/',activity('Lookup_KeyValueConfig').output.firstRow.AzureSQLServerName,'/databases/',activity('Lookup_KeyValueConfig').output.firstRow.AzureSQLDatabaseName,'?api-version=2017-10-01-preview')",
-								"type": "Expression"
-							},
-							"method": "PUT",
-							"headers": {
-								"Content-Type": "application/json"
-							},
-							"body": {
-								"value": "@json(concat('{\"sku\":{\"name\":\"', activity('Lookup_KeyValueConfig').output.firstRow.SQLComputeSizeLow, '\",\"tier\":\"', pipeline().parameters.ServiceTier, '\"}, \"location\": \"', pipeline().parameters.AzureRegionName, ' \"}' ) )",
-								"type": "Expression"
-							},
-							"authentication": {
-								"type": "MSI",
-								"resource": "https://management.azure.com/"
-							}
-						}
-					},
-					{
-						"name": "Lookup_KeyValueConfig",
-						"description": "This LookUp calls a stored procedure which\npulls the key/value pairs ",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT [dbo].[udf_GetETLConfiguration]('AzureSQLServerName') AS AzureSQLServerName,\n\t   [dbo].[udf_GetETLConfiguration]('AzureSQLDatabaseName') AS AzureSQLDatabaseName,\n\t   [dbo].[udf_GetETLConfiguration]('SubscriptionID') AS SubscriptionID,\n\t   [dbo].[udf_GetETLConfiguration]('ResourceGroupName') AS ResourceGroupName,\n           dbo.udf_GetETLConfiguration('SQLComputeSizeHigh') AS SQLComputeSizeHigh,\n\t   dbo.udf_GetETLConfiguration('SQLComputeSizeLow') AS SQLComputeSizeLow",
-								"queryTimeout": "02:00:00"
-							},
-							"dataset": {
-								"referenceName": "ds_AzureSqlTable_ETL_Master",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					}
-				],
-				"parameters": {
-					"ServiceTier": {
-						"type": "String",
-						"defaultValue": "GeneralPurpose"
-					},
-					"AzureRegionName": {
-						"type": "String",
-						"defaultValue": "East US"
-					}
-				},
-				"folder": {
-					"name": "MasterPipeline"
 				},
 				"annotations": []
 			},
@@ -511,8 +297,7 @@
 							},
 							"dataset": {
 								"referenceName": "ds_AzureSqlTable_ETL_MetadataIngestionList",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							},
 							"firstRowOnly": false
 						}
@@ -665,8 +450,7 @@
 										},
 										"dataset": {
 											"referenceName": "ds_AzureSqlTable_ETL_Master",
-											"type": "DatasetReference",
-											"parameters": {}
+											"type": "DatasetReference"
 										},
 										"firstRowOnly": false
 									}
@@ -840,8 +624,7 @@
 														"inputs": [
 															{
 																"referenceName": "ds_AzureSqlTable_ETL_Ingestion2",
-																"type": "DatasetReference",
-																"parameters": {}
+																"type": "DatasetReference"
 															}
 														],
 														"outputs": [
@@ -953,8 +736,7 @@
 												"inputs": [
 													{
 														"referenceName": "ds_AzureSqlTable_ETL_Ingestion1",
-														"type": "DatasetReference",
-														"parameters": {}
+														"type": "DatasetReference"
 													}
 												],
 												"outputs": [
@@ -1114,8 +896,7 @@
 										},
 										"dataset": {
 											"referenceName": "ds_AzureSqlTable_ETL_MetadataIngestionList",
-											"type": "DatasetReference",
-											"parameters": {}
+											"type": "DatasetReference"
 										}
 									}
 								},
@@ -1698,13 +1479,10 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_MetadataIngestionList')]",
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]",
 				"[concat(variables('factoryId'), '/datasets/ds_ADLSG2parquet_DataLakeIngestionDir')]",
 				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_Master')]",
-				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_Ingestion1')]",
 				"[concat(variables('factoryId'), '/datasets/ds_ADLSG2parquet_DataLakeIngestionNamedFile')]",
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureDatabricks')]",
-				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_Ingestion2')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_AzureDatabricks')]"
 			]
 		},
 		{
@@ -1750,8 +1528,7 @@
 							},
 							"dataset": {
 								"referenceName": "ds_AzureSqlTable_ETL_Master",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							},
 							"firstRowOnly": true
 						}
@@ -1979,8 +1756,7 @@
 							},
 							"dataset": {
 								"referenceName": "ds_AzureSqlTable_ETL_Master",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						}
 					},
@@ -2035,119 +1811,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_AzureSqlTable_ETL_Master')]",
-				"[concat(variables('factoryId'), '/pipelines/ETL_pl_AzureSQLDB_Scaling')]",
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]",
-				"[concat(variables('factoryId'), '/pipelines/ETL_pl_AzureSQLDB_Scaling_ScaleDown')]",
 				"[concat(variables('factoryId'), '/pipelines/ETL_pl_Ingestion_Subpipeline')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Run Dim_Customer')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "dim_customer",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "dim_customer",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"srcCustomer": {},
-									"srcCustomerAddress": {},
-									"srcAddress": {},
-									"SinkDimCustomer": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							}
-						}
-					}
-				],
-				"folder": {
-					"name": "Dimensions"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/dim_customer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Simple Copy Pipeline')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy customer",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"queryTimeout": "02:00:00"
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "ds_sourcesystem_Customer",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "ds_datalake_customerCSV",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"folder": {
-					"name": "Simple"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_sourcesystem_Customer')]",
-				"[concat(variables('factoryId'), '/datasets/ds_datalake_customerCSV')]"
 			]
 		},
 		{
@@ -2267,9 +1931,7 @@
 					"table": "Configurations"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ds_AzureSqlTable_DW_DimDate')]",
@@ -2532,9 +2194,7 @@
 					"table": "Dim_Date"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ds_AzureSqlTable_DW_DimTime')]",
@@ -2643,199 +2303,7 @@
 					"table": "Dim_Time"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_AzureSqlTable_ETL_Ingestion1')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_sourcesystem",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Framework"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "TableID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DB2SchemaTable",
-						"type": "varchar"
-					},
-					{
-						"name": "DataLakeSchemaTable",
-						"type": "varchar"
-					},
-					{
-						"name": "PKColumnList",
-						"type": "varchar"
-					},
-					{
-						"name": "ControlTable",
-						"type": "varchar"
-					},
-					{
-						"name": "ControlFilterColumn",
-						"type": "varchar"
-					},
-					{
-						"name": "ControlFilterColumn2",
-						"type": "varchar"
-					},
-					{
-						"name": "ControlStartDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ControlEndDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ControlFilterValue",
-						"type": "varchar"
-					},
-					{
-						"name": "ControlFilterType",
-						"type": "varchar"
-					},
-					{
-						"name": "ControlProcessNumber",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SelectQuery",
-						"type": "varchar"
-					},
-					{
-						"name": "DataLakeStagingFolder",
-						"type": "varchar"
-					},
-					{
-						"name": "ServerName",
-						"type": "varchar"
-					},
-					{
-						"name": "SqlOverrideQuery",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "ETL",
-					"table": "MetadataIngestionList"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_sourcesystem')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_AzureSqlTable_ETL_Ingestion2')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_sourcesystem",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Framework"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "TableID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DB2SchemaTable",
-						"type": "varchar"
-					},
-					{
-						"name": "DataLakeSchemaTable",
-						"type": "varchar"
-					},
-					{
-						"name": "PKColumnList",
-						"type": "varchar"
-					},
-					{
-						"name": "ControlTable",
-						"type": "varchar"
-					},
-					{
-						"name": "ControlFilterColumn",
-						"type": "varchar"
-					},
-					{
-						"name": "ControlFilterColumn2",
-						"type": "varchar"
-					},
-					{
-						"name": "ControlStartDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ControlEndDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ControlFilterValue",
-						"type": "varchar"
-					},
-					{
-						"name": "ControlFilterType",
-						"type": "varchar"
-					},
-					{
-						"name": "ControlProcessNumber",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SelectQuery",
-						"type": "varchar"
-					},
-					{
-						"name": "DataLakeStagingFolder",
-						"type": "varchar"
-					},
-					{
-						"name": "ServerName",
-						"type": "varchar"
-					},
-					{
-						"name": "SqlOverrideQuery",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "ETL",
-					"table": "MetadataIngestionList"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_sourcesystem')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ds_AzureSqlTable_ETL_Master')]",
@@ -2883,12 +2351,9 @@
 						"name": "DataLakeStagingFolder",
 						"type": "varchar"
 					}
-				],
-				"typeProperties": {}
+				]
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ds_AzureSqlTable_ETL_MetadataIngestionControlDateRanges')]",
@@ -2949,9 +2414,7 @@
 					"table": "MetadataIngestionControlDateRanges"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ds_AzureSqlTable_ETL_MetadataIngestionList')]",
@@ -3044,9 +2507,7 @@
 					"table": "MetadataIngestionList"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ds_datalake_address')]",
@@ -3403,97 +2864,7 @@
 					"table": "Dim_Customer"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_AzureSqlDatabase_ETL')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_sourcesystem_Customer')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_sourcesystem",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Simple"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "CustomerID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "NameStyle",
-						"type": "bit"
-					},
-					{
-						"name": "Title",
-						"type": "nvarchar"
-					},
-					{
-						"name": "FirstName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "MiddleName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "LastName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Suffix",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CompanyName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "SalesPerson",
-						"type": "nvarchar"
-					},
-					{
-						"name": "EmailAddress",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Phone",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PasswordHash",
-						"type": "varchar"
-					},
-					{
-						"name": "PasswordSalt",
-						"type": "varchar"
-					},
-					{
-						"name": "rowguid",
-						"type": "uniqueidentifier"
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "SalesLT",
-					"table": "Customer"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_sourcesystem')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ls_ADLSGen2')]",
@@ -3504,10 +2875,10 @@
 				"annotations": [],
 				"type": "AzureBlobFS",
 				"typeProperties": {
-					"url": "[parameters('ls_ADLSGen2_properties_typeProperties_url')]",
+					"url": "https://adlsmdpdemo.dfs.core.windows.net",
 					"accountKey": {
 						"type": "SecureString",
-						"value": "[parameters('ls_ADLSGen2_accountKey')]"
+						"value": "**********"
 					}
 				}
 			},
@@ -3524,22 +2895,9 @@
 					"domain": "https://eastus2.azuredatabricks.net",
 					"accessToken": {
 						"type": "SecureString",
-						"value": "[parameters('ls_AzureDatabricks_accessToken')]"
+						"value": "**********"
 					},
 					"existingClusterId": "0402-152549-adder831"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ls_AzureSqlDatabase_ETL')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('ls_AzureSqlDatabase_ETL_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -3553,20 +2911,7 @@
 				"annotations": [],
 				"type": "AzureKeyVault",
 				"typeProperties": {
-					"baseUrl": "[parameters('ls_KV_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ls_sourcesystem')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('ls_sourcesystem_connectionString')]"
+					"baseUrl": "https://kv-mdp-demo.vault.azure.net/"
 				}
 			},
 			"dependsOn": []
@@ -3585,7 +2930,7 @@
 							"type": "PipelineReference"
 						},
 						"parameters": {
-							"JobConfiguration": "[parameters('Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration')]"
+							"JobConfiguration": "OverrideLoad"
 						}
 					}
 				],
@@ -3601,102 +2946,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/MasterPipeline')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Gateway01IR')]",
-			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "SelfHosted",
-				"description": "Self hosted IR running on Gateway01",
-				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MDFIntegrationRuntime')]",
-			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "Managed",
-				"typeProperties": {
-					"computeProperties": {
-						"location": "AutoResolve",
-						"dataFlowProperties": {
-							"computeType": "General",
-							"coreCount": 36,
-							"timeToLive": 0
-						}
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/dim_customer')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "ds_datalake_customer",
-								"type": "DatasetReference"
-							},
-							"name": "srcCustomer"
-						},
-						{
-							"dataset": {
-								"referenceName": "ds_datalake_customeraddress",
-								"type": "DatasetReference"
-							},
-							"name": "srcCustomerAddress"
-						},
-						{
-							"dataset": {
-								"referenceName": "ds_datalake_address",
-								"type": "DatasetReference"
-							},
-							"name": "srcAddress"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "ds_dw_dim_customer",
-								"type": "DatasetReference"
-							},
-							"name": "SinkDimCustomer"
-						}
-					],
-					"transformations": [
-						{
-							"name": "LookupCustomerAddress"
-						},
-						{
-							"name": "SelectCustomerAddress"
-						},
-						{
-							"name": "LookupAddress"
-						},
-						{
-							"name": "SelectAddress"
-						},
-						{
-							"name": "DerivedCustomerColumns"
-						}
-					],
-					"script": "source(output(\n\t\tCustomerID as integer,\n\t\tNameStyle as boolean,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinferDriftedColumnTypes: true,\n\tformat: 'parquet') ~> srcCustomer\nsource(output(\n\t\tCustomerID as integer,\n\t\tAddressID as integer,\n\t\tAddressType as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinferDriftedColumnTypes: true,\n\tformat: 'parquet') ~> srcCustomerAddress\nsource(output(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvince as string,\n\t\tCountryRegion as string,\n\t\tPostalCode as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> srcAddress\nsrcCustomer, srcCustomerAddress lookup(srcCustomer@CustomerID == srcCustomerAddress@CustomerID,\n\tmultiple: false,\n\tpickup: 'first',\n\tasc(AddressID, true),\n\tasc(AddressType, true),\n\tbroadcast: 'none')~> LookupCustomerAddress\nLookupCustomerAddress select(mapColumn(\n\t\tCustomerID = srcCustomer@CustomerID,\n\t\tNameStyle,\n\t\tTitle,\n\t\tFirstName,\n\t\tMiddleName,\n\t\tLastName,\n\t\tSuffix,\n\t\tCompanyName,\n\t\tSalesPerson,\n\t\tEmailAddress,\n\t\tPhone,\n\t\tPasswordHash,\n\t\tPasswordSalt,\n\t\tModifiedDate = srcCustomer@ModifiedDate,\n\t\tAddressID,\n\t\tAddressType\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCustomerAddress\nSelectCustomerAddress, srcAddress lookup(SelectCustomerAddress@AddressID == srcAddress@AddressID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'none')~> LookupAddress\nLookupAddress select(mapColumn(\n\t\tCustomerID,\n\t\tNameStyle,\n\t\tTitle,\n\t\tFirstName,\n\t\tMiddleName,\n\t\tLastName,\n\t\tSuffix,\n\t\tCompanyName,\n\t\tSalesPerson,\n\t\tEmailAddress,\n\t\tPhone,\n\t\tPasswordHash,\n\t\tPasswordSalt,\n\t\tModifiedDate = SelectCustomerAddress@ModifiedDate,\n\t\tAddressID = SelectCustomerAddress@AddressID,\n\t\tAddressType,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tStateProvince,\n\t\tCountryRegion,\n\t\tPostalCode\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectAddress\nSelectAddress derive(FullName = trim(concat(iifNull(FirstName,\"\"), \" \", iifNull(MiddleName,\"\"), \" \", iifNull(LastName,\"\"), \" \", iifNull(Suffix,\"\")\r\n)\r\n),\n\t\teach(match(type==\"string\"), $$ = iifNull(trim($$), \"\"))) ~> DerivedCustomerColumns\nDerivedCustomerColumns sink(input(\n\t\tCustomer_sk as integer,\n\t\tCustomerID as integer,\n\t\tNameStyle as boolean,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tFullName as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\tModifiedDate as timestamp,\n\t\tAddressID as integer,\n\t\tAddressType as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvince as string,\n\t\tCountryRegion as string,\n\t\tPostalCode as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\ttruncate:true,\n\tformat: 'table',\n\tmapColumn(\n\t\tCustomerID,\n\t\tNameStyle,\n\t\tTitle,\n\t\tFirstName,\n\t\tMiddleName,\n\t\tLastName,\n\t\tSuffix,\n\t\tFullName,\n\t\tCompanyName,\n\t\tSalesPerson,\n\t\tEmailAddress,\n\t\tPhone,\n\t\tPasswordHash,\n\t\tPasswordSalt,\n\t\tModifiedDate,\n\t\tAddressID,\n\t\tAddressType,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tStateProvince,\n\t\tCountryRegion,\n\t\tPostalCode\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SinkDimCustomer"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_datalake_customer')]",
-				"[concat(variables('factoryId'), '/datasets/ds_datalake_customeraddress')]",
-				"[concat(variables('factoryId'), '/datasets/ds_datalake_address')]",
-				"[concat(variables('factoryId'), '/datasets/ds_dw_dim_customer')]"
 			]
 		}
 	]

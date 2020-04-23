@@ -22,7 +22,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_ADLSGen2_dataanalyticsadls21",
+					"referenceName": "ls_ADLSGen2",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -69,7 +69,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"referenceName": "ls_AzureSqlDatabase_ETL",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -311,7 +311,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+							"referenceName": "ls_AzureSqlDatabase_ETL",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -348,7 +348,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+							"referenceName": "ls_AzureSqlDatabase_ETL",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -769,13 +769,13 @@
 									"type": "Copy",
 									"dependsOn": [
 										{
-											"activity": "Delete_ExistingRaw",
+											"activity": "Switch_ServerName_CopySourceToStage",
 											"dependencyConditions": [
-												"Completed"
+												"Succeeded"
 											]
 										},
 										{
-											"activity": "Switch_ServerName",
+											"activity": "DeleteRawIfExists",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -929,7 +929,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"referenceName": "ls_AzureSqlDatabase_ETL",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -966,7 +966,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"referenceName": "ls_AzureSqlDatabase_ETL",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -976,7 +976,7 @@
 									"type": "SqlServerStoredProcedure",
 									"dependsOn": [
 										{
-											"activity": "Switch_ServerName",
+											"activity": "Switch_ServerName_CopySourceToStage",
 											"dependencyConditions": [
 												"Failed"
 											]
@@ -1003,94 +1003,18 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"referenceName": "ls_AzureSqlDatabase_ETL",
 										"type": "LinkedServiceReference"
 									}
 								},
 								{
-									"name": "Delete_ExistingStaging",
-									"description": "This activity deletes all existing files in the destination staging folder for each file being copied.",
-									"type": "Delete",
-									"dependsOn": [
-										{
-											"activity": "LookUp_SelectSql",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataset": {
-											"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
-											"type": "DatasetReference",
-											"parameters": {
-												"FolderPath": {
-													"value": "@concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_'))",
-													"type": "Expression"
-												}
-											}
-										},
-										"enableLogging": false,
-										"storeSettings": {
-											"type": "AzureBlobFSReadSettings",
-											"recursive": true
-										}
-									}
-								},
-								{
-									"name": "Delete_ExistingRaw",
-									"description": "This activity deletes files that have the same start time as the current run (i.e. only when this is a rerun). Therefore, most of the time this activity will not delete any files and will fail. The pipeline will continue upon completion of this activity - not success.",
-									"type": "Delete",
-									"dependsOn": [
-										{
-											"activity": "Delete_ExistingStaging",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataset": {
-											"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
-											"type": "DatasetReference",
-											"parameters": {
-												"FolderPath": {
-													"value": "@concat(replace(concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_') ), 'staging', 'raw'), '/TS=',string(item().StartTime))",
-													"type": "Expression"
-												}
-											}
-										},
-										"enableLogging": false,
-										"storeSettings": {
-											"type": "AzureBlobFSReadSettings",
-											"recursive": true
-										}
-									}
-								},
-								{
-									"name": "Switch_ServerName",
+									"name": "Switch_ServerName_CopySourceToStage",
 									"type": "Switch",
 									"dependsOn": [
 										{
-											"activity": "Delete_ExistingStaging",
+											"activity": "DeleteStagingIfExists",
 											"dependencyConditions": [
-												"Completed"
+												"Succeeded"
 											]
 										}
 									],
@@ -1209,7 +1133,7 @@
 															}
 														},
 														"linkedServiceName": {
-															"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+															"referenceName": "ls_AzureSqlDatabase_ETL",
 															"type": "LinkedServiceReference"
 														}
 													}
@@ -1322,7 +1246,7 @@
 													}
 												},
 												"linkedServiceName": {
-													"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+													"referenceName": "ls_AzureSqlDatabase_ETL",
 													"type": "LinkedServiceReference"
 												}
 											}
@@ -1474,7 +1398,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"referenceName": "ls_AzureSqlDatabase_ETL",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -1511,7 +1435,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"referenceName": "ls_AzureSqlDatabase_ETL",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -1563,7 +1487,7 @@
 													}
 												},
 												"linkedServiceName": {
-													"referenceName": "ls_AzureDatabricks_DataAnalyticsQA_ADBX",
+													"referenceName": "ls_AzureDatabricks",
 													"type": "LinkedServiceReference"
 												}
 											}
@@ -1603,7 +1527,337 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"referenceName": "ls_AzureSqlDatabase_ETL",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "StagingExists",
+									"type": "GetMetadata",
+									"dependsOn": [
+										{
+											"activity": "LookUp_SelectSql",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+											"type": "DatasetReference",
+											"parameters": {
+												"FolderPath": {
+													"value": "@concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_'))",
+													"type": "Expression"
+												}
+											}
+										},
+										"fieldList": [
+											"exists"
+										],
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"recursive": true
+										}
+									}
+								},
+								{
+									"name": "DeleteStagingIfExists",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "StagingExists",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@activity('StagingExists').output.exists",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "Delete_ExistingStaging",
+												"description": "This activity deletes all existing files in the destination staging folder for each file being copied.",
+												"type": "Delete",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "7.00:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"dataset": {
+														"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+														"type": "DatasetReference",
+														"parameters": {
+															"FolderPath": {
+																"value": "@concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_'))",
+																"type": "Expression"
+															}
+														}
+													},
+													"enableLogging": false,
+													"storeSettings": {
+														"type": "AzureBlobFSReadSettings",
+														"recursive": true
+													}
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "RawExists",
+									"type": "GetMetadata",
+									"dependsOn": [
+										{
+											"activity": "DeleteStagingIfExists",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+											"type": "DatasetReference",
+											"parameters": {
+												"FolderPath": {
+													"value": "@concat(replace(concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_') ), 'staging', 'raw'), '/TS=',string(item().StartTime))",
+													"type": "Expression"
+												}
+											}
+										},
+										"fieldList": [
+											"exists"
+										],
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"recursive": true
+										}
+									}
+								},
+								{
+									"name": "DeleteRawIfExists",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "RawExists",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@activity('RawExists').output.exists",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "Delete_ExistingRaw",
+												"description": "This activity deletes files that have the same start time as the current run (i.e. only when this is a rerun). Therefore, most of the time this activity will not delete any files and will fail. The pipeline will continue upon completion of this activity - not success.",
+												"type": "Delete",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "7.00:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"dataset": {
+														"referenceName": "ds_ADLSG2parquet_DataLakeIngestionDir",
+														"type": "DatasetReference",
+														"parameters": {
+															"FolderPath": {
+																"value": "@concat(replace(concat( item().DataLakeStagingFolder, '/', replace(item().DataLakeSchemaTable, '.', '_') ), 'staging', 'raw'), '/TS=',string(item().StartTime))",
+																"type": "Expression"
+															}
+														}
+													},
+													"enableLogging": false,
+													"storeSettings": {
+														"type": "AzureBlobFSReadSettings",
+														"recursive": true
+													}
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "SP_JobTableLogEnd_Failure6",
+									"description": "This stored procedures updates the status of the JobTableLog failed execution of previous steps.",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "StagingExists",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_JobTableLogEnd_Failure]",
+										"storedProcedureParameters": {
+											"JobTableLogID": {
+												"value": {
+													"value": "@{activity('LookUp_JobTableLogStart').output.value[0].JobTableLogID}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_AzureSqlDatabase_ETL",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "SP_JobTableLogEnd_Failure7",
+									"description": "This stored procedures updates the status of the JobTableLog failed execution of previous steps.",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "DeleteStagingIfExists",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_JobTableLogEnd_Failure]",
+										"storedProcedureParameters": {
+											"JobTableLogID": {
+												"value": {
+													"value": "@{activity('LookUp_JobTableLogStart').output.value[0].JobTableLogID}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_AzureSqlDatabase_ETL",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "SP_JobTableLogEnd_Failure8",
+									"description": "This stored procedures updates the status of the JobTableLog failed execution of previous steps.",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "RawExists",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_JobTableLogEnd_Failure]",
+										"storedProcedureParameters": {
+											"JobTableLogID": {
+												"value": {
+													"value": "@{activity('LookUp_JobTableLogStart').output.value[0].JobTableLogID}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_AzureSqlDatabase_ETL",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "SP_JobTableLogEnd_Failure9",
+									"description": "This stored procedures updates the status of the JobTableLog failed execution of previous steps.",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "DeleteRawIfExists",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_JobTableLogEnd_Failure]",
+										"storedProcedureParameters": {
+											"JobTableLogID": {
+												"value": {
+													"value": "@{activity('LookUp_JobTableLogStart').output.value[0].JobTableLogID}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_AzureSqlDatabase_ETL",
 										"type": "LinkedServiceReference"
 									}
 								}
@@ -1643,7 +1897,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+							"referenceName": "ls_AzureSqlDatabase_ETL",
 							"type": "LinkedServiceReference"
 						}
 					}
@@ -1915,7 +2169,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"referenceName": "ls_AzureSqlDatabase_ETL",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -1978,7 +2232,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+										"referenceName": "ls_AzureSqlDatabase_ETL",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -2041,7 +2295,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+							"referenceName": "ls_AzureSqlDatabase_ETL",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -2069,6 +2323,43 @@
 								"type": "DatasetReference",
 								"parameters": {}
 							}
+						}
+					},
+					{
+						"name": "SP_MasterJobEnd_Success",
+						"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after successful execution of previous steps.",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RunCheck",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_MasterJobEnd_Success]",
+							"storedProcedureParameters": {
+								"MasterProcessNumber": {
+									"value": {
+										"value": "@activity('LookUp_MasterJobStart').output.firstRow.MasterProcessNumber",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_AzureSqlDatabase_ETL",
+							"type": "LinkedServiceReference"
 						}
 					}
 				],

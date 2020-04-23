@@ -5,22 +5,22 @@
 		"factoryName": {
 			"value": "adf-mdp-demo"
 		},
-		"ls_ADLSGen2_dataanalyticsadls21_accountKey": {
+		"ls_ADLSGen2_accountKey": {
 			"value": ""
 		},
-		"ls_AzureDatabricks_DataAnalyticsQA_ADBX_accessToken": {
+		"ls_AzureDatabricks_accessToken": {
 			"value": ""
 		},
-		"ls_AzureSqlDatabase_HavertysDW_connectionString": {
+		"ls_AzureSqlDatabase_ETL_connectionString": {
 			"value": ""
 		},
 		"ls_sourcesystem_connectionString": {
 			"value": ""
 		},
-		"ls_ADLSGen2_dataanalyticsadls21_properties_typeProperties_url": {
+		"ls_ADLSGen2_properties_typeProperties_url": {
 			"value": "https://adlsmdpdemo.dfs.core.windows.net"
 		},
-		"ls_KV_KV21_properties_typeProperties_baseUrl": {
+		"ls_KV_properties_typeProperties_baseUrl": {
 			"value": "https://kv-mdp-demo.vault.azure.net/"
 		},
 		"Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration": {
