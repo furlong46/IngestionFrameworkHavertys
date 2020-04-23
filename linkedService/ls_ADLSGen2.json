@@ -1,5 +1,5 @@
 {
-	"name": "ls_ADLSGen2_dataanalyticsadls21",
+	"name": "ls_ADLSGen2",
 	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"description": "connect to ADLS Gen 2 via key vault using storage key secret",

@@ -2,7 +2,7 @@
 	"name": "ds_AzureSqlTable_DW_DimTime",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+			"referenceName": "ls_AzureSqlDatabase_ETL",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {

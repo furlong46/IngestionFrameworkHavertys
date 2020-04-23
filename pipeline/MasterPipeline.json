@@ -116,7 +116,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+								"referenceName": "ls_AzureSqlDatabase_ETL",
 								"type": "LinkedServiceReference"
 							}
 						},
@@ -179,7 +179,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+								"referenceName": "ls_AzureSqlDatabase_ETL",
 								"type": "LinkedServiceReference"
 							}
 						},
@@ -189,10 +189,6 @@
 							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
-								"pipeline": {
-									"referenceName": "ETL_pl_Ingestion_Subpipeline",
-									"type": "PipelineReference"
-								},
 								"waitOnCompletion": true,
 								"parameters": {
 									"JobConfiguration": {
@@ -242,7 +238,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "ls_AzureSqlDatabase_HavertysDW",
+					"referenceName": "ls_AzureSqlDatabase_ETL",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -269,6 +265,43 @@
 						"referenceName": "ds_AzureSqlTable_ETL_Master",
 						"type": "DatasetReference"
 					}
+				}
+			},
+			{
+				"name": "SP_MasterJobEnd_Success",
+				"description": "This stored procedure receives the MasterProcessNumber as input and updates the status of the MasterJob table after successful execution of previous steps.",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "RunCheck",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_MasterJobEnd_Success]",
+					"storedProcedureParameters": {
+						"MasterProcessNumber": {
+							"value": {
+								"value": "@activity('LookUp_MasterJobStart').output.firstRow.MasterProcessNumber",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_AzureSqlDatabase_ETL",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],

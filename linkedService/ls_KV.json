@@ -1,5 +1,5 @@
 {
-	"name": "ls_KV_KV21",
+	"name": "ls_KV",
 	"properties": {
 		"description": "This is a linked service to our Key Vault service",
 		"annotations": [],
