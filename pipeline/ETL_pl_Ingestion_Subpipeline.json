@@ -1150,6 +1150,18 @@
 								"referenceName": "ls_AzureSqlDatabase_ETL",
 								"type": "LinkedServiceReference"
 							}
+						},
+						{
+							"name": "If_LoadRaw",
+							"type": "IfCondition",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@item().CreateRawTable",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
