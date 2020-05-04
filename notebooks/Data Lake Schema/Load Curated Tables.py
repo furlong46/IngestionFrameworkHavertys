@@ -3,6 +3,7 @@
 dbutils.widgets.text("SchemaTable", "")
 dbutils.widgets.text("PKColumnList", "")
 dbutils.widgets.text("DataLakeStagingFolder", "")
+dbutils.widgets.text("DatabaseRaw", "")
 
 # COMMAND ----------
 
@@ -14,10 +15,12 @@ dbutils.widgets.text("DataLakeStagingFolder", "")
 varSchemaTable = dbutils.widgets.get("SchemaTable")
 varPKColumnList = dbutils.widgets.get("PKColumnList")
 varDataLakeStagingFolder = dbutils.widgets.get("DataLakeStagingFolder")
+varDatabaseRaw = dbutils.widgets.get("DatabaseRaw")
 
 print(varSchemaTable)
 print(varPKColumnList)
 print(varDataLakeStagingFolder)
+print(varDatabaseRaw)
 
 # COMMAND ----------
 
@@ -74,7 +77,7 @@ autotrimStringsDF.createOrReplaceTempView(stagingTableName)
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE DATABASE IF NOT EXISTS DataLakeCurated
+# MAGIC CREATE DATABASE IF NOT EXISTS ${DatabaseRaw}
 
 # COMMAND ----------
 
@@ -83,11 +86,11 @@ autotrimStringsDF.createOrReplaceTempView(stagingTableName)
 
 # COMMAND ----------
 
-createQuery = """CREATE TABLE IF NOT EXISTS DataLakeCurated.{0} 
+createQuery = """CREATE TABLE IF NOT EXISTS {3}.{0} 
 USING DELTA
 LOCATION '{1}'
 AS
-SELECT * FROM {2} WHERE 1 = 0""".format(tableName, filePathCurated, stagingTableName)
+SELECT * FROM {2} WHERE 1 = 0""".format(tableName, filePathCurated, stagingTableName, varDatabaseRaw)
 
 print(createQuery)
 
@@ -124,14 +127,14 @@ FROM
 {1}
 )
 
-MERGE INTO DataLakeCurated.{2} AS cur
+MERGE INTO {4}.{2} AS cur
 USING (SELECT * FROM stg WHERE ROWNUM=1) AS stage
 ON {3}
 WHEN MATCHED THEN 
   UPDATE SET *
 WHEN NOT MATCHED THEN
   INSERT *
-""".format(varPKColumnList, stagingTableName, tableName, pkJoinList)
+""".format(varPKColumnList, stagingTableName, tableName, pkJoinList, varDatabaseRaw)
 
 print(mergeQuery)
 
@@ -147,3 +150,7 @@ spark.sql(mergeQuery)
 countSQL = "SELECT COUNT(1) AS Cnt FROM DataLakeCurated." + tableName
 DF = spark.sql(countSQL)
 display(DF)
+
+# COMMAND ----------
+
+
