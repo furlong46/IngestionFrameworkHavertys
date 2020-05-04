@@ -773,7 +773,8 @@
 												"DataLakeStagingFolder": {
 													"value": "@string(item().DataLakeStagingFolder)",
 													"type": "Expression"
-												}
+												},
+												"DatabaseRaw": "DataLakeCurated"
 											}
 										},
 										"linkedServiceName": {
