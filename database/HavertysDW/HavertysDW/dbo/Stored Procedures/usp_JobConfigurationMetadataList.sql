@@ -1,4 +1,6 @@
 ﻿
+
+
 CREATE    PROCEDURE [dbo].[usp_JobConfigurationMetadataList] (
 @MasterProcessNumber int
 )
@@ -17,6 +19,7 @@ SELECT
 	IL.[DataLakeStagingFolder],
 	IL.[ServerName],
 	IL.[SqlOverrideQuery],
+	IL.[CreateRawTable],
 	IL.[LoadCurated],
 	CDR.[ControlTable],
 	CDR.[ControlProcessNumber], 

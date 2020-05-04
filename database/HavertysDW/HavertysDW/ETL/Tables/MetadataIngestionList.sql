@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [ETL].[MetadataIngestionList] (
     [TableID]               INT            IDENTITY (1, 1) NOT NULL,
-    [SchemaTable]        VARCHAR (50)   NOT NULL,
+    [SchemaTable]           VARCHAR (50)   NOT NULL,
     [DataLakeSchemaTable]   VARCHAR (50)   NOT NULL,
     [PKColumnList]          VARCHAR (300)  NOT NULL,
     [FilterColumn]          VARCHAR (50)   NULL,
@@ -11,7 +11,10 @@
     [ServerName]            VARCHAR (25)   NOT NULL,
     [SqlOverrideQuery]      VARCHAR (MAX)  NULL,
     [LoadCurated]           BIT            NOT NULL,
+    [CreateRawTable]        BIT            NOT NULL,
     [Disabled]              BIT            NOT NULL,
     CONSTRAINT [PK_MetadataIngestionList] PRIMARY KEY CLUSTERED ([TableID] ASC)
 );
+
+
 
