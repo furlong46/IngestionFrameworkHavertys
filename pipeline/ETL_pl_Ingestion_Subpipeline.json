@@ -734,7 +734,7 @@
 							"type": "IfCondition",
 							"dependsOn": [
 								{
-									"activity": "Copy_ADLStaging_ADLRaw",
+									"activity": "If_LoadRaw",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -1154,13 +1154,57 @@
 						{
 							"name": "If_LoadRaw",
 							"type": "IfCondition",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "Copy_ADLStaging_ADLRaw",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
 									"value": "@item().CreateRawTable",
 									"type": "Expression"
-								}
+								},
+								"ifTrueActivities": [
+									{
+										"name": "adbx_LoadRawTables",
+										"type": "DatabricksNotebook",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"notebookPath": "/Data Lake Schema/Load Raw Tables",
+											"baseParameters": {
+												"SchemaTable": {
+													"value": "@string(item().DataLakeSchemaTable)",
+													"type": "Expression"
+												},
+												"PKColumnList": {
+													"value": "@string(item().PKColumnList)",
+													"type": "Expression"
+												},
+												"DataLakeStagingFolder": {
+													"value": "@string(item().DataLakeStagingFolder)",
+													"type": "Expression"
+												},
+												"DatabaseRaw": "DataLakeRaw"
+											}
+										},
+										"linkedServiceName": {
+											"referenceName": "ls_AzureDatabricks",
+											"type": "LinkedServiceReference"
+										}
+									}
+								]
 							}
 						}
 					]
