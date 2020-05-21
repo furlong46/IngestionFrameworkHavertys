@@ -22,9 +22,6 @@
 		},
 		"ls_KV_properties_typeProperties_baseUrl": {
 			"value": "https://kv-mdp-demo.vault.azure.net/"
-		},
-		"Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration": {
-			"value": "OverrideLoad"
 		}
 	}
 }

@@ -6,10 +6,6 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-mdp-demo"
-		},
-		"Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration": {
-			"type": "string",
-			"defaultValue": "OverrideLoad"
 		}
 	},
 	"variables": {
@@ -2522,38 +2518,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/dim_customer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Mornings at 8AM')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "MasterPipeline",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"JobConfiguration": "[parameters('Mornings at 8AM_properties_MasterPipeline_parameters_JobConfiguration')]"
-						}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Day",
-						"interval": 1,
-						"startTime": "2019-10-31T13:00:00Z",
-						"timeZone": "UTC"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/MasterPipeline')]"
 			]
 		}
 	]
