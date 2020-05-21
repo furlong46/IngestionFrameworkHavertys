@@ -1,6 +1,7 @@
 {
 	"name": "dim_customer",
 	"properties": {
+		"description": "An example mapping data flow to load dim_customer",
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
