@@ -1,6 +1,7 @@
 {
 	"name": "Run Dim_Customer",
 	"properties": {
+		"description": "An example customer dimension load",
 		"activities": [
 			{
 				"name": "dim_customer",
