@@ -1,6 +1,7 @@
 {
 	"name": "ETL_pl_Ingestion_Subpipeline",
 	"properties": {
+		"description": "This sub pipeline executes threads through the foreach loop.",
 		"activities": [
 			{
 				"name": "LookUp_JobConfigurationMetadataList",
