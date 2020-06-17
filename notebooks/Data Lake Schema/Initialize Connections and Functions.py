@@ -22,10 +22,10 @@
 
 # COMMAND ----------
 
-varApplicationId = dbutils.secrets.get(scope = "key-vault-secrets", key = "ServicePrincipal21ClientID") #service principle id
-varAuthenticationKey = dbutils.secrets.get(scope = "key-vault-secrets", key = "ServicePrincipal21Secret") #service principle key
-varTenantId = "804ae74e-8a68-4c11-856b-ccf96b3c8e4e" #the directory id from azure active directory -> properties
-varStorageAccountName = "dataanalyticsqaadls21" #storage acccount name
+varApplicationId = dbutils.secrets.get(scope = "key-vault-secrets", key = "ServicePrincipalClientID") #service principle id
+varAuthenticationKey = dbutils.secrets.get(scope = "key-vault-secrets", key = "ServicePrincipalSecret") #service principle key
+varTenantId = dbutils.secrets.get(scope = "key-vault-secrets", key = "TenantId") #the directory id from azure active directory -> properties
+varStorageAccountName = "adlsmdpdemo" #storage acccount name
 varFileSystemName = "datalake" #ADLS container name
 
 configs = {"fs.azure.account.auth.type": "OAuth",
@@ -39,7 +39,15 @@ try:
     mount_point = "/mnt/datalake",
     extra_configs = configs)
 except:
-  print("{} already mounted".format(varFileSystemName))
+  print("{} already mounted or error".format(varFileSystemName))
+
+# COMMAND ----------
+
+# MAGIC %fs ls "/mnt/datalake/staging/"
+
+# COMMAND ----------
+
+# dbutils.fs.ls("/mnt/datalake")
 
 # COMMAND ----------
 
@@ -47,12 +55,12 @@ except:
 
 # COMMAND ----------
 
-# mounts = dbutils.fs.mounts()
+mounts = dbutils.fs.mounts()
 
-# for mount in mounts:
-#   print(mount.mountPoint + " >> " + mount.source)
+for mount in mounts:
+  print(mount.mountPoint + " >> " + mount.source)
 
-# print("-"*80)
+print("-"*80)
 
 # COMMAND ----------
 
@@ -62,11 +70,11 @@ except:
 
 # COMMAND ----------
 
-jdbcUsername = "ETL" #The dedicated loading user login 
-jdbcPassword = dbutils.secrets.get(scope = "key-vault-secrets", key = "HavertysDWETLAccountPassword") #The dediciated loading user login password
+jdbcUsername = dbutils.secrets.get(scope = "key-vault-secrets", key = "DWETLAccount") #The dedicated loading user login 
+jdbcPassword = dbutils.secrets.get(scope = "key-vault-secrets", key = "DWETLAccountPassword") #The dediciated loading user login password
 
-jdbcHostname = dbutils.secrets.get(scope = "key-vault-secrets", key = "HavertysDWServerName") #The Azure SQL Server
-jdbcDatabase = dbutils.secrets.get(scope = "key-vault-secrets", key = "HavertysDWDBName") #The Azure SQL Data DB database name
+jdbcHostname = dbutils.secrets.get(scope = "key-vault-secrets", key = "DWServerName") #The Azure SQL Server
+jdbcDatabase = dbutils.secrets.get(scope = "key-vault-secrets", key = "DWDBName") #The Azure SQL Data DB database name
 jdbcPort = 1433
 
 
@@ -118,11 +126,11 @@ spark.udf.register("udfSHA1withPython", udfSHA1Python)
 # MAGIC import com.microsoft.azure.sqldb.spark.connect._
 # MAGIC 
 # MAGIC val bulkCopyConfig_Update = Config(Map(
-# MAGIC   "url"          -> dbutils.secrets.get(scope = "key-vault-secrets", key = "HavertysDWServerName"),
-# MAGIC   "databaseName" -> dbutils.secrets.get(scope = "key-vault-secrets", key = "HavertysDWDBName"),
+# MAGIC   "url"          -> dbutils.secrets.get(scope = "key-vault-secrets", key = "DWServerName"),
+# MAGIC   "databaseName" -> dbutils.secrets.get(scope = "key-vault-secrets", key = "DWDBName"),
 # MAGIC   "dbTable"      -> varBulkInsertTableName_Update,
-# MAGIC   "user"         -> "ETL",
-# MAGIC   "password"     -> dbutils.secrets.get(scope = "key-vault-secrets", key = "HavertysDWETLAccountPassword"),
+# MAGIC   "user"         ->dbutils.secrets.get(scope = "key-vault-secrets", key = "DWETLAccount"),
+# MAGIC   "password"     -> dbutils.secrets.get(scope = "key-vault-secrets", key = "DWETLAccountPassword"),
 # MAGIC   "bulkCopyBatchSize" -> "10000",
 # MAGIC   "bulkCopyTableLock" -> "true",
 # MAGIC   "bulkCopyKeepNulls" -> "false",
@@ -138,11 +146,11 @@ spark.udf.register("udfSHA1withPython", udfSHA1Python)
 # MAGIC import com.microsoft.azure.sqldb.spark.connect._
 # MAGIC 
 # MAGIC val bulkCopyConfig_Insert = Config(Map(
-# MAGIC   "url"          -> dbutils.secrets.get(scope = "key-vault-secrets", key = "HavertysDWServerName"),
-# MAGIC   "databaseName" -> dbutils.secrets.get(scope = "key-vault-secrets", key = "HavertysDWDBName"),
+# MAGIC   "url"          -> dbutils.secrets.get(scope = "key-vault-secrets", key = "DWServerName"),
+# MAGIC   "databaseName" -> dbutils.secrets.get(scope = "key-vault-secrets", key = "DWDBName"),
 # MAGIC   "dbTable"      -> varBulkInsertTableName_Insert,
-# MAGIC   "user"         -> "ETL",
-# MAGIC   "password"     -> dbutils.secrets.get(scope = "key-vault-secrets", key = "HavertysDWETLAccountPassword"),
+# MAGIC   "user"         -> dbutils.secrets.get(scope = "key-vault-secrets", key = "DWETLAccount"),
+# MAGIC   "password"     -> dbutils.secrets.get(scope = "key-vault-secrets", key = "DWETLAccountPassword"),
 # MAGIC   "bulkCopyBatchSize" -> "10000",
 # MAGIC   "bulkCopyTableLock" -> "true",
 # MAGIC   "bulkCopyKeepNulls" -> "false",
