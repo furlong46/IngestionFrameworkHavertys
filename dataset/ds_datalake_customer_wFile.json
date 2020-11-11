@@ -13,6 +13,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"fileName": "SalesLT.Customer_12.parquet",
 				"folderPath": "staging/master data/customer/erp/SalesLT_Customer",
 				"fileSystem": "datalake"
 			},
