@@ -8,9 +8,6 @@
 		"ls_ADLSGen2_accountKey": {
 			"value": ""
 		},
-		"ls_AzureDatabricks_accessToken": {
-			"value": ""
-		},
 		"ls_AzureSqlDatabase_ETL_connectionString": {
 			"value": ""
 		},

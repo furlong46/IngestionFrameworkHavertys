@@ -11,10 +11,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'ls_ADLSGen2'"
 		},
-		"ls_AzureDatabricks_accessToken": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accessToken' of 'ls_AzureDatabricks'"
-		},
 		"ls_AzureSqlDatabase_ETL_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_AzureSqlDatabase_ETL'"
@@ -36,6 +32,51 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Customer Curated')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dataflow_customer_delta",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow_customer_delta",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"CustomerStagingParquet": {},
+									"CustomerCuratedDelta": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "Data Lake"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dataflow_customer_delta')]"
+			]
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ETL_pl_AAS_Processing_AzureAutoHook')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -258,7 +299,8 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": "SELECT dbo.udf_GetETLConfiguration('WebHookFull') AS WebHookFull,\n\t   dbo.udf_GetETLConfiguration('WebHookIncremental') AS WebHookIncremental,\n\t   dbo.udf_GetETLConfiguration('AnalysisServicesServer') AS AnalysisServicesServer,\n\t   dbo.udf_GetETLConfiguration('AzureSQLServerName') AS AzureSQLServerName,\n\t   dbo.udf_GetETLConfiguration('AzureSQLDatabaseName') AS AzureSQLDatabaseName,\n\t   dbo.udf_GetETLConfiguration('SubscriptionID') AS SubscriptionID,\n\t   dbo.udf_GetETLConfiguration('ResourceGroupName') AS ResourceGroupName,\n           dbo.udf_GetETLConfiguration('SQLComputeSizeHigh') AS SQLComputeSizeHigh,\n\t   dbo.udf_GetETLConfiguration('SQLComputeSizeLow') AS SQLComputeSizeLow",
-								"queryTimeout": "02:00:00"
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "ds_AzureSqlTable_ETL_Master",
@@ -349,7 +391,8 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": "SELECT [dbo].[udf_GetETLConfiguration]('AzureSQLServerName') AS AzureSQLServerName,\n\t   [dbo].[udf_GetETLConfiguration]('AzureSQLDatabaseName') AS AzureSQLDatabaseName,\n\t   [dbo].[udf_GetETLConfiguration]('SubscriptionID') AS SubscriptionID,\n\t   [dbo].[udf_GetETLConfiguration]('ResourceGroupName') AS ResourceGroupName",
-								"queryTimeout": "02:00:00"
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "ds_AzureSqlTable_ETL_Master",
@@ -443,7 +486,8 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": "SELECT [dbo].[udf_GetETLConfiguration]('AzureSQLServerName') AS AzureSQLServerName,\n\t   [dbo].[udf_GetETLConfiguration]('AzureSQLDatabaseName') AS AzureSQLDatabaseName,\n\t   [dbo].[udf_GetETLConfiguration]('SubscriptionID') AS SubscriptionID,\n\t   [dbo].[udf_GetETLConfiguration]('ResourceGroupName') AS ResourceGroupName,\n           dbo.udf_GetETLConfiguration('SQLComputeSizeHigh') AS SQLComputeSizeHigh,\n\t   dbo.udf_GetETLConfiguration('SQLComputeSizeLow') AS SQLComputeSizeLow",
-								"queryTimeout": "02:00:00"
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "ds_AzureSqlTable_ETL_Master",
@@ -504,7 +548,8 @@
 											"type": "Expression"
 										}
 									}
-								}
+								},
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "ds_AzureSqlTable_ETL_MetadataIngestionList",
@@ -575,6 +620,9 @@
 											"type": "ParquetSink",
 											"storeSettings": {
 												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
 											}
 										},
 										"enableStaging": false,
@@ -658,7 +706,8 @@
 														"type": "Expression"
 													}
 												}
-											}
+											},
+											"partitionOption": "None"
 										},
 										"dataset": {
 											"referenceName": "ds_AzureSqlTable_ETL_Master",
@@ -820,12 +869,16 @@
 																	"value": "@activity('LookUp_SelectSql').output.firstRow.Query",
 																	"type": "Expression"
 																},
-																"queryTimeout": "02:00:00"
+																"queryTimeout": "02:00:00",
+																"partitionOption": "None"
 															},
 															"sink": {
 																"type": "ParquetSink",
 																"storeSettings": {
 																	"type": "AzureBlobFSWriteSettings"
+																},
+																"formatSettings": {
+																	"type": "ParquetWriteSettings"
 																}
 															},
 															"enableStaging": false,
@@ -933,7 +986,8 @@
 															"value": "@activity('LookUp_SelectSql').output.firstRow.Query",
 															"type": "Expression"
 														},
-														"queryTimeout": "02:00:00"
+														"queryTimeout": "02:00:00",
+														"partitionOption": "None"
 													},
 													"sink": {
 														"type": "ParquetSink",
@@ -1107,7 +1161,8 @@
 													}
 												}
 											},
-											"queryTimeout": "02:00:00"
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
 										},
 										"dataset": {
 											"referenceName": "ds_AzureSqlTable_ETL_MetadataIngestionList",
@@ -1837,7 +1892,8 @@
 											"type": "Expression"
 										}
 									}
-								}
+								},
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "ds_AzureSqlTable_ETL_Master",
@@ -1867,11 +1923,11 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"ServiceTier": "GeneralPurpose",
+								"AzureRegionName": "East US",
 								"ComputeSize": {
 									"value": "@activity('Lookup_KeyValueConfig').output.firstRow.SQLComputeSizeHigh",
 									"type": "Expression"
-								},
-								"AzureRegionName": "East US"
+								}
 							}
 						}
 					},
@@ -2066,7 +2122,8 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": "SELECT dbo.udf_GetETLConfiguration('SQLComputeSizeHigh') AS SQLComputeSizeHigh",
-								"queryTimeout": "02:00:00"
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "ds_AzureSqlTable_ETL_Master",
@@ -2203,7 +2260,8 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"queryTimeout": "02:00:00"
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "DelimitedTextSink",
@@ -2242,6 +2300,24 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_sourcesystem_Customer')]",
 				"[concat(variables('factoryId'), '/datasets/ds_datalake_customerCSV')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDatabricksDeltaLakeDataset1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricksDeltaLake1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureDatabricksDeltaLakeDataset",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricksDeltaLake1')]"
 			]
 		},
 		{
@@ -3319,6 +3395,7 @@
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
+					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
 				"schema": []
@@ -3590,6 +3667,30 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureDatabricksDeltaLake1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricksDeltaLake",
+				"typeProperties": {
+					"domain": "https://adb-4601262962204989.9.azuredatabricks.net",
+					"clusterId": "0807-202850-slay770",
+					"accessToken": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "ls_KV",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "DBXToken"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_KV')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ls_ADLSGen2')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -3615,15 +3716,21 @@
 				"annotations": [],
 				"type": "AzureDatabricks",
 				"typeProperties": {
-					"domain": "https://eastus2.azuredatabricks.net",
+					"domain": "https://adb-4601262962204989.9.azuredatabricks.net/?o=4601262962204989#",
 					"accessToken": {
-						"type": "SecureString",
-						"value": "[parameters('ls_AzureDatabricks_accessToken')]"
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "ls_KV",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "DBXToken"
 					},
-					"existingClusterId": "0402-152549-adder831"
+					"existingClusterId": "0807-202850-slay770"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_KV')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ls_AzureSqlDatabase_ETL')]",
@@ -3696,6 +3803,44 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/dataflow_customer_delta')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_datalake_customer",
+								"type": "DatasetReference"
+							},
+							"name": "CustomerStagingParquet"
+						}
+					],
+					"sinks": [
+						{
+							"linkedService": {
+								"referenceName": "ls_ADLSGen2",
+								"type": "LinkedServiceReference"
+							},
+							"name": "CustomerCuratedDelta"
+						}
+					],
+					"transformations": [
+						{
+							"name": "AlterRow1"
+						}
+					],
+					"script": "source(output(\n\t\tCustomerID as integer,\n\t\tNameStyle as boolean,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> CustomerStagingParquet\nCustomerStagingParquet alterRow(upsertIf(true())) ~> AlterRow1\nAlterRow1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tCustomerID as integer,\n\t\tNameStyle as boolean,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tformat: 'delta',\n\tcompressionType: 'snappy',\n\tcompressionLevel: 'Fastest',\n\tfileSystem: 'datalake',\n\tfolderPath: 'curated/master data/customer/erp/SalesLT_Customer_Synapse',\n\ttruncate: false,\n\tmergeSchema: true,\n\tvacuum: 0,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['CustomerID'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> CustomerCuratedDelta"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_datalake_customer')]",
+				"[concat(variables('factoryId'), '/linkedServices/ls_ADLSGen2')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/dim_customer')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -3755,7 +3900,7 @@
 							"name": "AlterRow"
 						}
 					],
-					"script": "parameters{\n\tJobNumber as integer (1)\n}\nsource(output(\n\t\tCustomerID as integer,\n\t\tNameStyle as boolean,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinferDriftedColumnTypes: true,\n\tformat: 'parquet') ~> srcCustomer\nsource(output(\n\t\tCustomerID as integer,\n\t\tAddressID as integer,\n\t\tAddressType as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinferDriftedColumnTypes: true,\n\tformat: 'parquet') ~> srcCustomerAddress\nsource(output(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvince as string,\n\t\tCountryRegion as string,\n\t\tPostalCode as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> srcAddress\nsrcCustomer, srcCustomerAddress lookup(srcCustomer@CustomerID == srcCustomerAddress@CustomerID,\n\tmultiple: false,\n\tpickup: 'first',\n\tasc(AddressID, true),\n\tasc(AddressType, true),\n\tbroadcast: 'auto')~> LookupCustomerAddress\nLookupCustomerAddress select(mapColumn(\n\t\tCustomerID = srcCustomer@CustomerID,\n\t\tNameStyle,\n\t\tTitle,\n\t\tFirstName,\n\t\tMiddleName,\n\t\tLastName,\n\t\tSuffix,\n\t\tCompanyName,\n\t\tSalesPerson,\n\t\tEmailAddress,\n\t\tPhone,\n\t\tPasswordHash,\n\t\tPasswordSalt,\n\t\tModifiedDate = srcCustomer@ModifiedDate,\n\t\tAddressID,\n\t\tAddressType\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCustomerAddress\nSelectCustomerAddress, srcAddress lookup(SelectCustomerAddress@AddressID == srcAddress@AddressID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupAddress\nLookupAddress select(mapColumn(\n\t\tCustomerID,\n\t\tNameStyle,\n\t\tTitle,\n\t\tFirstName,\n\t\tMiddleName,\n\t\tLastName,\n\t\tSuffix,\n\t\tCompanyName,\n\t\tSalesPerson,\n\t\tEmailAddress,\n\t\tPhone,\n\t\tPasswordHash,\n\t\tPasswordSalt,\n\t\tModifiedDate = SelectCustomerAddress@ModifiedDate,\n\t\tAddressID = SelectCustomerAddress@AddressID,\n\t\tAddressType,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tStateProvince,\n\t\tCountryRegion,\n\t\tPostalCode\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectAddress\nSelectAddress derive(FullName = trim(concat(iifNull(FirstName,\"\"), \" \", iifNull(MiddleName,\"\"), \" \", iifNull(LastName,\"\"), \" \", iifNull(Suffix,\"\")\r\n)\r\n),\n\t\teach(match(type==\"string\"), $$ = iifNull(trim($$), \"\"))) ~> DerivedCustomerColumns\nDerivedCustomerColumns alterRow(upsertIf(true())) ~> AlterRow\nAlterRow sink(input(\n\t\tCustomer_sk as integer,\n\t\tCustomerID as integer,\n\t\tNameStyle as boolean,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tFullName as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\tModifiedDate as timestamp,\n\t\tAddressID as integer,\n\t\tAddressType as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvince as string,\n\t\tCountryRegion as string,\n\t\tPostalCode as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['CustomerID'],\n\tformat: 'table',\n\tmapColumn(\n\t\tCustomerID,\n\t\tNameStyle,\n\t\tTitle,\n\t\tFirstName,\n\t\tMiddleName,\n\t\tLastName,\n\t\tSuffix,\n\t\tFullName,\n\t\tCompanyName,\n\t\tSalesPerson,\n\t\tEmailAddress,\n\t\tPhone,\n\t\tPasswordHash,\n\t\tPasswordSalt,\n\t\tModifiedDate,\n\t\tAddressID,\n\t\tAddressType,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tStateProvince,\n\t\tCountryRegion,\n\t\tPostalCode\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SinkDimCustomer"
+					"script": "parameters{\n\tJobNumber as integer (1)\n}\nsource(output(\n\t\tCustomerID as integer,\n\t\tNameStyle as boolean,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tinferDriftedColumnTypes: true,\n\tformat: 'parquet') ~> srcCustomer\nsource(output(\n\t\tCustomerID as integer,\n\t\tAddressID as integer,\n\t\tAddressType as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tinferDriftedColumnTypes: true,\n\tformat: 'parquet') ~> srcCustomerAddress\nsource(output(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvince as string,\n\t\tCountryRegion as string,\n\t\tPostalCode as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> srcAddress\nsrcCustomer, srcCustomerAddress lookup(srcCustomer@CustomerID == srcCustomerAddress@CustomerID,\n\tmultiple: false,\n\tpickup: 'first',\n\tasc(AddressID, true),\n\tasc(AddressType, true),\n\tbroadcast: 'auto')~> LookupCustomerAddress\nLookupCustomerAddress select(mapColumn(\n\t\tCustomerID = srcCustomer@CustomerID,\n\t\tNameStyle,\n\t\tTitle,\n\t\tFirstName,\n\t\tMiddleName,\n\t\tLastName,\n\t\tSuffix,\n\t\tCompanyName,\n\t\tSalesPerson,\n\t\tEmailAddress,\n\t\tPhone,\n\t\tPasswordHash,\n\t\tPasswordSalt,\n\t\tModifiedDate = srcCustomer@ModifiedDate,\n\t\tAddressID,\n\t\tAddressType\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCustomerAddress\nSelectCustomerAddress, srcAddress lookup(SelectCustomerAddress@AddressID == srcAddress@AddressID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupAddress\nLookupAddress select(mapColumn(\n\t\tCustomerID,\n\t\tNameStyle,\n\t\tTitle,\n\t\tFirstName,\n\t\tMiddleName,\n\t\tLastName,\n\t\tSuffix,\n\t\tCompanyName,\n\t\tSalesPerson,\n\t\tEmailAddress,\n\t\tPhone,\n\t\tPasswordHash,\n\t\tPasswordSalt,\n\t\tModifiedDate = SelectCustomerAddress@ModifiedDate,\n\t\tAddressID = SelectCustomerAddress@AddressID,\n\t\tAddressType,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tStateProvince,\n\t\tCountryRegion,\n\t\tPostalCode\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectAddress\nSelectAddress derive(FullName = trim(concat(iifNull(FirstName,\"\"), \" \", iifNull(MiddleName,\"\"), \" \", iifNull(LastName,\"\"), \" \", iifNull(Suffix,\"\")\r\n)\r\n),\n\t\teach(match(type==\"string\"), $$ = iifNull(trim($$), \"\"))) ~> DerivedCustomerColumns\nDerivedCustomerColumns alterRow(upsertIf(true())) ~> AlterRow\nAlterRow sink(input(\n\t\tCustomer_sk as integer,\n\t\tCustomerID as integer,\n\t\tNameStyle as boolean,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tFullName as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\tModifiedDate as timestamp,\n\t\tAddressID as integer,\n\t\tAddressType as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvince as string,\n\t\tCountryRegion as string,\n\t\tPostalCode as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['CustomerID'],\n\tformat: 'table',\n\tmapColumn(\n\t\tCustomerID,\n\t\tNameStyle,\n\t\tTitle,\n\t\tFirstName,\n\t\tMiddleName,\n\t\tLastName,\n\t\tSuffix,\n\t\tFullName,\n\t\tCompanyName,\n\t\tSalesPerson,\n\t\tEmailAddress,\n\t\tPhone,\n\t\tPasswordHash,\n\t\tPasswordSalt,\n\t\tModifiedDate,\n\t\tAddressID,\n\t\tAddressType,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tStateProvince,\n\t\tCountryRegion,\n\t\tPostalCode\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SinkDimCustomer"
 				}
 			},
 			"dependsOn": [
