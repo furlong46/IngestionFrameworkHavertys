@@ -32,7 +32,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "ds_datalake_customer",
+						"referenceName": "ds_datalake_customer_wFile",
 						"type": "DatasetReference"
 					}
 				],
