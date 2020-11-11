@@ -1,0 +1,34 @@
+{
+	"name": "Customer Curated",
+	"properties": {
+		"activities": [
+			{
+				"name": "dataflow_customer_delta",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "dataflow_customer_delta",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "Data Lake"
+		},
+		"annotations": []
+	}
+}
